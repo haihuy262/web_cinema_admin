@@ -47,6 +47,7 @@ E chỉ biết đến đây thôi :rofl:
 1. Sử dụng chữ thường và dấu gạch ngang
 
 - Ví dụ: feature/add-login-page, bugfix/fix-signup-error
+- Ví dụ tạo branch để code 1 giao diện web: feature/add-login-page
 
 2. Phân loại branch bằng tiền tố
 
