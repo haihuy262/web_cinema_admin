@@ -9,7 +9,8 @@
     - [2. Phân loại branch bằng tiền tố](#2-phân-loại-branch-bằng-tiền-tố)
   - [Quy tắc commit, giúp quản lý lịch sử commit](#quy-tắc-commit-giúp-quản-lý-lịch-sử-commit)
   - [Lưu ý quan trọng tránh conflix](#lưu-ý-quan-trọng-tránh-conflix)
-    - [Trước khi pull requests](#trước-khi-pull-requests)
+    - [1. Trước khi pull requests ( nên dùng )](#1-trước-khi-pull-requests--nên-dùng-)
+    - [2. Options, không cần dùng cũng được](#2-options-không-cần-dùng-cũng-được)
 
 ## Cài đặt và chạy
 
@@ -86,7 +87,7 @@ cho nội dung full màn. **_mt-5 ( margin top 5), p-3( padding 3 )_**
 
 ## Lưu ý quan trọng tránh conflix
 
-### Trước khi pull requests
+### 1. Trước khi pull requests ( nên dùng )
 
 Kiểm tra lại tên branch đã đặt đúng quy tắc chưa. Nếu có lỡ đặt tên branch sai cách thì đổi tên branch với 2 command sau:
 
@@ -105,7 +106,9 @@ Làm theo các bước sau:
 3. di chuyển về branch đang làm việc, sau đó `git rebase origin/developer`
 4. resolve conflict nếu có
 
-**_[options]_** Đây cũng là bước cuối cùng của việc chuẩn bị pull requests, đó chính là squash commit.
+### 2. Options, không cần dùng cũng được
+
+Đây cũng là bước cuối cùng của việc chuẩn bị pull requests, đó chính là squash commit.
 
 **Bước 1: Kiểm tra lịch sử commit**
 Trước tiên, bạn cần xem lại lịch sử commit để xác định bạn muốn squash những commit nào. Sử dụng lệnh sau:
