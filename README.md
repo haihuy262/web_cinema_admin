@@ -7,8 +7,6 @@
 [5. Quy tắc commit, giúp quản lý lịch sử commit](#quy-tắc-commit-giúp-quản-lý-lịch-sử-commit)
 [6. Lưu ý quan trọng tránh conflix](#lưu-ý-quan-trọng-tránh-conflix)
 
----
-
 ## Cài đặt và chạy
 
 ```
