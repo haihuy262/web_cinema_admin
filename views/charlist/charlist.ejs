@@ -1,0 +1,141 @@
+<%- include('../partials/header.ejs') %>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seat Management</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.16.13/antd.min.css">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+  <div class="container mt-5" style=" padding-top: 5%;">
+    <h2>Seat Management</h2>
+    <form id="seatForm">
+      <div class="form-row">
+        <div class="form-group col-md-4">
+          <label for="cinemaSelect">Cinema</label>
+          <select id="cinemaSelect" class="form-control">
+            <option selected disabled>Select Cinema...</option>
+            <option value="cinema1">Cinema 1</option>
+            <option value="cinema2">Cinema 2</option>
+            <!-- Add more options for other cinemas -->
+          </select>
+        </div>
+        <div class="form-group col-md-4">
+          <label for="roomSelect"> Room</label>
+          <select id="roomSelect" class="form-control">
+            <option selected disabled>Select Room...</option>
+            <option value="room1">Room 1</option>
+            <option value="room2">Room 2</option>
+            <!-- Add more options for other rooms -->
+          </select>
+        </div>
+        
+      </div>
+      <button type="button" class="btn btn-primary" onclick="addSeat()">Add Seat</button>
+    </form>
+    <br>
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>Stt</th>
+          <th>Seat Number</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="seatTableBody">
+        <!-- Dynamic content for seats will be added here -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Modal Xác nhận Xóa Seat -->
+  <div class="modal fade" id="deleteSeatModal" tabindex="-1" role="dialog" aria-labelledby="deleteSeatModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteSeatModalLabel">Xác nhận Xóa Ghế</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>Bạn có chắc chắn muốn xóa ghế này?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
+          <button type="button" class="btn btn-danger" onclick="deleteSeat()">Xóa</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+  <script>
+    // Mock data for seats (you can replace this with actual dynamic data from backend)
+    let seatsData = [
+      { id: 1, seatNumber: "A1", status: "Booked" },
+      { id: 2, seatNumber: "A2", status: "Available" },
+      { id: 3, seatNumber: "A3", status: "Booked" },
+      { id: 4, seatNumber: "B1", status: "Available" },
+      { id: 5, seatNumber: "B2", status: "Available" }
+    ];
+
+    // Function to populate seat table
+    function populateSeatTable() {
+      let seatTableBody = document.getElementById("seatTableBody");
+      seatTableBody.innerHTML = "";
+      seatsData.forEach((seat, index) => {
+        let row = `<tr>
+                    <td>${index + 1}</td>
+                    <td>${seat.seatNumber}</td>
+                    <td>${seat.status}</td>
+                    <td>
+                      <button class="btn btn-info" onclick="editSeat(${seat.id})">Edit</button>
+                      <button class="btn btn-danger" data-toggle="modal" data-target="#deleteSeatModal">Delete</button>
+                    </td>
+                  </tr>`;
+        seatTableBody.innerHTML += row;
+      });
+    }
+
+    // Function to add a new seat (mock implementation, replace with actual logic)
+    function addSeat() {
+      alert("Add Seat function called.");
+      // Implement your logic to add seat here
+    }
+
+    // Function to delete a seat (mock implementation, replace with actual logic)
+    function deleteSeat() {
+      alert("Delete Seat function called.");
+      // Implement your logic to delete seat here
+    }
+
+    // Function to edit a seat (mock implementation, replace with actual logic)
+    function editSeat(seatId) {
+      alert("Edit Seat function called for Seat ID: " + seatId);
+      // Implement your logic to edit seat here
+    }
+
+    // Event listener to dynamically update seat list based on selected cinema and room
+    document.getElementById("cinemaSelect").addEventListener("change", function() {
+      // Implement logic to fetch seats for selected cinema and room and update #seatList
+      alert("Cinema selected: " + this.value);
+    });
+
+    document.getElementById("roomSelect").addEventListener("change", function() {
+      // Implement logic to fetch seats for selected cinema and room and update #seatList
+      alert("Room selected: " + this.value);
+    });
+
+    // Initialize seat table on page load
+    populateSeatTable();
+  </script>
+</body>
+</html>
