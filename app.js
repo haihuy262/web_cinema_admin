@@ -8,7 +8,11 @@ var dashboardRouter = require("./routes/dashboard");
 var employeeRouter = require("./routes/employee");
 var customerRouter = require("./routes/customer");
 var orderRouter = require("./routes/order");
-
+var movieRouter = require("./routes/movie");
+var charRouter = require("./routes/char");
+var cinemaRouter = require("./routes/cinema");
+var discountRouter = require("./routes/discount");
+var serviceRouter = require("./routes/service");
 var app = express();
 
 // view engine setup
@@ -25,7 +29,11 @@ app.use("/dashboard", dashboardRouter);
 app.use("/employee", employeeRouter);
 app.use("/customer", customerRouter);
 app.use("/order", orderRouter);
-
+app.use("/movie", movieRouter);
+app.use("/char", charRouter);
+app.use("/cinema", cinemaRouter);
+app.use("/discount", discountRouter);
+app.use("/service", serviceRouter);
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));
