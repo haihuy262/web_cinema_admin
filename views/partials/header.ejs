@@ -84,17 +84,17 @@
                       >Tổng quan</a
                     >
                   </li>
-                  <li><hr class="dropdown-divider" /></li>
+                  <!-- <li><hr class="dropdown-divider" /></li> -->
                   <li>
-                    <a class="dropdown-item" href="/dashboard/revenue_movie"
+                    <!-- <a class="dropdown-item" href="/dashboard/revenue_movie"
                       >Doanh thu theo phim</a
-                    >
+                    > -->
                   </li>
-                  <li><hr class="dropdown-divider" /></li>
+                  <!-- <li><hr class="dropdown-divider" /></li> -->
                   <li>
-                    <a class="dropdown-item" href="/dashboard/revenue_cinema"
+                    <!-- <a class="dropdown-item" href="/dashboard/revenue_cinema"
                       >Doanh thu theo rạp</a
-                    >
+                    > -->
                   </li>
                 </ul>
               </li>
@@ -179,11 +179,37 @@
                 </a>
                 <ul class="dropdown-menu dropdown-menu-dark">
                   <li>
-                    <a class="dropdown-item" href="#">Danh sách phim</a>
+                    <a class="dropdown-item" href="/movie/list"
+                      >Danh sách phim</a
+                    >
                   </li>
                   <li><hr class="dropdown-divider" /></li>
                   <li>
-                    <a class="dropdown-item" href="#">Tạo phim</a>
+                    <a class="dropdown-item" href="/movie/add">Tạo Phim</a>
+                  </li>
+                  <hr class="dropdown-divider" />
+                  <li>
+                    <a class="dropdown-item" href="/movie/listActor"
+                      >Danh Sách Tác Giả</a
+                    >
+                  </li>
+                  <hr class="dropdown-divider" />
+                  <li>
+                    <a class="dropdown-item" href="/movie/actor"
+                      >Thêm Tác Giả</a
+                    >
+                  </li>
+                  <hr class="dropdown-divider" />
+                  <li>
+                    <a class="dropdown-item" href="/movie/listDirectors"
+                      >Danh Sách Diễn Viên</a
+                    >
+                  </li>
+                  <hr class="dropdown-divider" />
+                  <li>
+                    <a class="dropdown-item" href="/movie/addDirectors"
+                      >Thêm Diễn Viên</a
+                    >
                   </li>
                 </ul>
               </li>
@@ -196,16 +222,48 @@
                   role="button"
                   data-bs-toggle="dropdown"
                 >
+                  <i class="bi bi-film h5 me-2"></i>
+                  <p class="dropdown-toggle h5">Quản lý ghế</p>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-dark">
+                  <li>
+                    <a class="dropdown-item" href="/char/list">Danh sách ghế</a>
+                  </li>
+                </ul>
+              </li>
+              <li class="nav-item dropdown mt-1">
+                <a
+                  class="nav-link d-flex"
+                  href="#"
+                  role="button"
+                  data-bs-toggle="dropdown"
+                >
                   <i class="bi bi-camera-reels h5 me-2"></i>
                   <p class="dropdown-toggle h5">Quản lý rạp phim</p>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-dark">
                   <li>
-                    <a class="dropdown-item" href="#">Danh sách rạp phim</a>
+                    <a class="dropdown-item" href="/cinema/cinemaList"
+                      >Danh sách rạp phim</a
+                    >
                   </li>
                   <li><hr class="dropdown-divider" /></li>
                   <li>
-                    <a class="dropdown-item" href="#">Tạo rạp phim</a>
+                    <a class="dropdown-item" href="/cinema/cinemaAdd"
+                      >Tạo rạp phim</a
+                    >
+                  </li>
+                  <li><hr class="dropdown-divider" /></li>
+                  <li>
+                    <a class="dropdown-item" href="/cinema/roomList"
+                      >Danh sách phòng chiếu</a
+                    >
+                  </li>
+                  <li><hr class="dropdown-divider" /></li>
+                  <li>
+                    <a class="dropdown-item" href="/cinema/roomAdd"
+                      >Tạo phòng chiếu</a
+                    >
                   </li>
                 </ul>
               </li>
@@ -223,11 +281,15 @@
                 </a>
                 <ul class="dropdown-menu dropdown-menu-dark">
                   <li>
-                    <a class="dropdown-item" href="#">Danh sách khuyến mãi </a>
+                    <a class="dropdown-item" href="/discount/discountList"
+                      >Danh sách khuyến mãi
+                    </a>
                   </li>
                   <li><hr class="dropdown-divider" /></li>
                   <li>
-                    <a class="dropdown-item" href="#">Tạo khuyến mãi</a>
+                    <a class="dropdown-item" href="/discount/discountAdd"
+                      >Tạo khuyến mãi</a
+                    >
                   </li>
                 </ul>
               </li>
@@ -245,11 +307,15 @@
                 </a>
                 <ul class="dropdown-menu dropdown-menu-dark">
                   <li>
-                    <a class="dropdown-item" href="#">Danh sách dịch vụ </a>
+                    <a class="dropdown-item" href="/service/serviceList"
+                      >Danh sách dịch vụ
+                    </a>
                   </li>
                   <li><hr class="dropdown-divider" /></li>
                   <li>
-                    <a class="dropdown-item" href="#">Tạo dịch vụ</a>
+                    <a class="dropdown-item" href="/service/serviceAdd"
+                      >Tạo dịch vụ</a
+                    >
                   </li>
                 </ul>
               </li>

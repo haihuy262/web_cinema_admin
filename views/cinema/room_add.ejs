@@ -1,0 +1,73 @@
+<%- include('../partials/header.ejs') %>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Room</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.16.13/antd.min.css">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+  <div class="container mt-5" style="padding: 3%;">
+    <h2>Add Room</h2>
+    <form id="addRoomForm">
+      <div class="form-group">
+        <label for="name">Name:</label>
+        <input type="text" class="form-control" id="name" name="name" required>
+      </div>
+      <div class="form-group">
+        <label for="capacity">Capacity:</label>
+        <input type="number" class="form-control" id="capacity" name="capacity" required>
+      </div>
+      <div class="form-group">
+        <label for="status">Status:</label>
+        <select class="form-control" id="status" name="status" required>
+          <option value="Active">Active</option>
+          <option value="Inactive">Inactive</option>
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary">Add Room</button>
+    </form>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+  <script>
+    // Example: Handle form submission for adding room
+    document.getElementById('addRoomForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+      
+      const name = document.getElementById('name').value;
+      const capacity = document.getElementById('capacity').value;
+      const status = document.getElementById('status').value;
+
+      // Replace with actual AJAX request to backend
+      // Example: Send data to backend API
+      // $.ajax({
+      //   url: '/api/add-room',
+      //   method: 'POST',
+      //   data: { name, capacity, status },
+      //   success: function(response) {
+      //     console.log('Room added successfully:', response);
+      //     // Example: Redirect to rooms list page
+      //     // window.location.href = '/rooms';
+      //   },
+      //   error: function(err) {
+      //     console.error('Error adding room:', err);
+      //     // Handle error
+      //   }
+      // });
+
+      // Example: Logging data for demonstration
+      console.log('Adding new room:', { name, capacity, status });
+
+      // Reset form after submission (optional)
+      this.reset();
+    });
+  </script>
+</body>
+</html>
