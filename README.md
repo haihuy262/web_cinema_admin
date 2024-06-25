@@ -2,6 +2,7 @@
 
 - [Mục lục](#mục-lục)
   - [Cài đặt và chạy](#cài-đặt-và-chạy)
+  - [Git](#git)
   - [Folder làm việc chính](#folder-làm-việc-chính)
   - [Ghi chú](#ghi-chú)
   - [Quy tắc đặt tên branch](#quy-tắc-đặt-tên-branch)
@@ -21,6 +22,20 @@ npm i
 ```
 npm start
 ```
+
+---
+
+## Git
+
+1. `git status --short` ( kiểm tra trạng thái của kho lưu trữ ( `??` Tập tin không bị theo dõi, `A` Tệp được thêm vào giai đoạn, `M` Tệp đã sửa đổi, `D` Các tệp đã xoá ))
+2. `git add` ( thêm các tập tin và kho lưu trữ )
+3. `git commit -m "message"` ( tạo một commit )
+4. `git push -u origin developer` ( push commit lên repo, trong đó `origin` là tên **remote**, `developer` là **branch** cần push lên )
+5. `git remote add origin + link github` ( tạo một remote từ local lên repo, `origin` là tên của **remote**, `link github` là link repo )
+6. `git log --oneline` ( xem lịch sử commit trên 1 dòng )
+7. `git show c0a5695` ( hiển thị những thay đổi của commit, `c0a5695` là mã **commit-hash** khi sử dụng `git log --oneline` )
+8. `git stash` ( lưu trữ những thay đổi hiện tại, có thể chuyển sang nhánh khác mà không lo mất dữ liệu )
+9. `git stash pop` ( khôi phục những thay đổi, nếu đã sử dụng `git stash` )
 
 ---
 
