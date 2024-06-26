@@ -13,6 +13,7 @@ var charRouter = require("./routes/char");
 var cinemaRouter = require("./routes/cinema");
 var discountRouter = require("./routes/discount");
 var serviceRouter = require("./routes/service");
+var loginRouter = require("./routes/login");
 var app = express();
 
 // view engine setup
@@ -25,6 +26,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
+app.use("/", loginRouter);
 app.use("/dashboard", dashboardRouter);
 app.use("/employee", employeeRouter);
 app.use("/customer", customerRouter);
@@ -34,6 +36,7 @@ app.use("/char", charRouter);
 app.use("/cinema", cinemaRouter);
 app.use("/discount", discountRouter);
 app.use("/service", serviceRouter);
+
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));
