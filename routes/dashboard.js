@@ -1,10 +1,12 @@
 var express = require("express");
 var router = express.Router();
 var dashboardController = require("../controller/dashboard.controller.js");
+var authMiddleware = require("../middleware/authMiddleware");
 
-/* GET home page. */
-router.get("/overview", dashboardController.getOverview);
-router.get("/revenue_cinema", dashboardController.getRevenueCinema);
-router.get("/revenue_movie", dashboardController.getRevenueMovie);
+router.get(
+  "/overview",
+  authMiddleware.requireLogin,
+  dashboardController.getOverview
+);
 
 module.exports = router;
