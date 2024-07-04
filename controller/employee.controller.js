@@ -105,8 +105,9 @@ exports.deleteEmployee = async (req, res, next) => {
         },
       }
     );
-    res.redirect("/employee/list");
+    res.json({ success: true });
   } catch (error) {
     console.log(error);
+    res.json({ success: false });
   }
 };
