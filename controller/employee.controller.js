@@ -1,5 +1,20 @@
+const axios = require("axios");
+
 exports.listEmployee = async (req, res, next) => {
-  res.render("../views/manager/employee/listEmployee.ejs");
+  const token = req.session.admin.token;
+
+  try {
+    const response = await axios.get("http://139.180.132.97:3000/users/staff", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const staffData = response.data.getall;
+    res.render("../views/manager/employee/listEmployee.ejs", { staffData });
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 exports.addEmployee = async (req, res, next) => {
