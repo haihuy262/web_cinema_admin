@@ -1,80 +1,93 @@
 <%- include('../../partials/header.ejs') %>
-<div class="container mt-5 p-3">
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+/>
+<div class="container-fluid mt-5 p-3">
   <h2 class="text-center mt-4">Chi tiết nhân viên</h2>
-  <div class="mb-3 ms-3">
-    <img
-      src="/images/avatar.jpg"
-      class="rounded-circle"
-      width="150"
-      height="150"
-    />
+  <div class="card container-fluid mt-5">
+    <div class="row">
+      <div class="col-md-4 p-1">
+        <img class="card-img-top" src="/uploads/avatar.jpg" alt="Card image" />
+      </div>
+      <div class="col-md-8">
+        <div class="card-body">
+          <h4 class="card-title">Họ Tên</h4>
+          <p class="card-text"><%= dataStaffID.name %></p>
+          <h4 class="card-title">Email</h4>
+          <p class="card-text"><%= dataStaffID.email %></p>
+          <h4 class="card-title">Số điện thoại</h4>
+          <p class="card-text"><%= dataStaffID.number_phone %></p>
+          <h4 class="card-title">Ngày tháng năm sinh</h4>
+          <p class="card-text"><%= dataStaffID.date_of_birth %></p>
+          <h4 class="card-title">Quyền</h4>
+          <p class="card-text"><%= dataStaffID.role %></p>
+          <h4 class="card-title">Trạng thái</h4>
+          <p class="card-text"><%= dataStaffID.status %></p>
+          <h4 class="card-title">Giới tính</h4>
+          <p class="card-text"><%= dataStaffID.gender %></p>
+          <button onclick="window.history.back()" class="btn btn-secondary">
+            Quay lại
+          </button>
+          <a href="/employee/edit/:id" class="btn btn-primary"
+            >Sửa thông tin nhân viên</a
+          >
+          <!-- Button trigger modal delete -->
+          <button
+            type="button"
+            class="btn btn-danger"
+            data-bs-toggle="modal"
+            data-bs-target="#exampleModal"
+          >
+            Xoá nhân viên
+          </button>
+
+          <!-- Modal -->
+          <div
+            class="modal fade"
+            id="exampleModal"
+            tabindex="-1"
+            aria-labelledby="exampleModalLabel"
+            aria-hidden="true"
+          >
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h1 class="modal-title fs-5" id="exampleModalLabel">
+                    <i class="fas fa-exclamation-triangle text-danger"></i> Xoá
+                    nhân viên
+                  </h1>
+                  <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                  ></button>
+                </div>
+                <div class="modal-body">
+                  Bạn có chắc muốn xoá nhân viên này?
+                </div>
+                <div class="modal-footer">
+                  <button
+                    type="button"
+                    class="btn btn-secondary"
+                    data-bs-dismiss="modal"
+                  >
+                    Close
+                  </button>
+                  <a
+                    type="button"
+                    class="btn btn-danger"
+                    href="/employee/delete/<%= dataStaffID._id %>"
+                  >
+                    Xoá
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-  <button class="btn btn-warning">Thay đổi ảnh đại diện</button>
-  <form>
-    <div class="mb-3 mt-3">
-      <label for="fullName" class="form-label required">Họ Tên</label>
-      <input
-        type="text"
-        class="form-control"
-        id="fullName"
-        placeholder="Nhập họ tên"
-        readonly
-      />
-    </div>
-    <div class="mb-3">
-      <label for="email" class="form-label required">Email</label>
-      <input
-        type="email"
-        class="form-control"
-        id="email"
-        placeholder="Nhập email"
-        readonly
-      />
-    </div>
-    <div class="mb-3">
-      <label for="phone" class="form-label required">Số điện thoại</label>
-      <input
-        type="tel"
-        class="form-control"
-        id="phone"
-        placeholder="Nhập số điện thoại"
-        readonly
-      />
-    </div>
-    <div class="mb-3">
-      <label for="birthdate" class="form-label">Ngày tháng năm sinh</label>
-      <input type="date" class="form-control" id="birthdate" readonly />
-    </div>
-    <div class="mb-3">
-      <label for="role" class="form-label required">Quyền</label>
-      <select class="form-select" id="role" required>
-        <option value="">Chọn quyền</option>
-        <option value="user">User</option>
-        <option value="nhân viên">Staff</option>
-      </select>
-    </div>
-    <div class="mb-3">
-      <label for="role" class="form-label required">Trạng thái</label>
-      <select class="form-select" id="role" required>
-        <option value="">Chọn trạng thái</option>
-        <option value="user">Active</option>
-        <option value="nhân viên">Close</option>
-      </select>
-    </div>
-    <div class="mb-3">
-      <label for="role" class="form-label required">Giới tính</label>
-      <select class="form-select" id="role" required>
-        <option value="">Chọn giới tính</option>
-        <option value="nam">Nam</option>
-        <option value="nữ">Nữ</option>
-      </select>
-    </div>
-    <button onclick="window.history.back()" class="btn btn-secondary">
-      Quay lại
-    </button>
-    <a href="/employee/edit/:id" class="btn btn-primary"
-      >Sửa thông tin nhân viên</a
-    >
-    <button class="btn btn-danger">Xoá nhân viên</button>
-  </form>
 </div>

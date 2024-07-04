@@ -27,5 +27,10 @@ router.post(
   uploadImage.single("image"),
   employeeController.addEmployee
 );
+router.get(
+  "/delete/:id",
+  authMiddleware.requireLogin,
+  employeeController.deleteEmployee
+);
 
 module.exports = router;

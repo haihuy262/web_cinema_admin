@@ -71,5 +71,42 @@ exports.editEmployee = async (req, res, next) => {
 };
 
 exports.detailsEmployee = async (req, res, next) => {
-  res.render("../views/manager/employee/detailsEmployee.ejs");
+  const id = req.params.id;
+  const token = req.session.admin.token;
+
+  try {
+    const response = await axios.get(
+      `http://139.180.132.97:3000/users/staff/${id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    const dataStaffID = response.data.getstaff;
+    res.render("../views/manager/employee/detailsEmployee.ejs", {
+      dataStaffID,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+exports.deleteEmployee = async (req, res, next) => {
+  const id = req.params.id;
+  const token = req.session.admin.token;
+
+  try {
+    const response = await axios.delete(
+      `http://139.180.132.97:3000/users/${id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    res.redirect("/employee/list");
+  } catch (error) {
+    console.log(error);
+  }
 };
