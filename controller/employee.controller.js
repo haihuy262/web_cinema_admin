@@ -1,4 +1,5 @@
 const axios = require("axios");
+var fs = require("fs");
 
 exports.getEmployee = async (req, res, next) => {
   res.render("../views/manager/employee/addEmployee.ejs");
@@ -23,15 +24,17 @@ exports.listEmployee = async (req, res, next) => {
 
 exports.addEmployee = async (req, res, next) => {
   try {
-    const {
-      name,
-      email,
-      password,
-      date_of_birth,
-      number_phone,
-      gender,
-      image,
-    } = req.body;
+    let image = "";
+
+    console.log("=== check file ====", req.file);
+
+    if (req.file && req.file.fieldname === "image") {
+      fs.renameSync(req.file.path, "./public/uploads/" + req.file.originalname);
+      image = "/uploads/" + req.file.originalname;
+    }
+
+    const { name, email, password, date_of_birth, number_phone, gender } =
+      req.body;
 
     const token = req.session.admin.token;
 

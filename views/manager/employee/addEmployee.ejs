@@ -18,7 +18,7 @@
   <div class="alert alert-danger" role="alert"><%= error %></div>
   <% } %>
   <!-- ======================= -->
-  <form action="/employee/add" method="post">
+  <form method="post" enctype="multipart/form-data">
     <div class="mb-3">
       <label for="fullName" class="form-label required">Họ Tên</label>
       <input
