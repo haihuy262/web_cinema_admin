@@ -31,9 +31,9 @@ exports.postLogin = async (req, res, next) => {
       response.data.admin.data.password === password
     ) {
       req.session.admin = {
-        id: response.data.admin._id,
-        name: response.data.admin.name,
-        role: response.data.admin.role,
+        id: response.data.admin.data._id,
+        name: response.data.admin.data.name,
+        role: response.data.admin.data.role,
         token: response.data.token.access_token,
       };
       res.render("../views/login/login.ejs", {
