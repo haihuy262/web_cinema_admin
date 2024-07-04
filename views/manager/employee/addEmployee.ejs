@@ -1,10 +1,28 @@
 <%- include('../../partials/header.ejs') %>
 <div class="container mt-5 p-3">
   <h2 class="text-center mt-4">Tạo nhân viên</h2>
-  <form>
+  <!-- ==== alert success ==== -->
+  <% if (typeof success !== 'undefined') { %>
+  <div class="alert alert-success" role="alert" id="success-alert">
+    <%= success %>
+    <script>
+      setTimeout(function () {
+        window.location.href = "/employee/list";
+      }, 1000);
+    </script>
+  </div>
+  <% } %>
+  <!-- ======================= -->
+  <!-- ===== alert error ===== -->
+  <% if (typeof error !== 'undefined') { %>
+  <div class="alert alert-danger" role="alert"><%= error %></div>
+  <% } %>
+  <!-- ======================= -->
+  <form action="/employee/add" method="post">
     <div class="mb-3">
       <label for="fullName" class="form-label required">Họ Tên</label>
       <input
+        name="name"
         type="text"
         class="form-control"
         id="fullName"
@@ -15,6 +33,7 @@
     <div class="mb-3">
       <label for="email" class="form-label required">Email</label>
       <input
+        name="email"
         type="email"
         class="form-control"
         id="email"
@@ -25,6 +44,7 @@
     <div class="mb-3">
       <label for="phone" class="form-label required">Số điện thoại</label>
       <input
+        name="number_phone"
         type="tel"
         class="form-control"
         id="phone"
@@ -34,11 +54,18 @@
     </div>
     <div class="mb-3">
       <label for="birthdate" class="form-label">Ngày tháng năm sinh</label>
-      <input type="date" class="form-control" id="birthdate" required />
+      <input
+        type="date"
+        class="form-control"
+        id="birthdate"
+        name="date_of_birth"
+        required
+      />
     </div>
     <div class="mb-3">
       <label for="password" class="form-label required">Mật Khẩu</label>
       <input
+        name="password"
         type="password"
         class="form-control"
         id="password"
@@ -56,7 +83,7 @@
     </div> -->
     <div class="mb-3">
       <label for="role" class="form-label required">Giới tính</label>
-      <select class="form-select" id="role" required>
+      <select name="gender" class="form-select" id="role" required>
         <option value="">Chọn giới tính</option>
         <option value="nam">Nam</option>
         <option value="nữ">Nữ</option>
@@ -65,11 +92,11 @@
     <div class="mb-3">
       <label for="imageUpload" class="form-label">Thêm ảnh</label>
       <input
+        name="image"
         type="file"
         class="form-control"
         id="imageUpload"
         accept="image/*"
-        required
       />
     </div>
     <img

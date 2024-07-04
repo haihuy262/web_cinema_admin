@@ -8,7 +8,7 @@ router.get(
   authMiddleware.requireLogin,
   employeeController.listEmployee
 );
-router.get("/add", authMiddleware.requireLogin, employeeController.addEmployee);
+router.get("/add", authMiddleware.requireLogin, employeeController.getEmployee);
 router.get(
   "/edit/:id",
   authMiddleware.requireLogin,
@@ -18,6 +18,11 @@ router.get(
   "/details/:id",
   authMiddleware.requireLogin,
   employeeController.detailsEmployee
+);
+router.post(
+  "/add",
+  authMiddleware.requireLogin,
+  employeeController.addEmployee
 );
 
 module.exports = router;
