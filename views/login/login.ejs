@@ -26,6 +26,17 @@
               <% if (typeof error !== 'undefined') { %>
               <div class="alert alert-danger" role="alert"><%= error %></div>
               <% } %>
+              <!-- ==== alert success ==== -->
+              <% if (typeof success !== 'undefined') { %>
+              <div class="alert alert-success" role="alert" id="success-alert">
+                <%= success %>
+                <script>
+                  setTimeout(function () {
+                    window.location.href = "/dashboard/overview";
+                  }, 1000);
+                </script>
+              </div>
+              <% } %>
               <form id="loginForm" action="/login" method="post">
                 <div class="mb-3">
                   <label for="email" class="form-label">Tài khoản</label>

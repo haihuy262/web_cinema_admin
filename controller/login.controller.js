@@ -36,7 +36,9 @@ exports.postLogin = async (req, res, next) => {
         role: response.data.admin.role,
         token: response.data.token.access_token,
       };
-      res.redirect("/dashboard/overview");
+      res.render("../views/login/login.ejs", {
+        success: "Đăng nhập thành công.",
+      });
     } else {
       res.render("../views/login/login.ejs", {
         error: "Đăng nhập thất bại. Vui lòng thử lại.",
