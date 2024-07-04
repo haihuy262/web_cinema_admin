@@ -27,8 +27,8 @@ exports.postLogin = async (req, res, next) => {
       }
     );
     if (
-      response.data.admin.name === name &&
-      response.data.admin.password === password
+      response.data.admin.data.name === name &&
+      response.data.admin.data.password === password
     ) {
       req.session.admin = {
         id: response.data.admin._id,
