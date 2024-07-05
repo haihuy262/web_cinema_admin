@@ -5,6 +5,7 @@ var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 var crypto = require("crypto");
 var session = require("express-session");
+var bodyParser = require("body-parser");
 
 var dashboardRouter = require("./routes/dashboard");
 var employeeRouter = require("./routes/employee");
@@ -27,6 +28,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
 const secretKey = crypto.randomBytes(32).toString("hex");
 

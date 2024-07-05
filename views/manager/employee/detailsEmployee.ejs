@@ -1,80 +1,441 @@
 <%- include('../../partials/header.ejs') %>
-<div class="container mt-5 p-3">
-  <h2 class="text-center mt-4">Chi tiết nhân viên</h2>
-  <div class="mb-3 ms-3">
-    <img
-      src="/images/avatar.jpg"
-      class="rounded-circle"
-      width="150"
-      height="150"
-    />
-  </div>
-  <button class="btn btn-warning">Thay đổi ảnh đại diện</button>
-  <form>
-    <div class="mb-3 mt-3">
-      <label for="fullName" class="form-label required">Họ Tên</label>
-      <input
-        type="text"
-        class="form-control"
-        id="fullName"
-        placeholder="Nhập họ tên"
-        readonly
-      />
-    </div>
-    <div class="mb-3">
-      <label for="email" class="form-label required">Email</label>
-      <input
-        type="email"
-        class="form-control"
-        id="email"
-        placeholder="Nhập email"
-        readonly
-      />
-    </div>
-    <div class="mb-3">
-      <label for="phone" class="form-label required">Số điện thoại</label>
-      <input
-        type="tel"
-        class="form-control"
-        id="phone"
-        placeholder="Nhập số điện thoại"
-        readonly
-      />
-    </div>
-    <div class="mb-3">
-      <label for="birthdate" class="form-label">Ngày tháng năm sinh</label>
-      <input type="date" class="form-control" id="birthdate" readonly />
-    </div>
-    <div class="mb-3">
-      <label for="role" class="form-label required">Quyền</label>
-      <select class="form-select" id="role" required>
-        <option value="">Chọn quyền</option>
-        <option value="user">User</option>
-        <option value="nhân viên">Staff</option>
-      </select>
-    </div>
-    <div class="mb-3">
-      <label for="role" class="form-label required">Trạng thái</label>
-      <select class="form-select" id="role" required>
-        <option value="">Chọn trạng thái</option>
-        <option value="user">Active</option>
-        <option value="nhân viên">Close</option>
-      </select>
-    </div>
-    <div class="mb-3">
-      <label for="role" class="form-label required">Giới tính</label>
-      <select class="form-select" id="role" required>
-        <option value="">Chọn giới tính</option>
-        <option value="nam">Nam</option>
-        <option value="nữ">Nữ</option>
-      </select>
-    </div>
-    <button onclick="window.history.back()" class="btn btn-secondary">
-      Quay lại
-    </button>
-    <a href="/employee/edit/:id" class="btn btn-primary"
-      >Sửa thông tin nhân viên</a
+<div class="container-fluid mt-5 p-3">
+  <div class="mt-5">
+    <div
+      class="alert alert-success alert-dismissible d-none position-absolute translate-middle-y ms-3 mt-3"
+      role="alert"
+      id="successAlert"
     >
-    <button class="btn btn-danger">Xoá nhân viên</button>
-  </form>
+      Xoá nhân viên thành công.
+      <button
+        type="button"
+        class="btn-close"
+        data-bs-dismiss="alert"
+        aria-label="Close"
+      ></button>
+    </div>
+  </div>
+  <div class="mt-5">
+    <div
+      class="alert alert-success alert-dismissible d-none position-absolute translate-middle-y ms-3 mt-3"
+      role="alert"
+      id="successUpdateAlert"
+    >
+      Sửa thông tin thành công.
+      <button
+        type="button"
+        class="btn-close"
+        data-bs-dismiss="alert"
+        aria-label="Close"
+      ></button>
+    </div>
+  </div>
+  <div
+    class="alert alert-danger alert-dismissible d-none position-absolute translate-middle-y ms-3 mt-3"
+    role="alert"
+    id="errorAlert"
+  >
+    Có lỗi xảy ra. Vui lòng thử lại sau.
+    <button
+      type="button"
+      class="btn-close"
+      data-bs-dismiss="alert"
+      aria-label="Close"
+    ></button>
+  </div>
+  <div class="text-center">
+    <h2 class="mt-4">Chi tiết nhân viên</h2>
+  </div>
+  <div class="card container mt-5">
+    <div class="row">
+      <div class="col-md-6 p-1">
+        <img
+          class="card-img-top"
+          src="<%= dataStaffID.image %>"
+          alt="Card image"
+          height="660"
+        />
+      </div>
+      <div class="col-md-6">
+        <div class="card-body">
+          <h5 class="card-title">Họ Tên</h5>
+          <p class="card-text"><%= dataStaffID.name %></p>
+          <hr />
+          <h5 class="card-title">Email</h5>
+          <p class="card-text"><%= dataStaffID.email %></p>
+          <hr />
+          <h5 class="card-title">Số điện thoại</h5>
+          <p class="card-text"><%= dataStaffID.number_phone %></p>
+          <hr />
+          <h5 class="card-title">Ngày tháng năm sinh</h5>
+          <p class="card-text"><%= dataStaffID.date_of_birth %></p>
+          <hr />
+          <h5 class="card-title">Quyền</h5>
+          <p class="card-text"><%= dataStaffID.role %></p>
+          <hr />
+          <h5 class="card-title">Trạng thái</h5>
+          <p class="card-text"><%= dataStaffID.status %></p>
+          <hr />
+          <h5 class="card-title">Giới tính</h5>
+          <p class="card-text"><%= dataStaffID.gender %></p>
+          <div class="row">
+            <!-- <a
+              href="/employee/edit/<%= dataStaffID._id %>"
+              class="btn btn-primary"
+              >Sửa thông tin nhân viên</a
+            > -->
+            <!-- Update Staff -->
+            <div class="col-sm-3">
+              <button
+                type="button"
+                class="btn btn-primary"
+                data-bs-toggle="modal"
+                data-bs-target="#updateModal"
+              >
+                Sửa thông tin
+              </button>
+              <form id="editForm">
+                <div
+                  class="modal fade"
+                  id="updateModal"
+                  tabindex="-1"
+                  aria-labelledby="updateModalLabel"
+                  aria-hidden="true"
+                >
+                  <div class="modal-dialog modal-dialog-centered modal-lg">
+                    <div class="modal-content">
+                      <!-- Modal Header -->
+                      <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="updateModalLabel">
+                          <i
+                            class="fas fa-solid fa-pen-to-square text-danger"
+                          ></i>
+                          Sửa thông tin nhân viên
+                        </h1>
+                        <button
+                          type="button"
+                          class="btn-close"
+                          data-bs-dismiss="modal"
+                          aria-label="Close"
+                        ></button>
+                      </div>
+                      <!-- Modal body -->
+                      <div class="modal-body">
+                        <div class="row">
+                          <div class="col-md-6">
+                            <div class="mb-3">
+                              <label for="imageUpload" class="form-label"
+                                >Thêm ảnh</label
+                              >
+                              <input
+                                name="image"
+                                type="file"
+                                class="form-control"
+                                id="imageUpload"
+                                accept="image/*"
+                              />
+                            </div>
+                            <img
+                              id="imagePreview"
+                              src="<%= dataStaffID.image %>"
+                              alt="Image Preview"
+                              width="100%"
+                              height="330"
+                            />
+                          </div>
+                          <div class="col-md-6">
+                            <div class="mb-3">
+                              <label for="fullName" class="form-label required"
+                                >Họ Tên</label
+                              >
+                              <input
+                                name="name"
+                                type="text"
+                                class="form-control"
+                                id="fullName"
+                                value="<%= dataStaffID.name %>"
+                                required
+                              />
+                            </div>
+                            <div class="mb-3">
+                              <label for="email" class="form-label required"
+                                >Email</label
+                              >
+                              <input
+                                name="email"
+                                type="email"
+                                class="form-control"
+                                id="email"
+                                value="<%= dataStaffID.email %>"
+                                required
+                              />
+                            </div>
+                            <div class="mb-3">
+                              <label for="phone" class="form-label required"
+                                >Số điện thoại</label
+                              >
+                              <input
+                                name="number_phone"
+                                type="tel"
+                                class="form-control"
+                                id="phone"
+                                value="<%= dataStaffID.number_phone %>"
+                                required
+                              />
+                            </div>
+                            <div class="mb-3">
+                              <label for="birthdate" class="form-label"
+                                >Ngày tháng năm sinh</label
+                              >
+                              <input
+                                type="text"
+                                class="form-control"
+                                id="birthdate"
+                                name="date_of_birth"
+                                value="<%= dataStaffID.date_of_birth %>"
+                                required
+                              />
+                            </div>
+                            <div class="mb-3">
+                              <label for="birthdate" class="form-label"
+                                >Giới tính</label
+                              >
+                              <input
+                                type="text"
+                                class="form-control"
+                                id="gender"
+                                name="gender"
+                                value="<%= dataStaffID.gender %>"
+                                required
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <!-- Modal footer -->
+                      <div class="modal-footer">
+                        <button
+                          type="button"
+                          class="btn btn-secondary"
+                          data-bs-dismiss="modal"
+                        >
+                          Close
+                        </button>
+                        <button
+                          type="button"
+                          class="btn btn-primary"
+                          id="confirmUpdate"
+                          data-bs-dismiss="modal"
+                        >
+                          Cập nhật
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+            <!-- Delete Staff -->
+            <div class="col-sm-3">
+              <button
+                type="button"
+                class="btn btn-danger"
+                data-bs-toggle="modal"
+                data-bs-target="#deleteModal"
+              >
+                Xoá nhân viên
+              </button>
+              <div
+                class="modal fade"
+                id="deleteModal"
+                tabindex="-1"
+                aria-labelledby="deleteModalLabel"
+                aria-hidden="true"
+              >
+                <div class="modal-dialog modal-dialog-centered">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h1 class="modal-title fs-5" id="deleteModalLabel">
+                        <i class="fas fa-exclamation-triangle text-danger"></i>
+                        Xoá nhân viên
+                      </h1>
+                      <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"
+                      ></button>
+                    </div>
+                    <div class="modal-body">
+                      Bạn có chắc muốn xoá nhân viên này?
+                    </div>
+                    <div class="modal-footer">
+                      <button
+                        type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal"
+                      >
+                        Close
+                      </button>
+                      <button
+                        type="button"
+                        class="btn btn-danger"
+                        id="confirmDelete"
+                        data-bs-dismiss="modal"
+                      >
+                        Xoá
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Doi mat khau -->
+            <div class="col-sm-3">
+              <button
+                type="button"
+                class="btn btn-warning"
+                data-bs-toggle="modal"
+                data-bs-target=""
+              >
+                Đổi mật khẩu
+              </button>
+            </div>
+            <!-- Quay lai -->
+            <div class="col-sm-3">
+              <button id="backList" class="btn btn-secondary">Quay lại</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Hien thi thong bao khi xoa thanh cong -->
+    <script>
+      document
+        .getElementById("confirmDelete")
+        .addEventListener("click", async function () {
+          const id = "<%= dataStaffID._id %>";
+          try {
+            const response = await fetch(`/employee/delete/${id}`, {
+              method: "DELETE",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            });
+
+            const result = await response.json();
+            if (result.success) {
+              const deleteModal = new bootstrap.Modal(
+                document.getElementById("deleteModal")
+              );
+              const successAlert = document.getElementById("successAlert");
+              successAlert.classList.remove("d-none");
+
+              setTimeout(function () {
+                deleteModal.hide();
+                window.location.href = "/employee/list";
+              }, 1000);
+            } else {
+              const errorAlert = document.getElementById("errorAlert");
+              errorAlert.classList.remove("d-none");
+
+              setTimeout(function () {
+                deleteModal.hide();
+              }, 3000);
+            }
+          } catch (error) {
+            console.error("Error:", error);
+
+            const errorAlert = document.getElementById("errorAlert");
+            errorAlert.classList.remove("d-none");
+
+            setTimeout(function () {
+              deleteModal.hide();
+            }, 3000);
+          }
+        });
+    </script>
+    <!-- Hien thi anh -->
+    <script>
+      document
+        .getElementById("imageUpload")
+        .addEventListener("change", function (event) {
+          const file = event.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+              const img = document.getElementById("imagePreview");
+              img.src = e.target.result;
+              img.classList.remove("d-none");
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+    </script>
+    <!-- Update -->
+    <script>
+      document
+        .getElementById("confirmUpdate")
+        .addEventListener("click", async function () {
+          const id = "<%= dataStaffID._id %>";
+          const token = "<%= token %>";
+          const name = document.getElementById("fullName").value;
+          const email = document.getElementById("email").value;
+          const number_phone = document.getElementById("phone").value;
+          const date_of_birth = document.getElementById("birthdate").value;
+          const gender = document.getElementById("gender").value;
+
+          try {
+            const response = await fetch(`/employee/edit/${id}`, {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                name,
+                email,
+                number_phone,
+                date_of_birth,
+                gender,
+              }),
+            });
+
+            const result = await response.json();
+            if (result.success) {
+              const successAlert =
+                document.getElementById("successUpdateAlert");
+              successAlert.classList.remove("d-none");
+
+              setTimeout(function () {
+                window.location.href = `/employee/details/${id}`;
+              }, 1000);
+            } else {
+              const errorAlert = document.getElementById("errorAlert");
+              errorAlert.classList.remove("d-none");
+
+              setTimeout(function () {
+                deleteModal.hide();
+              }, 3000);
+            }
+          } catch (error) {
+            console.error("Error:", error);
+
+            const errorAlert = document.getElementById("errorAlert");
+            errorAlert.classList.remove("d-none");
+
+            setTimeout(function () {
+              deleteModal.hide();
+            }, 3000);
+          }
+        });
+    </script>
+    <!-- Su kien back -->
+    <script>
+      document
+        .getElementById("backList")
+        .addEventListener("click", async function () {
+          window.location.href = "/employee/list";
+        });
+    </script>
+  </div>
 </div>

@@ -1,7 +1,12 @@
 var express = require("express");
 var router = express.Router();
 var customerController = require("../controller/customer.controller");
+var authMiddleware = require("../middleware/authMiddleware");
 
-router.get("/list", customerController.listCustomer);
+router.get(
+  "/list",
+  authMiddleware.requireLogin,
+  customerController.listCustomer
+);
 
 module.exports = router;
