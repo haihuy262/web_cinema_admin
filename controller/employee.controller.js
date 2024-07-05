@@ -67,7 +67,26 @@ exports.addEmployee = async (req, res, next) => {
 };
 
 exports.editEmployee = async (req, res, next) => {
-  res.render("../views/manager/employee/editEmployee.ejs");
+  const id = req.params.id;
+  const token = req.session.admin.token;
+
+  const { name, email, number_phone, date_of_birth, gender, image } = req.body;
+
+  try {
+    const response = await axios.put(
+      `http://139.180.132.97:3000/users/${id}`,
+      { name, email, number_phone, date_of_birth, gender, image },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    res.json({ success: true });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false });
+  }
 };
 
 exports.detailsEmployee = async (req, res, next) => {
@@ -86,6 +105,7 @@ exports.detailsEmployee = async (req, res, next) => {
     const dataStaffID = response.data.getstaff;
     res.render("../views/manager/employee/detailsEmployee.ejs", {
       dataStaffID,
+      token,
     });
   } catch (error) {
     console.log(error);
