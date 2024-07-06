@@ -1,5 +1,6 @@
 const axios = require("axios");
 var fs = require("fs");
+const FormData = require("form-data");
 
 exports.getEmployee = async (req, res, next) => {
   res.render("../views/manager/employee/addEmployee.ejs");
@@ -24,35 +25,43 @@ exports.listEmployee = async (req, res, next) => {
 
 exports.addEmployee = async (req, res, next) => {
   try {
-    let image = "";
+    const form = new FormData();
 
     if (req.file && req.file.fieldname === "image") {
-      fs.renameSync(req.file.path, "./public/uploads/" + req.file.originalname);
-      image = "/uploads/" + req.file.originalname;
+      form.append("image", fs.createReadStream(req.file.path), {
+        filename: req.file.originalname,
+      });
     }
 
     const { name, email, password, date_of_birth, number_phone, gender } =
       req.body;
 
+    form.append("name", name);
+    form.append("email", email);
+    form.append("password", password);
+    form.append("date_of_birth", date_of_birth);
+    form.append("number_phone", number_phone);
+    form.append("gender", gender);
+
     const token = req.session.admin.token;
 
     const response = await axios.post(
       "http://139.180.132.97:3000/users/staff",
-      {
-        name,
-        email,
-        password,
-        date_of_birth,
-        number_phone,
-        gender,
-        image,
-      },
+      form,
       {
         headers: {
           Authorization: `Bearer ${token}`,
+          ...form.getHeaders(),
+          // Đặt Header động: Để Axios tự động đặt header cho multipart/form-data
+          // bằng cách không đặt thủ công Content-Type.
         },
       }
     );
+
+    if (req.file && req.file.fieldname === "image") {
+      fs.unlinkSync(req.file.path);
+    }
+
     res.render("../views/manager/employee/addEmployee.ejs", {
       success: "Nhân viên đã được tạo thành công!",
     });
