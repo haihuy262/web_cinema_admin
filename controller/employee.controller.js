@@ -72,9 +72,6 @@ exports.editEmployee = async (req, res, next) => {
     image = "/uploads/" + req.file.originalname;
   }
 
-  console.log("==== edit check image ====", image);
-  console.log("=== check name formdata ===", req.body.name);
-
   const id = req.params.id;
   const token = req.session.admin.token;
 
