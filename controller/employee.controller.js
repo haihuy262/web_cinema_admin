@@ -65,14 +65,14 @@ exports.addEmployee = async (req, res, next) => {
 };
 
 exports.editEmployee = async (req, res, next) => {
-  let image = "";
+  let image = req.body.currentImage || "";
 
   if (req.file && req.file.fieldname === "image") {
     fs.renameSync(req.file.path, "./public/uploads/" + req.file.originalname);
     image = "/uploads/" + req.file.originalname;
   }
 
-  console.log("==== edit check image ====", req.file);
+  console.log("==== edit check image ====", image);
   console.log("=== check name formdata ===", req.body.name);
 
   const id = req.params.id;

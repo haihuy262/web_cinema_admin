@@ -6,7 +6,6 @@
       role="alert"
       id="successAlert"
     >
-      Xoá nhân viên thành công.
       <button
         type="button"
         class="btn-close"
@@ -120,7 +119,7 @@
                           <div class="col-md-6">
                             <div class="mb-3">
                               <label for="imageUpload" class="form-label"
-                                >Thêm ảnh</label
+                                >Sửa ảnh</label
                               >
                               <input
                                 name="image"
@@ -128,6 +127,12 @@
                                 class="form-control"
                                 id="imageUpload"
                                 accept="image/*"
+                              />
+                              <input
+                                type="hidden"
+                                name="currentImage"
+                                id="currentImage"
+                                value="<%= dataStaffID.image %>"
                               />
                             </div>
                             <img
@@ -380,6 +385,7 @@
           const date_of_birth = document.getElementById("birthdate").value;
           const gender = document.getElementById("gender").value;
           const image = document.getElementById("imageUpload").files[0];
+          const currentImage = document.getElementById("currentImage").value;
 
           console.log("check ejs image", image);
 
@@ -399,6 +405,7 @@
           formData.append("number_phone", number_phone);
           formData.append("date_of_birth", date_of_birth);
           formData.append("gender", gender);
+          formData.append("currentImage", currentImage);
           if (image) {
             formData.append("image", image);
           }
