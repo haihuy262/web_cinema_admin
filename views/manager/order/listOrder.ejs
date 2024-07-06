@@ -1,1 +1,46 @@
 <%- include('../../partials/header.ejs') %>
+<style>
+  .role-label {
+    background-color: #ffcccc;
+  }
+  .status-label {
+    background-color: #ccffcc;
+  }
+</style>
+<div class="container mt-5 p-3">
+  <div class="d-flex justify-content-between align-items-center mb-4 mt-5">
+    <button class="btn btn-primary">Refresh</button>
+    <h2 class="text-center flex-grow-1">Danh sách đơn hàng</h2>
+  </div>
+  <table class="table table-bordered table-hover align-middle text-center">
+    <thead class="thead-light">
+      <tr class="table table-secondary">
+        <th class="text-center">Mã đơn hàng</th>
+        <th class="text-center">Tên phim</th>
+        <th class="text-center">Suất chiếu</th>
+        <th class="text-center">Phòng chiếu</th>
+        <th class="text-center">Trạng thái</th>
+        <th class="text-center">Tổng tiền</th>
+        <th class="text-center">Ngày đặt</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="text-primary p-3">
+          <a href="/order/details/:id" class="nav-link">96175515</a>
+        </td>
+        <td class="text-primary">Monkey Man Báo Thù</td>
+        <td>ng.haihuy262@gmail.com</td>
+        <td>IMAX - HCinema Aeon Hà Đông</td>
+        <td class="text-center">
+          <span
+            class="status-label rounded-3 text-success border border-success ps-3 pe-3 pt-1 pb-1"
+            >Đã thanh toán</span
+          >
+        </td>
+        <td class="text-center">1,066,000</td>
+        <td class="text-center">22-06-2024</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

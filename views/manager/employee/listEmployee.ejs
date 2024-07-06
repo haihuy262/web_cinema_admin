@@ -1,1 +1,65 @@
 <%- include('../../partials/header.ejs') %>
+<style>
+  .role-label {
+    background-color: #ffcccc;
+  }
+  .status-label {
+    background-color: #ccffcc;
+  }
+</style>
+<div class="container mt-5 p-3">
+  <div class="d-flex justify-content-between align-items-center mb-4 mt-5">
+    <a href="/employee/add" class="btn btn-primary">Tạo nhân viên</a>
+    <h2 class="text-center flex-grow-1">Danh sách nhân viên</h2>
+  </div>
+  <table class="table table-bordered table-hover align-middle text-center">
+    <thead class="thead-light">
+      <tr class="table table-secondary">
+        <th class="text-center">STT</th>
+        <th class="text-center">Avatar</th>
+        <th class="text-center">Họ tên</th>
+        <th class="text-center">Email</th>
+        <th class="text-center">Số điện thoại</th>
+        <th class="text-center">Quyền</th>
+        <th class="text-center">Trạng thái</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% for(var i = 0; i < staffData.length; i++) { %>
+      <tr>
+        <td><%= i + 1 %></td>
+        <td>
+          <img
+            src="<%= staffData[i].image %>"
+            alt="Avatar 1"
+            class="rounded-3"
+            width="70"
+            height="70"
+          />
+        </td>
+        <td>
+          <a
+            class="nav-link text-primary"
+            href="/employee/details/<%= staffData[i]._id %>"
+            ><%= staffData[i].name %></a
+          >
+        </td>
+        <td><%= staffData[i].email %></td>
+        <td><%= staffData[i].number_phone %></td>
+        <td class="text-center">
+          <span
+            class="role-label rounded-pill text-danger border border-danger ps-3 pe-3 pt-1 pb-1"
+            ><%= staffData[i].role %></span
+          >
+        </td>
+        <td class="text-center">
+          <span
+            class="status-label border border-success rounded-pill text-success ps-3 pe-3 pt-1 pb-1"
+            ><%= staffData[i].status %></span
+          >
+        </td>
+      </tr>
+      <% } %>
+    </tbody>
+  </table>
+</div>

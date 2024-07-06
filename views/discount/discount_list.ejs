@@ -1,0 +1,78 @@
+<%- include('../partials/header.ejs') %>
+
+<div class="container mt-5" style="padding: 3%">
+  <h2 class="text-center mb-5">List Discounts</h2>
+  <table class="table table-bordered">
+    <thead>
+      <tr style="background-color: aquamarine">
+        <th>Stt</th>
+        <th>Name</th>
+        <th>Percent</th>
+        <th>Code</th>
+        <th>Type</th>
+        <th>Cinema</th>
+        <th>Image</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td>An uong tet ga</td>
+        <td>40%</td>
+        <td>XSYJQU</td>
+        <td>food</td>
+        <td>MDcinema My Dinh</td>
+        <td><img src="discount1.jpg" alt="Image" width="50" /></td>
+        <td>
+          <a href="/discount/edit/1" class="btn btn-info">
+            <i class="anticon anticon-edit"></i> Edit
+          </a>
+          <button
+            class="btn btn-danger"
+            data-bs-toggle="modal"
+            data-bs-target="#deleteDiscountModal1"
+          >
+            <i class="anticon anticon-delete"></i> Delete
+          </button>
+        </td>
+      </tr>
+      <!-- Add more static rows as needed -->
+    </tbody>
+  </table>
+</div>
+
+<!-- Delete Discount Modal -->
+<div
+  class="modal fade"
+  id="deleteDiscountModal1"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="deleteDiscountModalLabel1"
+  aria-hidden="true"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteDiscountModalLabel1">
+          Confirm Delete
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete this discount?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Cancel
+        </button>
+        <a href="/discount/delete/1" class="btn btn-danger">Delete</a>
+      </div>
+    </div>
+  </div>
+</div>
