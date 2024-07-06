@@ -26,8 +26,6 @@ exports.addEmployee = async (req, res, next) => {
   try {
     let image = "";
 
-    console.log("=== check file ====", req.file);
-
     if (req.file && req.file.fieldname === "image") {
       fs.renameSync(req.file.path, "./public/uploads/" + req.file.originalname);
       image = "/uploads/" + req.file.originalname;
@@ -67,10 +65,17 @@ exports.addEmployee = async (req, res, next) => {
 };
 
 exports.editEmployee = async (req, res, next) => {
+  let image = req.body.currentImage || "";
+
+  if (req.file && req.file.fieldname === "image") {
+    fs.renameSync(req.file.path, "./public/uploads/" + req.file.originalname);
+    image = "/uploads/" + req.file.originalname;
+  }
+
   const id = req.params.id;
   const token = req.session.admin.token;
 
-  const { name, email, number_phone, date_of_birth, gender, image } = req.body;
+  const { name, email, number_phone, date_of_birth, gender } = req.body;
 
   try {
     const response = await axios.put(

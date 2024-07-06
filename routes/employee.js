@@ -10,6 +10,7 @@ router.get("/add", authMiddleware.requireLogin, employeeController.getEmployee);
 router.put(
   "/edit/:id",
   authMiddleware.requireLogin,
+  uploadImage.single("image"),
   employeeController.editEmployee
 );
 // List Staff
