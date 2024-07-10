@@ -2,7 +2,8 @@ var express = require("express");
 var router = express.Router();
 var movieController = require("../controller/movieController");
 var authMiddleware = require("../middleware/authMiddleware");
-
+var multer = require("multer");
+var uploadImage = multer({ dest: "./tmp" });
 router.get("/list", authMiddleware.requireLogin, movieController.movieList);
 router.get("/add", authMiddleware.requireLogin, movieController.addMovie);
 router.get("/update", authMiddleware.requireLogin, movieController.updateMovie);
@@ -20,6 +21,20 @@ router.get(
 router.get(
   "/listDirectors",
   authMiddleware.requireLogin,
-  movieController.listDirectors
+  movieController.listDirector
 );
+router.post(
+  "/createDirector",
+  authMiddleware.requireLogin,
+  uploadImage.single("image"),
+  movieController.createDirector
+);
+router.post(
+  "/createActor",
+  authMiddleware.requireLogin,
+  uploadImage.single("image"),
+  movieController.createActor
+);
+router.delete('/directors/:id', movieController.deleteDirector);
+router.delete('/actors/:id', movieController.deleteActor);
 module.exports = router;
