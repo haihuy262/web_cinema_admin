@@ -15,32 +15,47 @@
   <table class="table table-bordered table-hover align-middle text-center">
     <thead class="thead-light">
       <tr class="table table-secondary">
+        <th class="text-center">STT</th>
         <th class="text-center">Mã đơn hàng</th>
         <th class="text-center">Tên phim</th>
-        <th class="text-center">Suất chiếu</th>
-        <th class="text-center">Phòng chiếu</th>
+        <th class="text-center">Rạp chiếu</th>
         <th class="text-center">Trạng thái</th>
         <th class="text-center">Tổng tiền</th>
-        <th class="text-center">Ngày đặt</th>
+        <th class="text-center">Giờ chiếu</th>
+        <th class="text-center">Ngày chiếu</th>
       </tr>
     </thead>
     <tbody>
       <tr>
+        <% for( var i = 0; i < ticketsData.length; i++){ %>
+        <td><%= i + 1 %></td>
         <td class="text-primary p-3">
-          <a href="/tickets/details/:id" class="nav-link">96175515</a>
-        </td>
-        <td class="text-primary">Monkey Man Báo Thù</td>
-        <td>ng.haihuy262@gmail.com</td>
-        <td>IMAX - HCinema Aeon Hà Đông</td>
-        <td class="text-center">
-          <span
-            class="status-label rounded-3 text-success border border-success ps-3 pe-3 pt-1 pb-1"
-            >Đã thanh toán</span
+          <a href="/tickets/details/:id" class="nav-link"
+            ><%= maDonHang[i] %></a
           >
         </td>
-        <td class="text-center">1,066,000</td>
-        <td class="text-center">22-06-2024</td>
+        <td class="text-primary"><%= tenPhim[i] %></td>
+        <td><%= rapChieu[i] %></td>
+        <td class="text-center">
+          <% if (trangThai[i] === 'active') { %>
+          <span
+            class="status-label rounded-3 text-success border border-success ps-3 pe-3 pt-1 pb-1"
+          >
+            Đã thanh toán
+          </span>
+          <% } else if (trangThai[i] === 'inactive') { %>
+          <span
+            class="role-label rounded-3 text-danger border border-danger ps-3 pe-3 pt-1 pb-1"
+          >
+            Chưa thanh toán
+          </span>
+          <% } %>
+        </td>
+        <td class="text-center"><%= tongTien[i] %></td>
+        <td><%= gioChieu[i] %></td>
+        <td class="text-center"><%= ngayChieu[i] %></td>
       </tr>
+      <% } %>
     </tbody>
   </table>
 </div>
