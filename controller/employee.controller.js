@@ -26,10 +26,15 @@ exports.listEmployee = async (req, res, next) => {
 exports.addEmployee = async (req, res, next) => {
   try {
     const form = new FormData();
+    const defaultImagePath = "public//images//avatar.jpg";
 
     if (req.file && req.file.fieldname === "image") {
       form.append("image", fs.createReadStream(req.file.path), {
         filename: req.file.originalname,
+      });
+    } else {
+      form.append("image", fs.createReadStream(defaultImagePath), {
+        filename: "avatart.jpg",
       });
     }
 
