@@ -1,0 +1,66 @@
+<%- include('../../partials/header.ejs') %>
+<style>
+  .role-label {
+    background-color: #ffcccc;
+  }
+  .status-label {
+    background-color: #ccffcc;
+  }
+</style>
+<div class="container mt-5 p-3">
+  <div class="d-flex justify-content-between align-items-center mb-4 mt-5">
+    <button id="refreshTickets" class="btn btn-primary">Refresh</button>
+    <h2 class="text-center flex-grow-1">Danh sách tickets</h2>
+  </div>
+  <table class="table table-bordered table-hover align-middle text-center">
+    <thead class="thead-light">
+      <tr class="table table-secondary">
+        <th class="text-center">STT</th>
+        <th class="text-center">Mã đơn hàng</th>
+        <th class="text-center">Tên phim</th>
+        <th class="text-center">Rạp chiếu</th>
+        <th class="text-center">Trạng thái</th>
+        <th class="text-center">Tổng tiền</th>
+        <th class="text-center">Ngày đặt</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <% for( var i = 0; i < ticketsData.length; i++){ %>
+        <td><%= i + 1 %></td>
+        <td class="text-primary p-3">
+          <a href="/tickets/details/<%= ticketsData[i]._id %>" class="nav-link"
+            ><%= maDonHang[i] %></a
+          >
+        </td>
+        <td class="text-primary"><%= tenPhim[i] %></td>
+        <td><%= rapChieu[i] %></td>
+        <td class="text-center">
+          <% if (trangThai[i] === 'active') { %>
+          <span
+            class="status-label rounded-3 text-success border border-success ps-3 pe-3 pt-1 pb-1"
+          >
+            Đã thanh toán
+          </span>
+          <% } else if (trangThai[i] === 'inactive') { %>
+          <span
+            class="role-label rounded-3 text-danger border border-danger ps-3 pe-3 pt-1 pb-1"
+          >
+            Chưa thanh toán
+          </span>
+          <% } %>
+        </td>
+        <td class="text-center"><%= tongTien[i] %></td>
+        <td class="text-center"><%= ngayDat[i] %></td>
+      </tr>
+      <% } %>
+    </tbody>
+  </table>
+</div>
+<script>
+  document
+    .getElementById("refreshTickets")
+    .addEventListener("click", async function () {
+      window.location.href = "/tickets/list";
+    });
+</script>
