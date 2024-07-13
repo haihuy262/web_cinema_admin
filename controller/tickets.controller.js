@@ -1,16 +1,16 @@
 const { default: axios } = require("axios");
 
-exports.listOrder = async (req, res, next) => {
+exports.listTickets = async (req, res, next) => {
   const token = req.session.admin.token;
 
-  var arrShortID = [];
-  var arrCinema = [];
-  var arrMovieName = [];
-  var arrGenre = [];
-  var arrStatus = [];
-  var arrDate = [];
-  var arrTime = [];
-  var arrTotalMoney = [];
+  const arrShortID = [];
+  const arrCinema = [];
+  const arrMovieName = [];
+  const arrGenre = [];
+  const arrStatus = [];
+  const arrDate = [];
+  const arrTime = [];
+  const arrTotalMoney = [];
 
   try {
     const response = await axios.get("http://139.180.132.97:3000/tickets", {
@@ -19,41 +19,36 @@ exports.listOrder = async (req, res, next) => {
       },
     });
     const ticketsData = response.data.getall;
-    console.log(ticketsData);
 
-    for (var i = 0; i < ticketsData.length; i++) {
+    for (let i = 0; i < ticketsData.length; i++) {
       // Thể loại phim
-      let genre = ticketsData[i].movie.genre;
-      let dataGenre = genre.map((g) => g.name).join(", ");
+      const genre = ticketsData[i].movie.genre;
+      const dataGenre = genre.map((g) => g.name).join(", ");
       arrGenre.push(dataGenre);
       // Mã tickets
-      let id = ticketsData[i]._id;
-      let shorId = id.substring(0, 8).toUpperCase();
+      const id = ticketsData[i]._id;
+      const shorId = id.substring(0, 8).toUpperCase();
       arrShortID.push(shorId);
       // Tên phim
-      let movieName = ticketsData[i].movie.name;
-      arrMovieName.push(movieName);
+      arrMovieName.push(ticketsData[i].movie.name);
       // Rạp chiếu
-      let cinema = ticketsData[i].cinema.name;
-      arrCinema.push(cinema);
+      arrCinema.push(ticketsData[i].cinema.name);
       // Trạng thái
-      let status = ticketsData[i].status;
-      arrStatus.push(status);
+      arrStatus.push(ticketsData[i].status);
       // Ngày chiếu
-      let date = ticketsData[i].showdate.date;
-      let dateString = date.substring(0, 10);
-      let dateParts = dateString.split("-");
-      let year = dateParts[0];
-      let month = dateParts[1];
-      let day = dateParts[2];
-      let formattedDate = `${day}-${month}-${year}`;
+      const date = ticketsData[i].date;
+      const dateString = date.substring(0, 10);
+      const dateParts = dateString.split("-");
+      const year = dateParts[0];
+      const month = dateParts[1];
+      const day = dateParts[2];
+      const formattedDate = `${day}-${month}-${year}`;
       arrDate.push(formattedDate);
       // Ngày chiếu
-      let time = ticketsData[i].time.time;
-      arrTime.push(time);
+      arrTime.push(ticketsData[i].time.time);
       // Tổng tiền
-      let totalMoney = ticketsData[i].total;
-      let formattedMoney = totalMoney.toLocaleString("en-US");
+      const totalMoney = ticketsData[i].total;
+      const formattedMoney = totalMoney.toLocaleString("en-US");
       arrTotalMoney.push(formattedMoney);
     }
 
@@ -64,7 +59,7 @@ exports.listOrder = async (req, res, next) => {
       tenPhim: arrMovieName,
       rapChieu: arrCinema,
       trangThai: arrStatus,
-      ngayChieu: arrDate,
+      ngayDat: arrDate,
       gioChieu: arrTime,
       tongTien: arrTotalMoney,
     });
@@ -72,6 +67,95 @@ exports.listOrder = async (req, res, next) => {
     console.log(error);
   }
 };
-exports.detailsOrder = async (req, res, next) => {
-  res.render("../views/manager/tickets/detailsTickets.ejs");
+
+exports.detailsTickets = async (req, res, next) => {
+  const id = req.params.id;
+  const token = req.session.admin.token;
+
+  const arrUser = [];
+  const arrSeat = [];
+  const arrFood = [];
+
+  try {
+    const response = await axios.get(
+      `http://139.180.132.97:3000/tickets/${id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    // Mã tickets
+    const idTickets = response.data.getTicket._id;
+    const shorId = idTickets.substring(0, 8).toUpperCase();
+    // Tên phim
+    const movieName = response.data.getTicket.movie.name;
+    // Giờ chiếu
+    const time = response.data.getTicket.time.time;
+    // Ngày chiếu
+    const dateShow = response.data.getTicket.showdate.date;
+    const dateString = dateShow.substring(0, 10);
+    const dateParts = dateString.split("-");
+    const year = dateParts[0];
+    const month = dateParts[1];
+    const day = dateParts[2];
+    const formattedDate = `${day}-${month}-${year}`;
+    // Phòng chiếu
+    const room = response.data.getTicket.room.name;
+    // Rạp chiếu
+    const cinema = response.data.getTicket.cinema.name;
+    // Ngày đặt
+    const date = response.data.getTicket.date;
+    const dateString2 = date.substring(0, 10);
+    const dateParts2 = dateString2.split("-");
+    const year2 = dateParts2[0];
+    const month2 = dateParts2[1];
+    const day2 = dateParts2[2];
+    const formattedDate2 = `${day2}-${month2}-${year2}`;
+    // Khách hàng
+    const nameUser = response.data.getTicket.user.name;
+    const emailUser = response.data.getTicket.user.email;
+    arrUser.push(nameUser, emailUser);
+    // Tổng tiền
+    const total = response.data.getTicket.total;
+    const formattedMoney = total.toLocaleString("en-US");
+    // Ghế
+    const seat = response.data.getTicket.seat;
+    for (let i = 0; i < seat.length; i++) {
+      if (seat[i] !== null) {
+        arrSeat.push(seat[i].name, seat[i].price);
+      } else {
+        console.log("Dữ liệu", seat[i], "trống!");
+      }
+    }
+    // Đồ ăn
+    const food = response.data.getTicket.food;
+    for (let i = 0; i < food.length; i++) {
+      if (food[i].foodId !== null) {
+        arrFood.push(
+          food[i].foodId.name.toUpperCase(),
+          food[i].quantity,
+          food[i].foodId.price
+        );
+      } else {
+        console.log("Dữ liệu", food[i], "trống!");
+      }
+    }
+
+    res.render("../views/manager/tickets/detailsTickets.ejs", {
+      maDonHang: shorId,
+      tenPhim: movieName,
+      gioChieu: time,
+      ngayChieu: formattedDate,
+      phongChieu: room,
+      rapChieu: cinema,
+      ngayDat: formattedDate2,
+      khachHang: arrUser,
+      tongTien: formattedMoney,
+      seat: arrSeat,
+      food: arrFood,
+    });
+  } catch (error) {
+    console.log(error);
+  }
 };

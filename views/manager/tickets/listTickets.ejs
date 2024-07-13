@@ -9,7 +9,7 @@
 </style>
 <div class="container mt-5 p-3">
   <div class="d-flex justify-content-between align-items-center mb-4 mt-5">
-    <button class="btn btn-primary">Refresh</button>
+    <button id="refreshTickets" class="btn btn-primary">Refresh</button>
     <h2 class="text-center flex-grow-1">Danh sách tickets</h2>
   </div>
   <table class="table table-bordered table-hover align-middle text-center">
@@ -21,8 +21,7 @@
         <th class="text-center">Rạp chiếu</th>
         <th class="text-center">Trạng thái</th>
         <th class="text-center">Tổng tiền</th>
-        <th class="text-center">Giờ chiếu</th>
-        <th class="text-center">Ngày chiếu</th>
+        <th class="text-center">Ngày đặt</th>
       </tr>
     </thead>
     <tbody>
@@ -30,7 +29,7 @@
         <% for( var i = 0; i < ticketsData.length; i++){ %>
         <td><%= i + 1 %></td>
         <td class="text-primary p-3">
-          <a href="/tickets/details/:id" class="nav-link"
+          <a href="/tickets/details/<%= ticketsData[i]._id %>" class="nav-link"
             ><%= maDonHang[i] %></a
           >
         </td>
@@ -52,10 +51,16 @@
           <% } %>
         </td>
         <td class="text-center"><%= tongTien[i] %></td>
-        <td><%= gioChieu[i] %></td>
-        <td class="text-center"><%= ngayChieu[i] %></td>
+        <td class="text-center"><%= ngayDat[i] %></td>
       </tr>
       <% } %>
     </tbody>
   </table>
 </div>
+<script>
+  document
+    .getElementById("refreshTickets")
+    .addEventListener("click", async function () {
+      window.location.href = "/tickets/list";
+    });
+</script>

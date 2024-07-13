@@ -2,9 +2,7 @@
 <div class="container-fluid mt-5 p-3">
   <div class="row mb-4 mt-5">
     <div class="col-12 mt-5">
-      <button onclick="window.history.back()" class="btn btn-secondary">
-        Quay lại
-      </button>
+      <button id="backListTickets" class="btn btn-secondary">Quay lại</button>
     </div>
   </div>
   <div class="row">
@@ -13,23 +11,23 @@
       <h4 class="border-bottom pb-4">Thông tin đơn hàng</h4>
       <p class="d-flex mt-3">
         <strong>Mã đơn hàng:</strong>
-        <a class="ms-2 nav-link text-primary" href="">96175515</a>
+        <a class="ms-2 nav-link text-primary" href=""><%= maDonHang %></a>
       </p>
       <p class="d-flex">
         <strong>Phim:</strong>
-        <a class="ms-2 nav-link text-primary" href="#">Monkey Man Báo Thù</a>
+        <a class="ms-2 nav-link text-primary" href="#"><%= tenPhim %></a>
       </p>
       <p>
         <strong>Giờ chiếu:</strong>
-        <span class="badge bg-warning text-dark">20:25 - 22:20</span>
+        <span class="badge bg-warning text-dark"><%= gioChieu %></span>
       </p>
-      <p><strong>Ngày chiếu:</strong> 06-05-2024</p>
-      <p><strong>Phòng chiếu:</strong> IMAX</p>
+      <p><strong>Ngày chiếu:</strong> <%= ngayChieu %></p>
+      <p><strong>Phòng chiếu:</strong> <%= phongChieu %></p>
       <p class="d-flex">
         <strong>Rạp chiếu:</strong>
-        <a class="ms-2 nav-link text-primary" href="#">HCinema Aeon Hà Đông</a>
+        <a class="ms-2 nav-link text-primary" href="#"><%= rapChieu %></a>
       </p>
-      <p><strong>Ngày đặt:</strong> 06-05-2024</p>
+      <p><strong>Ngày đặt:</strong> <%= ngayDat %></p>
     </div>
 
     <!-- Thông tin khách hàng -->
@@ -37,17 +35,17 @@
       <h4 class="border-bottom pb-4">Thông tin khách hàng</h4>
       <p class="d-flex mt-3">
         <strong>Khách hàng:</strong>
-        <a class="ms-2 nav-link text-primary" href="#">Hiền Super</a>
+        <a class="ms-2 nav-link text-primary" href="#"><%= khachHang[0] %></a>
       </p>
       <p><strong>Điện thoại:</strong> 0344005816</p>
-      <p><strong>Email:</strong> hien@gmail.com</p>
+      <p><strong>Email:</strong> <%= khachHang[1] %></p>
       <p>
         <strong>Trạng thái:</strong>
         <span class="badge bg-success p-2">Đã xác nhận</span>
       </p>
-      <p><strong>Thành tiền:</strong> 1,066,000</p>
+      <p><strong>Thành tiền:</strong> <%= tongTien %></p>
       <p><strong>Giảm giá:</strong> 0</p>
-      <p><strong>Tổng tiền:</strong> 1,066,000</p>
+      <p><strong>Tổng tiền:</strong> <%= tongTien %></p>
     </div>
 
     <!-- Ghế & Dịch vụ -->
@@ -62,31 +60,13 @@
           </tr>
         </thead>
         <tbody>
+          <% for(let i = 0; i < seat.length; i += 2) { %>
           <tr>
-            <td>A1</td>
+            <td><%= seat[i] %></td>
             <td><span class="badge bg-secondary p-2">Ghế thường</span></td>
-            <td>100,000</td>
+            <td><%= seat[i + 1] %></td>
           </tr>
-          <tr>
-            <td>C2</td>
-            <td><span class="badge bg-secondary p-2">Ghế thường</span></td>
-            <td>100,000</td>
-          </tr>
-          <tr>
-            <td>C3</td>
-            <td><span class="badge bg-secondary p-2">Ghế thường</span></td>
-            <td>100,000</td>
-          </tr>
-          <tr>
-            <td>C4</td>
-            <td><span class="badge bg-secondary p-2">Ghế thường</span></td>
-            <td>100,000</td>
-          </tr>
-          <tr>
-            <td>D4</td>
-            <td><span class="badge bg-secondary p-2">Ghế thường</span></td>
-            <td>100,000</td>
-          </tr>
+          <% } %>
         </tbody>
       </table>
       <table class="table mt-5">
@@ -99,28 +79,25 @@
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td><a class="nav-link text-primary" href="#">HCINEMA COMBO</a></td>
-            <td>1</td>
-            <td>113,000</td>
-            <td>113,000</td>
-          </tr>
-          <tr>
-            <td><a class="nav-link text-primary" href="#">MY COMBO</a></td>
-            <td>1</td>
-            <td>87,000</td>
-            <td>87,000</td>
-          </tr>
+          <% for(let i = 0; i < food.length; i += 3) { %>
           <tr>
             <td>
-              <a class="nav-link text-primary" href="#">LADIES LOVE SET</a>
+              <a class="nav-link text-primary" href="#"><%= food[i] %></a>
             </td>
-            <td>2</td>
-            <td>183,000</td>
-            <td>366,000</td>
+            <td class="text-center"><%= food[i + 1] %></td>
+            <td class="text-center"><%= food[i + 2] %></td>
+            <td class="text-center">600,000</td>
           </tr>
+          <% } %>
         </tbody>
       </table>
     </div>
   </div>
 </div>
+<script>
+  document
+    .getElementById("backListTickets")
+    .addEventListener("click", async function () {
+      window.location.href = "/tickets/list";
+    });
+</script>
