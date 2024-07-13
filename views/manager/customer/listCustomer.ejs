@@ -31,10 +31,11 @@
         <td>
           <img
             src="http://139.180.132.97:3000/images/<%= userData[i].image %>"
-            alt="Avatar 1"
+            alt="Avatar"
             class="rounded-3"
             width="70"
             height="70"
+            onerror="handleImageError(this);"
           />
         </td>
         <td><%= userData[i].name %></td>
@@ -63,4 +64,11 @@
     .addEventListener("click", async function () {
       window.location.href = "/customer/list";
     });
+</script>
+<!-- Nếu ảnh bị lỗi không load được, thay thế bằng ảnh này -->
+<script>
+  function handleImageError(image) {
+    image.onerror = null;
+    image.src = "/images/avatar.jpg";
+  }
 </script>
