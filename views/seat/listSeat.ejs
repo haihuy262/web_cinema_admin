@@ -1,0 +1,196 @@
+<%- include('../partials/header.ejs') %>
+<div class="container mt-5 p-5">
+  <h2 class="text-center">Quản lý ghế</h2>
+  <form id="seatForm">
+    <div class="row row-cols-2 mt-5 mb-4">
+      <div class="col-6">
+        <label for="cinemaSelect" class="form-label h6">Rạp phim</label>
+        <select id="cinemaSelect" class="form-select">
+          <option selected disabled>Chọn Rạp Phim...</option>
+          <option value="cinema1">Cinema 1</option>
+          <option value="cinema2">Cinema 2</option>
+          <!-- Add more options for other cinemas -->
+        </select>
+      </div>
+      <div class="col-6">
+        <label for="roomSelect" class="form-label h6">Phòng chiếu</label>
+        <select id="roomSelect" class="form-select">
+          <option selected disabled>Chọn Phòng Chiếu...</option>
+          <option value="room1">Room 1</option>
+          <option value="room2">Room 2</option>
+          <!-- Add more options for other rooms -->
+        </select>
+      </div>
+      <div class="col-6 mt-4">
+        <label for="roomSelect" class="form-label h6">Ngày chiếu</label>
+        <select id="roomSelect" class="form-select">
+          <option selected disabled>Chọn Ngày Chiếu...</option>
+          <option value="room1">Room 1</option>
+          <option value="room2">Room 2</option>
+          <!-- Add more options for other rooms -->
+        </select>
+      </div>
+      <div class="col-6 mt-4">
+        <label for="roomSelect" class="form-label h6">Giờ chiếu</label>
+        <select id="roomSelect" class="form-select">
+          <option selected disabled>Chọn Giờ Chiếu...</option>
+          <option value="room1">Room 1</option>
+          <option value="room2">Room 2</option>
+          <!-- Add more options for other rooms -->
+        </select>
+      </div>
+    </div>
+  </form>
+  <div class="d-flex justify-content-center">
+    <button
+      class="btn btn-primary mb-4"
+      data-bs-toggle="modal"
+      data-bs-target="#addSeatModal"
+    >
+      Thêm hàng ghế mới
+    </button>
+    <button class="btn btn-primary mb-4 ms-3">Xem Ghế</button>
+    <button class="btn btn-primary mb-4 ms-3">Edit</button>
+    <button class="btn btn-danger mb-4 ms-3">Delete</button>
+  </div>
+  <!-- Seat -->
+  <div id="seats">
+    <div class="row justify-content-center">
+      <div class="col-md-1 mb-3">
+        <button class="btn btn-secondary w-100">A1</button>
+      </div>
+      <div class="col-md-1 mb-3">
+        <button class="btn btn-secondary w-100">A2</button>
+      </div>
+      <div class="col-md-1 mb-3">
+        <button class="btn btn-secondary w-100">A3</button>
+      </div>
+      <div class="col-md-1 mb-3">
+        <button class="btn btn-secondary w-100">A4</button>
+      </div>
+      <div class="col-md-1 mb-3">
+        <button class="btn btn-secondary w-100">A5</button>
+      </div>
+      <div class="col-md-1 mb-3">
+        <button class="btn btn-secondary w-100">A6</button>
+      </div>
+      <div class="col-md-1 mb-3">
+        <button class="btn btn-secondary w-100">A7</button>
+      </div>
+      <div class="col-md-1 mb-3">
+        <button class="btn btn-secondary w-100">A8</button>
+      </div>
+    </div>
+  </div>
+  <!-- Modal Add Seat -->
+  <div
+    class="modal fade"
+    id="addSeatModal"
+    tabindex="-1"
+    aria-labelledby="addSeatModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="addSeatModalLabel">
+            <i class="fas fa-exclamation-triangle text-danger"></i>
+            Thêm hàng ghế mới
+          </h1>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <!-- Modal Body -->
+        <div class="modal-body">
+          <label for="seatSelect" class="form-label h6">Tên ghế</label>
+          <select id="seatSelect" class="form-select">
+            <option selected disabled>Chọn tên ghế...</option>
+          </select>
+          <div id="priceContainer" class="mt-3">
+            <label for="seatPrice" class="form-label h6">Giá tiền</label>
+            <input type="text" id="seatPrice" class="form-control" readonly />
+          </div>
+          <label for="roomSelect" class="form-label h6">Phòng chiếu</label>
+          <select id="roomSelect" class="form-select mb-3">
+            <option selected disabled>Chọn phòng chiếu...</option>
+            <!-- Example rooms, replace or add actual rooms -->
+            <option value="room1">Phòng chiếu 1</option>
+            <option value="room2">Phòng chiếu 2</option>
+            <option value="room3">Phòng chiếu 3</option>
+          </select>
+        </div>
+        <!-- Modal Footer -->
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Close
+          </button>
+          <button type="button" class="btn btn-danger" id="confirmAdd">
+            Lưu thông tin
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Add Seat -->
+<script>
+  document
+    .getElementById("confirmAdd")
+    .addEventListener("click", async function () {});
+</script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const seatSelect = document.getElementById("seatSelect");
+    const seatPrice = document.getElementById("seatPrice");
+    const roomSelect = document.getElementById("roomSelect");
+
+    const existingSeats = ["A1", "A2", "A3"]; // Danh sách các ghế đã có sẵn
+
+    // Generate seat options from A1 to H8
+    const seats = [];
+    const rows = ["A", "B", "C", "D", "E", "F", "G", "H"];
+    const columns = 8;
+
+    rows.forEach((row) => {
+      for (let i = 1; i <= columns; i++) {
+        seats.push(`${row}${i}`);
+      }
+    });
+
+    // Danh sách các ghế có thể chọn sau khi loại bỏ các ghế đã có sẵn
+    const availableSeats = seats.filter(
+      (seat) => !existingSeats.includes(seat)
+    );
+
+    // Populate the select dropdown with seat options
+    availableSeats.forEach((seat) => {
+      const option = document.createElement("option");
+      option.value = seat;
+      option.textContent = seat;
+      seatSelect.appendChild(option);
+    });
+
+    // Event listener to update the seat price based on the selected seat
+    seatSelect.addEventListener("change", function () {
+      const selectedSeat = seatSelect.value;
+      let price = 70000; // Default price
+
+      if (selectedSeat.match(/^[CDEF][3-6]$/)) {
+        price = 80000;
+      } else if (selectedSeat.match(/^H[1-8]$/)) {
+        price = 90000;
+      }
+
+      seatPrice.value = price.toLocaleString("en-US");
+    });
+  });
+</script>
