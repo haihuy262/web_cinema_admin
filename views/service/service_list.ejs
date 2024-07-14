@@ -1,122 +1,533 @@
 <%- include('../partials/header.ejs') %>
-<div class="container mt-5" style="padding: 3%">
-  <h2 class="text-center mb-5">Danh Sách Dịch Vụ</h2>
-  <table class="table table-bordered table-hover">
+<div class="container mt-5 p-3">
+  <div class="row mb-3 mt-5">
+    <div class="col-md-3">
+      <div class="d-flex">
+        <div class="me-3">
+          <button id="addService" class="btn btn-primary p-2">
+            Tạo dịch vụ
+          </button>
+        </div>
+
+        <!-- Alert Edit Success -->
+        <div
+          class="alert alert-success p-2 text-center text-success d-flex d-none"
+          role="alert"
+          id="alertEditSuccess"
+        >
+          <i class="bi bi-check-circle-fill me-2"></i>
+          Sửa thành công
+        </div>
+        <!-- Alert Edit Error -->
+        <div
+          class="alert alert-danger p-2 text-center text-danger d-flex d-none"
+          role="alert"
+          id="alertEditError"
+        >
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>
+          Sửa thất bại
+        </div>
+        <!-- Alert Delete Success -->
+        <div
+          class="alert alert-success p-2 text-center text-success d-flex d-none"
+          role="alert"
+          id="alertDeleteSuccess"
+        >
+          <i class="bi bi-check-circle-fill me-2"></i>
+          Xoá thành công
+        </div>
+        <!-- Alert Delete Error -->
+        <div
+          class="alert alert-danger p-2 text-center text-danger d-flex d-none"
+          role="alert"
+          id="alertDeleteError"
+        >
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>
+          Xoá thất bại
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <h2 class="text-center">Danh sách dịch vụ</h2>
+    </div>
+    <div class="col-md-3">
+      <div class="d-flex">
+        <input
+          id="searchInput"
+          class="form-control me-2 p-2"
+          type="search"
+          placeholder="Search"
+          aria-label="Search"
+          oninput="searchTable()"
+        />
+        <button
+          class="btn btn-outline-success"
+          type="submit"
+          onclick="searchTable()"
+        >
+          Search
+        </button>
+      </div>
+    </div>
+  </div>
+  <table class="table table-bordered table-hover align-middle">
     <thead>
       <tr class="table table-secondary">
-        <th>Id</th>
-        <th>Tên</th>
-        <th>Giá</th>
-        <th>Hình ảnh</th>
-        <th>Thao tác</th>
+        <th class="text-center">STT</th>
+        <th class="text-center">ID</th>
+        <th class="text-center">Hình ảnh</th>
+        <th class="text-center">Tên</th>
+        <th class="text-center">Giá</th>
+        <th class="text-center">Thao tác</th>
       </tr>
     </thead>
-    <tbody>
-      <% foods.getall.forEach(food => { %>
-        <tr>
-          <td><%= food._id %></td>
-          <td><%= food.name %></td>
-          <td><%= food.price %></td>
-          <td><img src="http://139.180.132.97:3000/images/<%= food.image %>" width="50"></td>
-          <td>
-            <button class="btn btn-info" 
-                    data-food='<%= JSON.stringify(food) %>' 
-                    onclick="editFood(this)">Sửa</button>
-            <button class="btn btn-danger" onclick="deleteFood('<%= food._id %>')">Xoá</button>
-          </td>
-        </tr>
+    <tbody id="tableBody">
+      <% foods.getall.forEach((food,index) => { %>
+      <tr>
+        <td class="text-center"><%= index + 1 %></td>
+        <% const id = food._id %> <% const shorId =
+        id.substring(0,8).toUpperCase() %>
+        <td class="text-center text-primary"><%= shorId %></td>
+        <td class="text-center">
+          <img
+            src="http://139.180.132.97:3000/images/<%= food.image %>"
+            alt="Avatar"
+            class="rounded-3"
+            width="70"
+            height="70"
+            onerror="handleImageError(this);"
+          />
+        </td>
+        <td class="text-center"><%= food.name %></td>
+        <% const price = food.price %> <% const formattedPrice =
+        price.toLocaleString("en-US") %>
+        <td class="text-center"><%= formattedPrice %></td>
+        <td class="text-center">
+          <button
+            class="btn btn-info"
+            data-food="<%= JSON.stringify(food) %>"
+            onclick="editFood(this)"
+          >
+            Sửa
+          </button>
+          <button
+            class="btn btn-danger"
+            data-food="<%= JSON.stringify(food) %>"
+            onclick="deleteFood(this)"
+          >
+            Xoá
+          </button>
+        </td>
+      </tr>
       <% }); %>
     </tbody>
   </table>
+  <nav>
+    <ul class="pagination justify-content-end" id="pagination"></ul>
+  </nav>
+  <div id="foodData" class="d-none"><%= JSON.stringify(foods.getall) %></div>
 </div>
 
 <!-- Modal Sửa Thực Phẩm -->
-<div class="modal fade" id="editFoodModal" tabindex="-1" aria-labelledby="editFoodModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
+<div
+  class="modal fade"
+  id="editFoodModal"
+  tabindex="-1"
+  aria-labelledby="editFoodModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="editFoodModalLabel">Sửa Thực Phẩm</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+        <h5 class="modal-title" id="editFoodModalLabel">
+          <i class="fas fa-solid fa-pen-to-square text-danger"></i>
+          Sửa dịch vụ
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Đóng"
+        ></button>
       </div>
       <div class="modal-body">
         <form id="editFoodForm">
-          <input type="hidden" id="foodId" name="foodId">
+          <input type="hidden" id="foodId" name="foodId" />
           <div class="mb-3">
             <label for="foodName" class="form-label">Tên</label>
-            <input type="text" class="form-control" id="foodName" name="name" required>
+            <input
+              type="text"
+              class="form-control"
+              id="foodName"
+              name="name"
+              required
+            />
           </div>
           <div class="mb-3">
             <label for="foodPrice" class="form-label">Giá</label>
-            <input type="number" class="form-control" id="foodPrice" name="price" required>
+            <input
+              type="number"
+              class="form-control"
+              id="foodPrice"
+              name="price"
+              required
+            />
           </div>
           <div class="mb-3">
             <label for="foodImage" class="form-label">Hình Ảnh</label>
-            <input type="file" class="form-control" id="foodImage" name="image">
+            <input
+              type="file"
+              class="form-control"
+              id="foodImage"
+              name="image"
+            />
           </div>
         </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-        <button type="button" class="btn btn-primary" onclick="submitEditFood()">Lưu thay đổi</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Đóng
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          onclick="submitEditFood()"
+        >
+          Lưu thay đổi
+        </button>
       </div>
     </div>
   </div>
 </div>
-
+<!-- Modal Delete -->
+<div
+  class="modal fade"
+  id="deleteModal"
+  tabindex="-1"
+  aria-labelledby="deleteModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="deleteModalLabel">
+          <i class="fas fa-exclamation-triangle text-danger"></i>
+          Xoá dịch vụ
+        </h1>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">Bạn có chắc muốn xoá dịch vụ này?</div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Close
+        </button>
+        <button
+          type="button"
+          class="btn btn-danger"
+          onclick="submitDeleteFood()"
+        >
+          Xoá
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 <script>
-  async function deleteFood(foodId) {
-    if (confirm('Bạn có chắc chắn muốn xoá?')) {
-      try {
-        const response = await fetch(`/service/foods/${foodId}`, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        });
+  function deleteFood(button) {
+    const food = JSON.parse(button.getAttribute("data-food"));
+    document.getElementById("foodId").value = food._id;
 
-        if (response.ok) {
-          alert('Xoá thành công!');
+    // Hiện modal
+    var myModal = new bootstrap.Modal(document.getElementById("deleteModal"));
+    myModal.show();
+  }
+
+  async function submitDeleteFood() {
+    const foodId = document.getElementById("foodId").value;
+    const deleteFoodModal = bootstrap.Modal.getInstance(
+      document.getElementById("deleteModal")
+    );
+
+    try {
+      const response = await fetch(`/service/foods/${foodId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.ok) {
+        const successAlert = document.getElementById("alertDeleteSuccess");
+        successAlert.classList.remove("d-none");
+
+        deleteFoodModal.hide();
+
+        setTimeout(function () {
           window.location.reload();
-        } else {
-          alert('Đã xảy ra lỗi khi xoá.');
-        }
-      } catch (error) {
-        alert('Đã xảy ra lỗi khi xoá.');
-        console.error(error);
+        }, 1000);
+      } else {
+        const errorAlert = document.getElementById("alertDeleteError");
+        errorAlert.classList.remove("d-none");
+
+        deleteFoodModal.hide();
+
+        setTimeout(function () {
+          window.location.reload();
+        }, 1000);
       }
+    } catch (error) {
+      const errorAlert = document.getElementById("alertDeleteError");
+      errorAlert.classList.remove("d-none");
+
+      deleteFoodModal.hide();
+
+      setTimeout(function () {
+        window.location.reload();
+      }, 1000);
+      console.error(error);
     }
   }
 
   function editFood(button) {
-    const food = JSON.parse(button.getAttribute('data-food'));
-    document.getElementById('foodId').value = food._id;
-    document.getElementById('foodName').value = food.name;
-    document.getElementById('foodPrice').value = food.price;
+    const food = JSON.parse(button.getAttribute("data-food"));
+    document.getElementById("foodId").value = food._id;
+    document.getElementById("foodName").value = food.name;
+    document.getElementById("foodPrice").value = food.price;
 
     // Hiện modal
-    var myModal = new bootstrap.Modal(document.getElementById('editFoodModal'));
+    var myModal = new bootstrap.Modal(document.getElementById("editFoodModal"));
     myModal.show();
   }
 
   async function submitEditFood() {
-    const foodId = document.getElementById('foodId').value;
-    const formData = new FormData(document.getElementById('editFoodForm'));
-
+    const foodId = document.getElementById("foodId").value;
+    const formData = new FormData(document.getElementById("editFoodForm"));
+    const editFoodModal = bootstrap.Modal.getInstance(
+      document.getElementById("editFoodModal")
+    );
     try {
       const response = await fetch(`/service/updateFood/${foodId}`, {
-        method: 'PUT',
+        method: "PUT",
         body: formData,
       });
+      console.log(response);
 
       if (response.ok) {
-        alert('Cập nhật thành công!');
-        window.location.reload();
+        const successAlert = document.getElementById("alertEditSuccess");
+        successAlert.classList.remove("d-none");
+
+        editFoodModal.hide();
+
+        setTimeout(function () {
+          window.location.reload();
+        }, 1000);
       } else {
-        alert('Đã xảy ra lỗi khi cập nhật.');
+        const errorAlert = document.getElementById("alertEditError");
+        errorAlert.classList.remove("d-none");
+
+        editFoodModal.hide();
+
+        setTimeout(function () {
+          window.location.reload();
+        }, 1000);
       }
     } catch (error) {
-      alert('Đã xảy ra lỗi khi cập nhật.');
+      const errorAlert = document.getElementById("alertEditError");
+      errorAlert.classList.remove("d-none");
+
+      editFoodModal.hide();
+
+      setTimeout(function () {
+        window.location.reload();
+      }, 1000);
       console.error(error);
     }
   }
+</script>
+<!-- Search -->
+<script>
+  function searchTable() {
+    const input = document.getElementById("searchInput").value.toLowerCase();
+    const tableBody = document.getElementById("tableBody");
+    const rows = tableBody.getElementsByTagName("tr");
+
+    for (let i = 0; i < rows.length; i++) {
+      const row = rows[i];
+      const cells = row.getElementsByTagName("td");
+      let match = false;
+
+      for (let j = 0; j < cells.length; j++) {
+        if (cells[j].innerText.toLowerCase().indexOf(input) > -1) {
+          match = true;
+          break;
+        }
+      }
+
+      if (match) {
+        row.style.display = "";
+      } else {
+        row.style.display = "none";
+      }
+    }
+  }
+</script>
+<!-- Refresh -->
+<script>
+  document
+    .getElementById("addService")
+    .addEventListener("click", async function () {
+      window.location.href = "/service/serviceAdd";
+    });
+</script>
+<!-- Nếu ảnh bị lỗi không load được, thay thế bằng ảnh này -->
+<script>
+  function handleImageError(image) {
+    image.onerror = null;
+    image.src = "/images/avatar.jpg";
+  }
+</script>
+<!-- Pagination (Số trang) -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const foodDataElement = document.getElementById("foodData");
+    const foods = JSON.parse(foodDataElement.innerText);
+    const itemsPerPage = 7;
+    let currentPage = 1;
+
+    function displayTable(data, page) {
+      const tableBody = document.getElementById("tableBody");
+      // Xóa các phần tử con trong tableBody hiện tại
+      while (tableBody.firstChild) {
+        tableBody.removeChild(tableBody.firstChild);
+      }
+
+      const startIndex = (page - 1) * itemsPerPage;
+      const endIndex = page * itemsPerPage;
+      const pageData = data.slice(startIndex, endIndex);
+
+      // Tạo và thêm các dòng vào tableBody
+      pageData.forEach((food, index) => {
+        const row = document.createElement("tr");
+
+        const sttCell = document.createElement("td");
+        sttCell.textContent = startIndex + index + 1;
+        sttCell.classList.add("text-center");
+        row.appendChild(sttCell);
+
+        const idCell = document.createElement("td");
+        idCell.textContent = food._id.substring(0, 8).toUpperCase();
+        idCell.classList.add("text-center", "text-primary");
+        row.appendChild(idCell);
+
+        const imageCell = document.createElement("td");
+        const img = document.createElement("img");
+        img.src = `http://139.180.132.97:3000/images/${food.image}`;
+        img.alt = "Avatar";
+        img.classList.add("rounded-3");
+        img.width = 70;
+        img.height = 70;
+        img.onerror = function () {
+          handleImageError(this);
+        };
+        imageCell.classList.add("text-center");
+        imageCell.appendChild(img);
+        row.appendChild(imageCell);
+
+        const nameCell = document.createElement("td");
+        nameCell.textContent = food.name;
+        nameCell.classList.add("text-center");
+        row.appendChild(nameCell);
+
+        const priceCell = document.createElement("td");
+        priceCell.textContent = food.price.toLocaleString("en-US");
+        priceCell.classList.add("text-center");
+        row.appendChild(priceCell);
+
+        const actionsCell = document.createElement("td");
+        actionsCell.classList.add("text-center");
+        const editButton = document.createElement("button");
+        editButton.classList.add("btn", "btn-info");
+        editButton.setAttribute("data-food", JSON.stringify(food));
+        editButton.textContent = "Sửa";
+        editButton.onclick = function () {
+          editFood(this);
+        };
+        actionsCell.appendChild(editButton);
+
+        const deleteButton = document.createElement("button");
+        deleteButton.classList.add("btn", "btn-danger", "ms-2");
+        deleteButton.setAttribute("data-food", JSON.stringify(food));
+        deleteButton.textContent = "Xoá";
+        deleteButton.onclick = function () {
+          deleteFood(this);
+        };
+        actionsCell.appendChild(deleteButton);
+
+        row.appendChild(actionsCell);
+
+        tableBody.appendChild(row);
+      });
+    }
+
+    function displayPagination(data, currentPage) {
+      const pagination = document.getElementById("pagination");
+      pagination.innerHTML = "";
+
+      const totalPages = Math.ceil(data.length / itemsPerPage);
+
+      // Previous button
+      const prevPageItem = document.createElement("li");
+      prevPageItem.classList.add("page-item");
+      if (currentPage === 1) {
+        prevPageItem.classList.add("disabled");
+      } else {
+        prevPageItem.addEventListener("click", function () {
+          currentPage--;
+          displayTable(data, currentPage);
+          displayPagination(data, currentPage);
+        });
+      }
+      prevPageItem.innerHTML = `<a class="page-link" href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a>`;
+      pagination.appendChild(prevPageItem);
+
+      // Page buttons
+      for (let i = 1; i <= totalPages; i++) {
+        const pageItem = document.createElement("li");
+        pageItem.classList.add("page-item");
+        if (i === currentPage) {
+          pageItem.classList.add("active");
+        }
+        pageItem.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+        pageItem.addEventListener("click", function () {
+          currentPage = i;
+          displayTable(data, currentPage);
+          displayPagination(data, currentPage);
+        });
+        pagination.appendChild(pageItem);
+      }
+
+      // Next button
+      const nextPageItem = document.createElement("li");
+      nextPageItem.classList.add("page-item");
+      if (currentPage === totalPages || totalPages === 0) {
+        nextPageItem.classList.add("disabled");
+      } else {
+        nextPageItem.addEventListener("click", function () {
+          currentPage++;
+          displayTable(data, currentPage);
+          displayPagination(data, currentPage);
+        });
+      }
+      nextPageItem.innerHTML = `<a class="page-link" href="#" aria-label="Next"><span aria-hidden="true">&raquo;</span></a>`;
+      pagination.appendChild(nextPageItem);
+    }
+
+    displayTable(foods, currentPage);
+    displayPagination(foods, currentPage);
+  });
 </script>
