@@ -1,4 +1,5 @@
 const axios = require("axios");
+const { response } = require("express");
 
 exports.getLogin = async (req, res, next) => {
   res.render("../views/login/login.ejs");
@@ -26,14 +27,15 @@ exports.postLogin = async (req, res, next) => {
         password,
       }
     );
+    console.log(response.data);
     if (
-      response.data.admin.data.name === name &&
-      response.data.admin.data.password === password
+      response.data.admin.name === name &&
+      response.data.admin.password === password
     ) {
       req.session.admin = {
-        id: response.data.admin.data._id,
-        name: response.data.admin.data.name,
-        role: response.data.admin.data.role,
+        id: response.data.admin._id,
+        name: response.data.admin.name,
+        role: response.data.admin.role,
         token: response.data.token.access_token,
       };
       res.render("../views/login/login.ejs", {
