@@ -27,21 +27,48 @@
     </div>
     <div class="mb-3">
       <label for="cinema" class="form-label">Cinema</label>
-      <select class="form-select" id="cinema" name="cinema">
-        <option>Mỹ Đình</option>
-        <option>Mỹ Đình 2</option>
+      <select class="form-select" id="cinema" name="cinema" required>
+        <!-- Options sẽ được điền từ API -->
+      </select>
+    </div>
+    <div class="mb-3">
+      <label for="dayStart" class="form-label">Start Date</label>
+      <input type="date" class="form-control" id="dayStart" name="dayStart" required />
+    </div>
+    <div class="mb-3">
+      <label for="dayEnd" class="form-label">End Date</label>
+      <input type="date" class="form-control" id="dayEnd" name="dayEnd" required />
+    </div>
+    <div class="mb-3">
+      <label for="status" class="form-label">Status</label>
+      <select class="form-select" id="status" name="status">
+        <option value="inactive" selected>Inactive</option>
+        <option value="active">Active</option>
       </select>
     </div>
     <div class="mb-3">
       <label for="image" class="form-label">Image</label>
-      <input
-        type="file"
-        class="form-control"
-        id="image"
-        name="image"
-        required
-      />
+      <input type="file" class="form-control" id="image" name="image" required />
     </div>
     <button type="submit" class="btn btn-primary">Submit</button>
   </form>
 </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    fetch('/api/cinemas') // Thay thế đường dẫn API thực tế của bạn
+      .then(response => response.json())
+      .then(data => {
+        const cinemaSelect = document.getElementById('cinema');
+        data.forEach(cinema => {
+          const option = document.createElement('option');
+          option.value = cinema._id; // Hoặc trường ID tương ứng
+          option.textContent = cinema.name;
+          cinemaSelect.appendChild(option);
+        });
+      })
+      .catch(error => {
+        console.error('Error fetching cinema data:', error);
+      });
+  });
+</script>

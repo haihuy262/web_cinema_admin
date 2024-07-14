@@ -13,5 +13,13 @@ router.get(
   authMiddleware.requireLogin,
   discountController.discountAdd
 );
+router.put(
+  "/updateStatus/:id",
+  authMiddleware.requireLogin,
+  discountController.updateStatus
+);
 
+router.delete('/deleteDistcount/:id',  
+  authMiddleware.requireLogin,
+  discountController.deleteDistcount);
 module.exports = router;
