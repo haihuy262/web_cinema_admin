@@ -2,24 +2,14 @@
 
 <div class="container mt-5" style="padding: 3%">
   <h2 class="text-center mb-5">Add New Discount</h2>
-  <form action="/discount/create" method="POST" enctype="multipart/form-data">
+  <form action="/discount/createDiscount" method="POST" enctype="multipart/form-data">
     <div class="mb-3">
       <label for="name" class="form-label">Name</label>
       <input type="text" class="form-control" id="name" name="name" required />
     </div>
     <div class="mb-3">
       <label for="percent" class="form-label">Percent</label>
-      <input
-        type="text"
-        class="form-control"
-        id="percent"
-        name="percent"
-        required
-      />
-    </div>
-    <div class="mb-3">
-      <label for="code" class="form-label">Code</label>
-      <input type="text" class="form-control" id="code" name="code" required />
+      <input type="text" class="form-control" id="percent" name="percent" required />
     </div>
     <div class="mb-3">
       <label for="type" class="form-label">Type</label>
@@ -27,25 +17,18 @@
     </div>
     <div class="mb-3">
       <label for="cinema" class="form-label">Cinema</label>
-      <select class="form-select" id="cinema" name="cinema" required>
-        <!-- Options sẽ được điền từ API -->
+      <select class="form-select" id="cinema" name="cinema" multiple required>
+      
       </select>
     </div>
-    <div class="mb-3">
+    <!-- <div class="mb-3">
       <label for="dayStart" class="form-label">Start Date</label>
       <input type="date" class="form-control" id="dayStart" name="dayStart" required />
     </div>
     <div class="mb-3">
       <label for="dayEnd" class="form-label">End Date</label>
       <input type="date" class="form-control" id="dayEnd" name="dayEnd" required />
-    </div>
-    <div class="mb-3">
-      <label for="status" class="form-label">Status</label>
-      <select class="form-select" id="status" name="status">
-        <option value="inactive" selected>Inactive</option>
-        <option value="active">Active</option>
-      </select>
-    </div>
+    </div> -->
     <div class="mb-3">
       <label for="image" class="form-label">Image</label>
       <input type="file" class="form-control" id="image" name="image" required />
@@ -56,16 +39,26 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    fetch('/api/cinemas') // Thay thế đường dẫn API thực tế của bạn
-      .then(response => response.json())
+    fetch('/discount/cinemaList')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
       .then(data => {
-        const cinemaSelect = document.getElementById('cinema');
-        data.forEach(cinema => {
-          const option = document.createElement('option');
-          option.value = cinema._id; // Hoặc trường ID tương ứng
-          option.textContent = cinema.name;
-          cinemaSelect.appendChild(option);
-        });
+        if (data.success) {
+          console.log('cinema', data.getAll);
+          const cinemaSelect = document.getElementById('cinema');
+          data.getAll.forEach(cinema => {
+            const option = document.createElement('option');
+            option.value = cinema._id;
+            option.textContent = cinema.name;
+            cinemaSelect.appendChild(option);
+          });
+        } else {
+          console.error('Error fetching cinema data:', data.error);
+        }
       })
       .catch(error => {
         console.error('Error fetching cinema data:', error);

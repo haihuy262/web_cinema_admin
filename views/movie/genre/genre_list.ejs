@@ -1,0 +1,115 @@
+<%- include('../../partials/header.ejs') %>
+
+<div class="container mt-5" style="padding: 3%;">
+  <h2 class="text-center">List Genre</h2>
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Stt</th>
+        <th>Name</th>
+        <th>Image</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% genres.forEach((genre, index) => { %>
+      <tr>
+        <td><%= index + 1 %></td>
+        <td><%= genre.name %></td>
+        <td><img src="http://139.180.132.97:3000/images/<%= genre.image %>" width="50"></td>
+        <td>
+          <button class="btn btn-info" 
+                  data-genre='<%= JSON.stringify(genre) %>' 
+                  onclick="editGenre(this)">Sửa</button>
+          <button class="btn btn-danger" onclick="deleteGenre('<%= genre._id %>')">Xóa</button>
+        </td>
+      </tr>
+      <% }); %>
+    </tbody>
+  </table>
+</div>
+
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editModalLabel">Chỉnh sửa Thể Loại</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+      </div>
+      <div class="modal-body">
+        <form id="editForm">
+          <input type="hidden" id="Id" name="Id">
+          <div class="mb-3">
+            <label for="Name" class="form-label">Tên</label>
+            <input type="text" class="form-control" id="Name" name="name" required>
+          </div>
+          <div class="mb-3">
+            <label for="Image" class="form-label">Hình Ảnh</label>
+            <input type="file" class="form-control" id="Image" name="image">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+        <button type="button" class="btn btn-primary" onclick="submitEdit()">Lưu thay đổi</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  async function deleteGenre(Id) {
+    if (confirm('Bạn có chắc chắn muốn xoá?')) {
+      try {
+        const response = await fetch(`/genre/delete/${Id}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          alert('Xoá thành công!');
+          window.location.reload();
+        } else {
+          alert('Đã xảy ra lỗi khi xoá.');
+        }
+      } catch (error) {
+        alert('Đã xảy ra lỗi khi xoá.');
+        console.error(error);
+      }
+    }
+  }
+
+  function editGenre(button) {
+    const genre = JSON.parse(button.getAttribute('data-genre'));
+    document.getElementById('Id').value = genre._id;
+    document.getElementById('Name').value = genre.name;
+
+    // Hiện modal
+    var myModal = new bootstrap.Modal(document.getElementById('editModal'));
+    myModal.show();
+  }
+
+  async function submitEdit() {
+    const Id = document.getElementById('Id').value;
+    const formData = new FormData(document.getElementById('editForm'));
+
+    try {
+      const response = await fetch(`/genre/updateGenre/${Id}`, {
+        method: 'PUT',
+        body: formData,
+      });
+
+      if (response.ok) {
+        alert('Cập nhật thành công!');
+        window.location.reload();
+      } else {
+        alert('Đã xảy ra lỗi khi cập nhật.');
+      }
+    } catch (error) {
+      alert('Đã xảy ra lỗi khi cập nhật.');
+      console.error(error);
+    }
+  }
+</script>

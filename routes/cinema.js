@@ -16,7 +16,7 @@ router.get(
 router.get("/roomList", authMiddleware.requireLogin, cinemaController.roomList);
 router.get("/roomAdd", authMiddleware.requireLogin, cinemaController.roomAdd);
 router.post(
-  "/creatCinema",
+  '/creatCinema',
   authMiddleware.requireLogin,
   cinemaController.creatCinema
 );

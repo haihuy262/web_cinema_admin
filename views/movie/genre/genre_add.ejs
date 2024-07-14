@@ -1,8 +1,8 @@
 <%- include('../../partials/header.ejs') %>
 
 <div class="container mt-5" style="padding: 3%;">
-  <h2 class="text-center">Add Director</h2>
-  <form action="/movie/createDirector" method="POST" enctype="multipart/form-data">
+  <h2 class="text-center">Add Genre</h2>
+  <form action="/genre/createGenre" method="POST" enctype="multipart/form-data">
     <div class="form-group">
       <label for="name">Name</label>
       <input type="text" class="form-control" id="name" name="name" required>
@@ -11,6 +11,6 @@
       <label for="image">Image</label>
       <input type="file" class="form-control" id="image" name="image" required>
     </div>
-    <button type="submit" class="btn btn-primary">Add Actor</button>
+    <button type="submit" class="btn btn-primary">Add Genre</button>
   </form>
 </div>

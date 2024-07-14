@@ -16,7 +16,7 @@ exports.discountList = async (req, res, next) => {
     });
 
     const discounts = response.data;
-    console.log('check',discounts)
+   
     res.render("../views/discount/discount_list.ejs", { discounts });
    
   } catch (error) {
@@ -95,5 +95,80 @@ exports.deleteDistcount = async (req, res, next) => {
   } catch (error) {
     console.log(error);
     res.json({ success: false });
+  }
+};
+exports.cinemaList = async (req, res, next) => {
+  try {
+    const token = req.session.admin.token;
+    console.log("token cinema controller:", token);
+
+    const response = await axios.get('http://139.180.132.97:3000/cinemas', {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    const cinemas = response.data.getAll;
+ 
+
+    // Trả về dữ liệu danh sách rạp chiếu phim
+    res.json({ success: true, getAll: cinemas });
+  } catch (error) {
+    console.log(error);
+
+    // Trả về thông báo lỗi
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+exports.createDiscount = async (req, res, next) => {
+  const { name, percent, type, cinema} = req.body;
+  const image = req.file;
+
+  // Kiểm tra các trường bắt buộc
+  if (!name || !percent || !type || !image) {
+    return res.status(400).json({ error: 'Tất cả các trường là bắt buộc.' });
+  }
+
+  try {
+    const token = req.session.admin.token;
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('percent', percent);
+    formData.append('type', type);
+    
+    formData.append('image', fs.createReadStream(image.path));
+
+    
+    if (Array.isArray(cinema)) {
+      cinema.forEach(cinemaId => {
+        formData.append('cinema', cinemaId);
+      });
+    } else {
+      formData.append('cinema', cinema); 
+    }
+
+    const response = await axios.post(
+      'http://139.180.132.97:3000/discounts',
+      formData,
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          ...formData.getHeaders(), 
+        },
+      }
+    );
+
+    if (req.file && req.file.fieldname === "image") {
+      fs.unlinkSync(req.file.path);
+    }
+
+    console.log('Response data:', cinema,image,name,percent,type);
+    res.render("../views/discount/discount_add.ejs", {    
+      success: 'Tạo discount thành công!',
+    });
+  } catch (error) {
+    console.error('Error creating discount:', error);
+    res.render("../views/discount/discount_add.ejs", {
+      error: 'Đã xảy ra lỗi khi tạo discount.'
+    });
   }
 };

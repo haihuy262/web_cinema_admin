@@ -17,6 +17,7 @@ var cinemaRouter = require("./routes/cinema");
 var discountRouter = require("./routes/discount");
 var serviceRouter = require("./routes/service");
 var loginRouter = require("./routes/login");
+var genreRouter = require("./routes/genre");
 var app = express();
 
 // view engine setup
@@ -57,6 +58,7 @@ app.use("/seat", seatRouter);
 app.use("/cinema", cinemaRouter);
 app.use("/discount", discountRouter);
 app.use("/service", serviceRouter);
+app.use("/genre", genreRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
