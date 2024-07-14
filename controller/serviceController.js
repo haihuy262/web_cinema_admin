@@ -120,13 +120,10 @@ exports.serviceList = async (req, res, next) => {
         if (image) {
             fs.unlinkSync(image.path);
         }
-        console.log('check',response)
-        return res.render("../views/service/service_list.ejs");
+        res.json({ success: true });
     } catch (error) {
-        console.error(error);
-        return res.render("../views/service/service_list.ejs", {
-            error: 'Đã xảy ra lỗi khi cập nhật food.',
-        });
+      console.log(error);
+      res.json({ success: false });
     }
 };
 

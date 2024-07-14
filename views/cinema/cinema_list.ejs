@@ -1,80 +1,125 @@
 <%- include('../partials/header.ejs') %>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>List of Cinemas</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.16.13/antd.min.css">
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-</head>
-<body>
-  <div class="container mt-5" style="padding: 3%;">
-    <h2>List of Cinemas</h2>
-    <table class="table table-bordered">
-      <thead>
-        <tr>
-          <th>Stt</th>
-          <th>Name</th>
-          <th>Address</th>
-          <th>Hotline</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>1</td>
-          <td>MDcinema My Dinh</td>
-          <td>So 1 Dinh Thon</td>
-          <td>023334444</td>
-          <td>
-            <button class="btn btn-info" onclick="editCinema(1)">Edit</button>
-            <button class="btn btn-danger" data-toggle="modal" data-target="#deleteCinemaModal">Delete</button>
-          </td>
-        </tr>
-        <!-- Thêm các dòng dữ liệu tương tự nếu cần -->
-      </tbody>
-    </table>
-  </div>
+<div class="container mt-5" style="padding: 3%;">
+  <h2>List of Cinemas</h2>
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Id</th>
+        <th>Name</th>
+        <th>Address</th>
+        <th>Hotline</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% console.log("check cinemas", cinemas) %>
+      <% cinemas.getAll.forEach(cinema => { %>
+      <tr>
+        <td><%= cinema._id %></td>
+        <td><%= cinema.name %></td>
+        <td><%= cinema.address %></td>
+        <td><%= cinema.hotline %></td>
+        <td>
+          <button class="btn btn-info" 
+          data-cinema='<%= JSON.stringify(cinema) %>' 
+          onclick="editCinema(this)">Sửa</button>
+          <button class="btn btn-danger" onclick="deleteCinema('<%= cinema._id %>')">Xoá</button>
+        </td>
+      </tr>
+      <% }); %>
+    </tbody>
+  </table>
+</div>
 
-  <!-- Modal Xác nhận Xóa Cinema -->
-  <div class="modal fade" id="deleteCinemaModal" tabindex="-1" role="dialog" aria-labelledby="deleteCinemaModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="deleteCinemaModalLabel">Xác nhận Xóa Rạp Chiếu Phim</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <p>Bạn có chắc chắn muốn xóa rạp chiếu phim này?</p>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
-          <button type="button" class="btn btn-danger" onclick="deleteCinema()">Xóa</button>
-        </div>
+<!-- Modal Sửa Rạp -->
+<div class="modal fade" id="editCinemaModal" tabindex="-1" aria-labelledby="editCinemaModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editCinemaModalLabel">Sửa Rạp</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+      </div>
+      <div class="modal-body">
+        <form id="editCinemaForm">
+          <input type="hidden" id="cinemaId" name="cinemaId">
+          <div class="mb-3">
+            <label for="cinemaName" class="form-label">Tên</label>
+            <input type="text" class="form-control" id="cinemaName" name="name" required>
+          </div>
+          <div class="mb-3">
+            <label for="cinemaAddress" class="form-label">Địa chỉ</label>
+            <input type="text" class="form-control" id="cinemaAddress" name="address" required>
+          </div>
+          <div class="mb-3">
+            <label for="cinemaHotline" class="form-label">Hotline</label>
+            <input type="text" class="form-control" id="cinemaHotline" name="hotline" required>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+        <button type="button" class="btn btn-primary" onclick="submitEditCinema()">Lưu thay đổi</button>
       </div>
     </div>
   </div>
+</div>
 
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+  async function deleteCinema(Id) {
+    if (confirm('Bạn có chắc chắn muốn xoá?')) {
+      try {
+        const response = await fetch(`/cinema/cinema/${Id}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
 
-  <script>
-    // Function to delete a cinema (mock implementation, replace with actual logic)
-    function deleteCinema() {
-      alert("Delete Cinema function called.");
-      // Implement your logic to delete cinema here
+        if (response.ok) {
+          alert('Xoá thành công!');
+          window.location.reload();
+        } else {
+          alert('Đã xảy ra lỗi khi xoá.');
+        }
+      } catch (error) {
+        alert('Đã xảy ra lỗi khi xoá.');
+        console.error(error);
+      }
     }
+  }
 
-    // Function to edit a cinema (mock implementation, replace with actual logic)
-    function editCinema(cinemaId) {
-      alert("Edit Cinema function called for Cinema ID: " + cinemaId);
-      // Implement your logic to edit cinema here
+  function editCinema(button) {
+    const cinema = JSON.parse(button.getAttribute('data-cinema'));
+    document.getElementById('cinemaId').value = cinema._id;
+    document.getElementById('cinemaName').value = cinema.name;
+    document.getElementById('cinemaAddress').value = cinema.address;
+    document.getElementById('cinemaHotline').value = cinema.hotline;
+
+    // Hiện modal
+    var myModal = new bootstrap.Modal(document.getElementById('editCinemaModal'));
+    myModal.show();
+  }
+
+  async function submitEditCinema() {
+    const cinemaId = document.getElementById('cinemaId').value;
+    const formData = new FormData(document.getElementById('editCinemaForm'));
+
+    try {
+      const response = await fetch(`/cinema/updateCinema/${cinemaId}`, {
+        method: 'PUT',
+        body: formData,
+      });
+
+      if (response.ok) {
+        alert('Cập nhật thành công!');
+        window.location.reload();
+      } else {
+        alert('Đã xảy ra lỗi khi cập nhật.');
+      }
+    } catch (error) {
+      alert('Đã xảy ra lỗi khi cập nhật.');
+      console.error(error);
     }
-  </script>
-</body>
-</html>
+  }
+</script>
