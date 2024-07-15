@@ -1,17 +1,17 @@
 <%- include('../partials/header.ejs') %>
 <div class="container mt-5 p-5">
-  <h2 class="text-center">Thêm dịch vụ</h2>
+  <h2 class="text-center">Thêm đồ ăn</h2>
   <form
     action="/service/createFood"
     method="POST"
     enctype="multipart/form-data"
   >
     <div class="mb-3">
-      <label for="name" class="form-label">Tên dịch vụ</label>
+      <label for="name" class="form-label">Tên đồ ăn</label>
       <input type="text" class="form-control" id="name" name="name" required />
     </div>
     <div class="mb-3">
-      <label for="price" class="form-label">Giá dịch vụ</label>
+      <label for="price" class="form-label">Giá đồ ăn</label>
       <input
         type="number"
         class="form-control"
@@ -21,7 +21,7 @@
       />
     </div>
     <div class="mb-3">
-      <label for="image" class="form-label">Image</label>
+      <label for="image" class="form-label">Ảnh đồ ăn</label>
       <input
         type="file"
         class="form-control"
@@ -33,6 +33,6 @@
     <button onclick="window.history.back()" class="btn btn-secondary mt-3">
       Quay lại
     </button>
-    <button type="submit" class="btn btn-primary mt-3">Tạo dịch vụ</button>
+    <button type="submit" class="btn btn-primary mt-3">Tạo đồ ăn</button>
   </form>
 </div>

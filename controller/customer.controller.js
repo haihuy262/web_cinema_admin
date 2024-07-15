@@ -10,7 +10,7 @@ exports.listCustomer = async (req, res, next) => {
       },
     });
 
-    const userData = response.data.getAll.data;
+    const userData = response.data.getAll;
 
     res.render("../views/manager/customer/listCustomer.ejs", { userData });
   } catch (error) {
