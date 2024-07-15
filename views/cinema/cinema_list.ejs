@@ -1,6 +1,6 @@
 <%- include('../partials/header.ejs') %>
 
-<div class="container mt-5" style="padding: 3%;">
+<div class="container mt-5" style="padding: 3%">
   <h2>List of Cinemas</h2>
   <table class="table table-bordered">
     <thead>
@@ -13,18 +13,26 @@
       </tr>
     </thead>
     <tbody>
-      <% console.log("check cinemas", cinemas) %>
-      <% cinemas.getAll.forEach(cinema => { %>
+      %> <% cinemas.forEach(cinema => { %>
       <tr>
         <td><%= cinema._id %></td>
         <td><%= cinema.name %></td>
         <td><%= cinema.address %></td>
         <td><%= cinema.hotline %></td>
         <td>
-          <button class="btn btn-info" 
-          data-cinema='<%= JSON.stringify(cinema) %>' 
-          onclick="editCinema(this)">Sửa</button>
-          <button class="btn btn-danger" onclick="deleteCinema('<%= cinema._id %>')">Xoá</button>
+          <button
+            class="btn btn-info"
+            data-cinema="<%= JSON.stringify(cinema) %>"
+            onclick="editCinema(this)"
+          >
+            Sửa
+          </button>
+          <button
+            class="btn btn-danger"
+            onclick="deleteCinema('<%= cinema._id %>')"
+          >
+            Xoá
+          </button>
         </td>
       </tr>
       <% }); %>
@@ -33,33 +41,70 @@
 </div>
 
 <!-- Modal Sửa Rạp -->
-<div class="modal fade" id="editCinemaModal" tabindex="-1" aria-labelledby="editCinemaModalLabel" aria-hidden="true">
+<div
+  class="modal fade"
+  id="editCinemaModal"
+  tabindex="-1"
+  aria-labelledby="editCinemaModalLabel"
+  aria-hidden="true"
+>
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="editCinemaModalLabel">Sửa Rạp</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Đóng"
+        ></button>
       </div>
       <div class="modal-body">
         <form id="editCinemaForm">
-          <input type="hidden" id="cinemaId" name="cinemaId">
+          <input type="hidden" id="cinemaId" name="cinemaId" />
           <div class="mb-3">
             <label for="cinemaName" class="form-label">Tên</label>
-            <input type="text" class="form-control" id="cinemaName" name="name" required>
+            <input
+              type="text"
+              class="form-control"
+              id="cinemaName"
+              name="name"
+              required
+            />
           </div>
           <div class="mb-3">
             <label for="cinemaAddress" class="form-label">Địa chỉ</label>
-            <input type="text" class="form-control" id="cinemaAddress" name="address" required>
+            <input
+              type="text"
+              class="form-control"
+              id="cinemaAddress"
+              name="address"
+              required
+            />
           </div>
           <div class="mb-3">
             <label for="cinemaHotline" class="form-label">Hotline</label>
-            <input type="text" class="form-control" id="cinemaHotline" name="hotline" required>
+            <input
+              type="text"
+              class="form-control"
+              id="cinemaHotline"
+              name="hotline"
+              required
+            />
           </div>
         </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-        <button type="button" class="btn btn-primary" onclick="submitEditCinema()">Lưu thay đổi</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Đóng
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          onclick="submitEditCinema()"
+        >
+          Lưu thay đổi
+        </button>
       </div>
     </div>
   </div>
@@ -67,58 +112,60 @@
 
 <script>
   async function deleteCinema(Id) {
-    if (confirm('Bạn có chắc chắn muốn xoá?')) {
+    if (confirm("Bạn có chắc chắn muốn xoá?")) {
       try {
         const response = await fetch(`/cinema/cinema/${Id}`, {
-          method: 'DELETE',
+          method: "DELETE",
           headers: {
-            'Content-Type': 'application/json'
-          }
+            "Content-Type": "application/json",
+          },
         });
 
         if (response.ok) {
-          alert('Xoá thành công!');
+          alert("Xoá thành công!");
           window.location.reload();
         } else {
-          alert('Đã xảy ra lỗi khi xoá.');
+          alert("Đã xảy ra lỗi khi xoá.");
         }
       } catch (error) {
-        alert('Đã xảy ra lỗi khi xoá.');
+        alert("Đã xảy ra lỗi khi xoá.");
         console.error(error);
       }
     }
   }
 
   function editCinema(button) {
-    const cinema = JSON.parse(button.getAttribute('data-cinema'));
-    document.getElementById('cinemaId').value = cinema._id;
-    document.getElementById('cinemaName').value = cinema.name;
-    document.getElementById('cinemaAddress').value = cinema.address;
-    document.getElementById('cinemaHotline').value = cinema.hotline;
+    const cinema = JSON.parse(button.getAttribute("data-cinema"));
+    document.getElementById("cinemaId").value = cinema._id;
+    document.getElementById("cinemaName").value = cinema.name;
+    document.getElementById("cinemaAddress").value = cinema.address;
+    document.getElementById("cinemaHotline").value = cinema.hotline;
 
     // Hiện modal
-    var myModal = new bootstrap.Modal(document.getElementById('editCinemaModal'));
+    var myModal = new bootstrap.Modal(
+      document.getElementById("editCinemaModal")
+    );
     myModal.show();
   }
 
   async function submitEditCinema() {
-    const cinemaId = document.getElementById('cinemaId').value;
-    const formData = new FormData(document.getElementById('editCinemaForm'));
+    const cinemaId = document.getElementById("cinemaId").value;
+    const formData = new FormData(document.getElementById("editCinemaForm"));
 
     try {
       const response = await fetch(`/cinema/updateCinema/${cinemaId}`, {
-        method: 'PUT',
+        method: "PUT",
         body: formData,
       });
 
       if (response.ok) {
-        alert('Cập nhật thành công!');
+        alert("Cập nhật thành công!");
         window.location.reload();
       } else {
-        alert('Đã xảy ra lỗi khi cập nhật.');
+        alert("Đã xảy ra lỗi khi cập nhật.");
       }
     } catch (error) {
-      alert('Đã xảy ra lỗi khi cập nhật.');
+      alert("Đã xảy ra lỗi khi cập nhật.");
       console.error(error);
     }
   }

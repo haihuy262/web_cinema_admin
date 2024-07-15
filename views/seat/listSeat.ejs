@@ -7,9 +7,11 @@
         <label for="cinemaSelect" class="form-label h6">Rạp phim</label>
         <select id="cinemaSelect" class="form-select">
           <option selected disabled>Chọn Rạp Phim...</option>
-          <option value="cinema1">Cinema 1</option>
-          <option value="cinema2">Cinema 2</option>
-          <!-- Add more options for other cinemas -->
+          <% for(let i = 0; i < dataCinemas.length; i++){ %>
+          <option value="<%= dataCinemas[i]._id %>">
+            <%= dataCinemas[i].name %>
+          </option>
+          <% } %>
         </select>
       </div>
       <div class="col-6">
@@ -17,26 +19,22 @@
         <select id="roomSelect" class="form-select">
           <option selected disabled>Chọn Phòng Chiếu...</option>
           <option value="room1">Room 1</option>
-          <option value="room2">Room 2</option>
-          <!-- Add more options for other rooms -->
         </select>
       </div>
       <div class="col-6 mt-4">
-        <label for="roomSelect" class="form-label h6">Ngày chiếu</label>
-        <select id="roomSelect" class="form-select">
+        <label for="showDataSelect" class="form-label h6">Ngày chiếu</label>
+        <select id="showDataSelect" class="form-select">
           <option selected disabled>Chọn Ngày Chiếu...</option>
           <option value="room1">Room 1</option>
           <option value="room2">Room 2</option>
-          <!-- Add more options for other rooms -->
         </select>
       </div>
       <div class="col-6 mt-4">
-        <label for="roomSelect" class="form-label h6">Giờ chiếu</label>
-        <select id="roomSelect" class="form-select">
+        <label for="timeSelect" class="form-label h6">Giờ chiếu</label>
+        <select id="timeSelect" class="form-select">
           <option selected disabled>Chọn Giờ Chiếu...</option>
           <option value="room1">Room 1</option>
           <option value="room2">Room 2</option>
-          <!-- Add more options for other rooms -->
         </select>
       </div>
     </div>
@@ -118,10 +116,11 @@
           <label for="roomSelect" class="form-label h6">Phòng chiếu</label>
           <select id="roomSelect" class="form-select mb-3">
             <option selected disabled>Chọn phòng chiếu...</option>
-            <!-- Example rooms, replace or add actual rooms -->
-            <option value="room1">Phòng chiếu 1</option>
-            <option value="room2">Phòng chiếu 2</option>
-            <option value="room3">Phòng chiếu 3</option>
+            <% for(let i = 0; i < dataCinemas.length; i++){ %>
+            <option value="<%= dataCinemas[i]._id %>">
+              <%= dataCinemas[i].name %>
+            </option>
+            <% } %>
           </select>
         </div>
         <!-- Modal Footer -->
@@ -147,6 +146,7 @@
     .getElementById("confirmAdd")
     .addEventListener("click", async function () {});
 </script>
+<!-- Chọn ghế tự động tính tiền -->
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     const seatSelect = document.getElementById("seatSelect");
@@ -191,6 +191,89 @@
       }
 
       seatPrice.value = price.toLocaleString("en-US");
+    });
+  });
+</script>
+<!-- Install Extension CORS để sử dụng hàm -->
+<!-- https://chromewebstore.google.com/detail/cors-unblock/lfhmikememgdcahcdlaciloancbhjino?hl=vi -->
+<script>
+  $(document).ready(function () {
+    $("#cinemaSelect").change(function () {
+      const selectedCinemaId = $(this).val();
+      const token = "<%= token %>";
+
+      $.ajax({
+        url: `http://139.180.132.97:3000/rooms/room/cinema?cinemaId=${selectedCinemaId}`,
+        data: { cinemaId: selectedCinemaId },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        success: function (data) {
+          $("#roomSelect").empty();
+          $("#roomSelect").append(
+            $("<option>")
+              .text("Chọn Phòng Chiếu...")
+              .attr("disabled", "disabled")
+              .attr("selected", "selected")
+          );
+
+          let showtimes = [];
+          for (let i = 0; i < data.length; i++) {
+            const option = $("<option>").val(data[i]._id).text(data[i].name);
+            $("#roomSelect").append(option);
+
+            if (data[i].showtime && Array.isArray(data[i].showtime)) {
+              showtimes = showtimes.concat(data[i].showtime);
+            }
+          }
+
+          const uniqueDates = Array.from(
+            new Set(showtimes.map((st) => st.date))
+          );
+
+          $("#showDataSelect").empty();
+          $("#showDataSelect").append(
+            $("<option>")
+              .text("Chọn Ngày Chiếu...")
+              .attr("disabled", "disabled")
+              .attr("selected", "selected")
+          );
+
+          uniqueDates.forEach((date) => {
+            const dateOption = $("<option>")
+              .val(date)
+              .text(new Date(date).toLocaleDateString());
+            $("#showDataSelect").append(dateOption);
+          });
+
+          $("#showDataSelect").change(function () {
+            const selectedDate = $(this).val();
+            const selectedShowtime = showtimes.find(
+              (st) => st.date === selectedDate
+            );
+
+            $("#timeSelect").empty();
+            $("#timeSelect").append(
+              $("<option>")
+                .text("Chọn Giờ Chiếu...")
+                .attr("disabled", "disabled")
+                .attr("selected", "selected")
+            );
+
+            if (selectedShowtime && Array.isArray(selectedShowtime.time)) {
+              selectedShowtime.time.forEach((timeObj) => {
+                const timeOption = $("<option>")
+                  .val(timeObj._id)
+                  .text(timeObj.time);
+                $("#timeSelect").append(timeOption);
+              });
+            }
+          });
+        },
+        error: function (error) {
+          console.error("Error fetching rooms:", error);
+        },
+      });
     });
   });
 </script>

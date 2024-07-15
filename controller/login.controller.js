@@ -27,7 +27,6 @@ exports.postLogin = async (req, res, next) => {
         password,
       }
     );
-    console.log(response.data);
     if (
       response.data.admin.name === name &&
       response.data.admin.password === password
