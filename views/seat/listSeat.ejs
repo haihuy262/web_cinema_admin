@@ -47,39 +47,12 @@
     >
       Thêm hàng ghế mới
     </button>
-    <button class="btn btn-primary mb-4 ms-3">Xem Ghế</button>
+    <button id="viewSeatsBtn" class="btn btn-primary mb-4 ms-3">Xem Ghế</button>
     <button class="btn btn-primary mb-4 ms-3">Edit</button>
     <button class="btn btn-danger mb-4 ms-3">Delete</button>
   </div>
   <!-- Seat -->
-  <div id="seats">
-    <div class="row justify-content-center">
-      <div class="col-md-1 mb-3">
-        <button class="btn btn-secondary w-100">A1</button>
-      </div>
-      <div class="col-md-1 mb-3">
-        <button class="btn btn-secondary w-100">A2</button>
-      </div>
-      <div class="col-md-1 mb-3">
-        <button class="btn btn-secondary w-100">A3</button>
-      </div>
-      <div class="col-md-1 mb-3">
-        <button class="btn btn-secondary w-100">A4</button>
-      </div>
-      <div class="col-md-1 mb-3">
-        <button class="btn btn-secondary w-100">A5</button>
-      </div>
-      <div class="col-md-1 mb-3">
-        <button class="btn btn-secondary w-100">A6</button>
-      </div>
-      <div class="col-md-1 mb-3">
-        <button class="btn btn-secondary w-100">A7</button>
-      </div>
-      <div class="col-md-1 mb-3">
-        <button class="btn btn-secondary w-100">A8</button>
-      </div>
-    </div>
-  </div>
+  <div id="seats" class="row justify-content-center"></div>
   <!-- Modal Add Seat -->
   <div
     class="modal fade"
@@ -114,13 +87,9 @@
             <input type="text" id="seatPrice" class="form-control" readonly />
           </div>
           <label for="roomSelect" class="form-label h6">Phòng chiếu</label>
-          <select id="roomSelect" class="form-select mb-3">
-            <option selected disabled>Chọn phòng chiếu...</option>
-            <% for(let i = 0; i < dataCinemas.length; i++){ %>
-            <option value="<%= dataCinemas[i]._id %>">
-              <%= dataCinemas[i].name %>
-            </option>
-            <% } %>
+          <select id="roomSelect" class="form-select">
+            <option selected disabled>Chọn Phòng Chiếu...</option>
+            <option value="room1">Room 1</option>
           </select>
         </div>
         <!-- Modal Footer -->
@@ -148,12 +117,11 @@
 </script>
 <!-- Chọn ghế tự động tính tiền -->
 <script>
+  var existingSeats = [];
   document.addEventListener("DOMContentLoaded", function () {
     const seatSelect = document.getElementById("seatSelect");
     const seatPrice = document.getElementById("seatPrice");
     const roomSelect = document.getElementById("roomSelect");
-
-    const existingSeats = ["A1", "A2", "A3"]; // Danh sách các ghế đã có sẵn
 
     // Generate seat options from A1 to H8
     const seats = [];
@@ -274,6 +242,53 @@
           console.error("Error fetching rooms:", error);
         },
       });
+    });
+  });
+</script>
+<!-- Xem ghế -->
+<script>
+  $(document).ready(function () {
+    $("#viewSeatsBtn").click(function () {
+      const token = "<%= token %>";
+      const roomId = $("#roomSelect").val();
+      if (roomId) {
+        $.ajax({
+          url: `http://139.180.132.97:3000/seats/room/${roomId}`,
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          success: function (data) {
+            $("#seats").empty(); // Xóa các ghế hiện tại nếu có
+
+            // Sắp xếp các tên ghế theo thứ tự alphabet
+            const sortedSeats = data.sort((a, b) => {
+              const rowA = a.name.charAt(0);
+              const rowB = b.name.charAt(0);
+              const numA = parseInt(a.name.slice(1));
+              const numB = parseInt(b.name.slice(1));
+
+              if (rowA < rowB) return -1;
+              if (rowA > rowB) return 1;
+              return numA - numB;
+            });
+
+            // Hiển thị các ghế sau khi sắp xếp
+            sortedSeats.forEach(function (seat) {
+              const seatButton = `<div class="col-md-1 mb-3">
+                                    <button class="btn btn-secondary w-100">${seat.name}</button>
+                                  </div>`;
+              $("#seats").append(seatButton);
+              existingSeats.push(seat.name);
+            });
+          },
+          error: function (error) {
+            console.error("Error fetching seats:", error);
+          },
+        });
+      } else {
+        console.log("Please select a room.");
+      }
     });
   });
 </script>
