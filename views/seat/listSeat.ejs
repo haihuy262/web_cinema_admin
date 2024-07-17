@@ -1,4 +1,22 @@
 <%- include('../partials/header.ejs') %>
+<style>
+  #seats-container {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%; /* Adjust width as needed */
+  }
+
+  .seat {
+    flex: 0 0 12.5%; /* Each seat takes up 12.5% of the row width */
+    box-sizing: border-box;
+    padding: 5px; /* Add some padding between seats */
+  }
+
+  .seat button {
+    width: 100%;
+    min-height: 50px;
+  }
+</style>
 <div class="container mt-5 p-5">
   <h2 class="text-center">Quản lý ghế</h2>
   <form id="seatForm">
@@ -52,7 +70,7 @@
     <button class="btn btn-danger mb-4 ms-3">Delete</button>
   </div>
   <!-- Seat -->
-  <div id="seats" class="row justify-content-center"></div>
+  <div id="seats-container"></div>
   <!-- Modal Add Seat -->
   <div
     class="modal fade"
@@ -67,7 +85,7 @@
         <div class="modal-header">
           <h1 class="modal-title fs-5" id="addSeatModalLabel">
             <i class="fas fa-exclamation-triangle text-danger"></i>
-            Thêm hàng ghế mới
+            Thêm ghế mới
           </h1>
           <button
             type="button"
@@ -78,19 +96,35 @@
         </div>
         <!-- Modal Body -->
         <div class="modal-body">
-          <label for="seatSelect" class="form-label h6">Tên ghế</label>
-          <select id="seatSelect" class="form-select">
-            <option selected disabled>Chọn tên ghế...</option>
-          </select>
+          <div id="name">
+            <label for="seatSelect" class="form-label h6">Tên ghế</label>
+            <select id="seatSelect" class="form-select">
+              <option selected disabled>Chọn tên ghế...</option>
+            </select>
+          </div>
+          <div id="seatMessage" class="text-danger h5 mt-2"></div>
           <div id="priceContainer" class="mt-3">
             <label for="seatPrice" class="form-label h6">Giá tiền</label>
             <input type="text" id="seatPrice" class="form-control" readonly />
           </div>
-          <label for="roomSelect" class="form-label h6">Phòng chiếu</label>
-          <select id="roomSelect" class="form-select">
-            <option selected disabled>Chọn Phòng Chiếu...</option>
-            <option value="room1">Room 1</option>
-          </select>
+          <div id="cinema" class="mt-3">
+            <label for="cinemaSelectAdd" class="form-label h6">Rạp chiếu</label>
+            <select id="cinemaSelectAdd" class="form-select">
+              <option selected disabled>Chọn Rạp Chiếu...</option>
+              <% for(let i = 0; i < dataCinemas.length; i++){ %>
+              <option value="<%= dataCinemas[i]._id %>">
+                <%= dataCinemas[i].name %>
+              </option>
+              <% } %>
+            </select>
+          </div>
+          <div id="room" class="mt-3">
+            <label for="roomSelectAdd" class="form-label h6">Phòng chiếu</label>
+            <select id="roomSelectAdd" class="form-select">
+              <option selected disabled>Chọn Phòng Chiếu...</option>
+              <option value="room1">Room 1</option>
+            </select>
+          </div>
         </div>
         <!-- Modal Footer -->
         <div class="modal-footer">
@@ -109,70 +143,18 @@
     </div>
   </div>
 </div>
-<!-- Add Seat -->
-<script>
-  document
-    .getElementById("confirmAdd")
-    .addEventListener("click", async function () {});
-</script>
-<!-- Chọn ghế tự động tính tiền -->
-<script>
-  var existingSeats = [];
-  document.addEventListener("DOMContentLoaded", function () {
-    const seatSelect = document.getElementById("seatSelect");
-    const seatPrice = document.getElementById("seatPrice");
-    const roomSelect = document.getElementById("roomSelect");
-
-    // Generate seat options from A1 to H8
-    const seats = [];
-    const rows = ["A", "B", "C", "D", "E", "F", "G", "H"];
-    const columns = 8;
-
-    rows.forEach((row) => {
-      for (let i = 1; i <= columns; i++) {
-        seats.push(`${row}${i}`);
-      }
-    });
-
-    // Danh sách các ghế có thể chọn sau khi loại bỏ các ghế đã có sẵn
-    const availableSeats = seats.filter(
-      (seat) => !existingSeats.includes(seat)
-    );
-
-    // Populate the select dropdown with seat options
-    availableSeats.forEach((seat) => {
-      const option = document.createElement("option");
-      option.value = seat;
-      option.textContent = seat;
-      seatSelect.appendChild(option);
-    });
-
-    // Event listener to update the seat price based on the selected seat
-    seatSelect.addEventListener("change", function () {
-      const selectedSeat = seatSelect.value;
-      let price = 70000; // Default price
-
-      if (selectedSeat.match(/^[CDEF][3-6]$/)) {
-        price = 80000;
-      } else if (selectedSeat.match(/^H[1-8]$/)) {
-        price = 90000;
-      }
-
-      seatPrice.value = price.toLocaleString("en-US");
-    });
-  });
-</script>
 <!-- Install Extension CORS để sử dụng hàm -->
 <!-- https://chromewebstore.google.com/detail/cors-unblock/lfhmikememgdcahcdlaciloancbhjino?hl=vi -->
+<!-- Sự kiện chọn Rạp, Phòng, Ngày, Giờ -->
 <script>
+  const token = "<%= token %>";
   $(document).ready(function () {
     $("#cinemaSelect").change(function () {
       const selectedCinemaId = $(this).val();
-      const token = "<%= token %>";
 
       $.ajax({
         url: `http://139.180.132.97:3000/rooms/room/cinema?cinemaId=${selectedCinemaId}`,
-        data: { cinemaId: selectedCinemaId },
+        method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -245,9 +227,129 @@
     });
   });
 </script>
-<!-- Xem ghế -->
+
+<!-- Đưa dữ liệu rạp phim và phòng chiếu -->
 <script>
   $(document).ready(function () {
+    $("#cinemaSelectAdd").change(function () {
+      const idCinema = $(this).val();
+      $.ajax({
+        url: `http://139.180.132.97:3000/rooms/room/cinema?cinemaId=${idCinema}`,
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        success: function (data) {
+          $("#roomSelectAdd").empty();
+          $("#roomSelectAdd").append(
+            $("<option>")
+              .text("Chọn Phòng Chiếu...")
+              .attr("disabled", "disabled")
+              .attr("selected", "selected")
+          );
+          for (let i = 0; i < data.length; i++) {
+            const option = $("<option>").val(data[i]._id).text(data[i].name);
+            $("#roomSelectAdd").append(option);
+          }
+        },
+        error: function (error) {
+          console.log(error);
+        },
+      });
+    });
+  });
+</script>
+<!-- Sự kiện thêm ghế -->
+<script>
+  $(document).ready(function () {
+    $("#roomSelectAdd").change(function () {
+      const idRoomAdd = $(this).val();
+      $("#confirmAdd").click(function () {
+        const selectedSeat = seatSelect.value;
+        const selectedPrice = seatPrice.value.replace(/,/g, "");
+        const selectedRoom = idRoomAdd;
+
+        console.log(selectedSeat);
+        console.log(selectedPrice);
+        console.log(idRoomAdd);
+
+        $.ajax({
+          url: "http://139.180.132.97:3000/seats",
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          data: JSON.stringify({
+            name: selectedSeat,
+            price: selectedPrice,
+            room: selectedRoom,
+          }),
+          success: function (response) {
+            console.log(response);
+          },
+          error: function (error) {
+            console.log(error);
+          },
+        });
+      });
+    });
+  });
+</script>
+<!-- Xem ghế, logic hiển thị add ghế, add ghế -->
+<script>
+  $(document).ready(function () {
+    const seatSelect = $("#seatSelect");
+    const seatPrice = $("#seatPrice");
+    const roomSelect = $("#roomSelect");
+    const seatMessage = $("#seatMessage");
+    const existingSeats = [];
+
+    // Generate seat options from A1 to H8
+    const seats = [];
+    const rows = ["A", "B", "C", "D", "E", "F", "G", "H"];
+    const columns = 8;
+
+    rows.forEach((row) => {
+      for (let i = 1; i <= columns; i++) {
+        seats.push(`${row}${i}`);
+      }
+    });
+
+    // Function to populate the select dropdown with seat options
+    function populateSeatOptions(availableSeats) {
+      seatSelect.empty();
+      if (availableSeats.length == 0) {
+        seatMessage.text("Phòng đã đủ ghế");
+        $("#priceContainer").hide();
+        $("#name").hide();
+        $("#room").hide();
+        $("#cinema").hide();
+      } else {
+        // Clear the existing options
+        availableSeats.forEach((seat) => {
+          seatSelect.append(new Option(seat, seat));
+        });
+      }
+    }
+
+    // Initial population of the select dropdown
+    populateSeatOptions(seats);
+
+    // Event listener to update the seat price based on the selected seat
+    seatSelect.change(function () {
+      const selectedSeat = seatSelect.val();
+      let price = 70000; // Default price
+
+      if (/^[CDEF][3-6]$/.test(selectedSeat)) {
+        price = 80000;
+      } else if (/^H[1-8]$/.test(selectedSeat)) {
+        price = 90000;
+      }
+
+      seatPrice.val(price.toLocaleString("en-US"));
+    });
+
     $("#viewSeatsBtn").click(function () {
       const token = "<%= token %>";
       const roomId = $("#roomSelect").val();
@@ -259,9 +361,24 @@
             Authorization: `Bearer ${token}`,
           },
           success: function (data) {
-            $("#seats").empty(); // Xóa các ghế hiện tại nếu có
+            // Store existing seats from API response
+            data.forEach((seat) => existingSeats.push(seat.name));
 
-            // Sắp xếp các tên ghế theo thứ tự alphabet
+            // Filter out the taken seats from the pre-generated seats
+            const availableSeats = seats.filter(
+              (seat) => !existingSeats.includes(seat)
+            );
+
+            // Populate the select dropdown with available seats
+            populateSeatOptions(availableSeats);
+
+            // Clear the current displayed seats if any
+            const seatsContainer = document.getElementById("seats-container");
+            while (seatsContainer.firstChild) {
+              seatsContainer.removeChild(seatsContainer.firstChild);
+            }
+
+            // Sort and display the existing seats from the API response
             const sortedSeats = data.sort((a, b) => {
               const rowA = a.name.charAt(0);
               const rowB = b.name.charAt(0);
@@ -273,13 +390,12 @@
               return numA - numB;
             });
 
-            // Hiển thị các ghế sau khi sắp xếp
+            // Display the sorted seats
             sortedSeats.forEach(function (seat) {
-              const seatButton = `<div class="col-md-1 mb-3">
-                                    <button class="btn btn-secondary w-100">${seat.name}</button>
-                                  </div>`;
-              $("#seats").append(seatButton);
-              existingSeats.push(seat.name);
+              const seatElement = document.createElement("div");
+              seatElement.className = "seat";
+              seatElement.innerHTML = `<button class="btn btn-secondary">${seat.name}</button>`;
+              seatsContainer.appendChild(seatElement);
             });
           },
           error: function (error) {
