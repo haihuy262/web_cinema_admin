@@ -8,5 +8,19 @@ router.get(
   authMiddleware.requireLogin,
   dashboardController.getOverview
 );
-
+router.get(
+  "/movieList",
+  authMiddleware.requireLogin,
+  dashboardController.movieList
+);
+router.get(
+  "/total",
+  authMiddleware.requireLogin,
+  dashboardController.total
+);
+router.get(
+  "/totalCinema",
+  authMiddleware.requireLogin,
+  dashboardController.totalCinema
+);
 module.exports = router;
