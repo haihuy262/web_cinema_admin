@@ -105,6 +105,25 @@ exports.createMovie = async (req, res, next) => {
   exports.updateMovie = async (req, res, next) => {
     res.render("../views/movie/update_movie.ejs"); 
   };
+  exports.deleteMovie = async (req, res, next) => {
+    const id = req.params.id;
+    const token = req.session.admin.token;
+  
+    try {
+      const response = await axios.delete(
+        `http://139.180.132.97:3000/movies/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      res.json({ success: true });
+    } catch (error) {
+      console.log(error);
+      res.json({ success: false });
+    }
+  };
   exports.addActor = async (req, res, next) => {
     res.render("../views/movie/actor/add_actor.ejs"); 
   };

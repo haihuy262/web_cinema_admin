@@ -14,6 +14,7 @@ router.post(
   movieController.createMovie
 );
 router.get("/update/:id", authMiddleware.requireLogin, movieController.updateMovie);
+router.delete('/updateMovie/:id', movieController.deleteMovie);
 router.get("/actor", authMiddleware.requireLogin, movieController.addActor);
 router.get(
   "/addDirectors",
