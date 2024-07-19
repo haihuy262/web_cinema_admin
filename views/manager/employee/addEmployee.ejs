@@ -12,12 +12,10 @@
     </script>
   </div>
   <% } %>
-  <!-- ======================= -->
   <!-- ===== alert error ===== -->
   <% if (typeof error !== 'undefined') { %>
   <div class="alert alert-danger" role="alert"><%= error %></div>
   <% } %>
-  <!-- ======================= -->
   <form method="post" enctype="multipart/form-data">
     <div class="mb-3">
       <label for="fullName" class="form-label required">Họ Tên</label>
@@ -73,14 +71,6 @@
         required
       />
     </div>
-    <!-- <div class="mb-3">
-      <label for="role" class="form-label required">Quyền</label>
-      <select class="form-select" id="role" required>
-        <option value="">Chọn quyền</option>
-        <option value="user">User</option>
-        <option value="nhân viên">Staff</option>
-      </select>
-    </div> -->
     <div class="mb-3">
       <label for="role" class="form-label required">Giới tính</label>
       <select name="gender" class="form-select" id="role" required>
