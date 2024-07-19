@@ -14,13 +14,23 @@
 
   .seat button {
     width: 100%;
-    min-height: 50px;
+    min-height: 30px;
+  }
+  .fixed-bottom {
+    position: fixed;
+    right: 0;
+    bottom: 20px;
+    left: 350px;
+    z-index: 1030;
+  }
+  h2 {
+    margin-bottom: 1.5rem;
   }
 </style>
 <div class="container mt-5 p-5">
   <h2 class="text-center">Quản lý ghế</h2>
   <form id="seatForm">
-    <div class="row row-cols-2 mt-5 mb-4">
+    <div class="row row-cols-2 mt-3 mb-4">
       <div class="col-6">
         <label for="cinemaSelect" class="form-label h6">Rạp phim</label>
         <select id="cinemaSelect" class="form-select">
@@ -65,12 +75,37 @@
     >
       Thêm ghế mới
     </button>
-    <button id="viewSeatsBtn" class="btn btn-primary mb-4 ms-3">Xem Ghế</button>
-    <button class="btn btn-primary mb-4 ms-3">Edit</button>
-    <button class="btn btn-danger mb-4 ms-3">Delete</button>
+    <div>
+      <button id="viewSeatsBtn" class="btn btn-primary mb-4 ms-3">
+        Xem Ghế
+      </button>
+      <button class="btn btn-primary mb-4 ms-3">Edit</button>
+      <button class="btn btn-danger mb-4 ms-3">Delete</button>
+    </div>
+  </div>
+  <div class="d-flex justify-content-center mb-3">
+    <h2 id="movieTitle"></h2>
+    <h2 id="movieName" class="ms-3"></h2>
   </div>
   <!-- Seat -->
   <div id="seats-container"></div>
+  <!-- Ghi chú -->
+  <div id="divMovieNote" class="d-flex fixed-bottom">
+    <i class="bi bi-diamond-fill text-success fs-3 d-flex align-items-center">
+      <h3 class="ms-2">Đã đặt</h3>
+    </i>
+    <i
+      class="bi bi-diamond-fill text-warning fs-3 d-flex align-items-center ms-5"
+    >
+      <h3 class="ms-2">Chờ thanh toán</h3>
+    </i>
+    <i
+      id="iconAvailble"
+      class="bi bi-diamond-fill text-secondary fs-3 d-flex align-items-center ms-5"
+    >
+      <h3 id="nameAvailble" class="ms-2">Có sẵn</h3>
+    </i>
+  </div>
   <!-- Modal Add Seat -->
   <div
     class="modal fade"
@@ -143,6 +178,11 @@
     </div>
   </div>
 </div>
+<script>
+  $(document).ready(function () {
+    $("#divMovieNote").addClass("d-none");
+  });
+</script>
 <!-- Install Extension CORS để sử dụng hàm -->
 <!-- https://chromewebstore.google.com/detail/cors-unblock/lfhmikememgdcahcdlaciloancbhjino?hl=vi -->
 <!-- Sự kiện chọn Rạp, Phòng, Ngày, Giờ -->
@@ -256,7 +296,7 @@
               .attr("disabled", "disabled")
               .attr("selected", "selected")
           );
-          console.log(data);
+
           for (let i = 0; i < data.length; i++) {
             const option = $("<option>").val(data[i]._id).text(data[i].name);
             $("#roomSelectAdd").append(option);
@@ -292,7 +332,7 @@
             room: selectedRoom,
           }),
           success: function (response) {
-            console.log(response);
+            alert("Thêm ghế thành công!");
           },
           error: function (error) {
             console.log(error);
@@ -309,23 +349,19 @@
     let seatStatuses = [];
     $("#roomSelect").change(function () {
       roomId = $(this).val();
-      console.log("roomId", roomId);
       makeApiCall();
     });
     $("#showDateSelect").change(function () {
       showDateId = $(this).val();
-      console.log("showDateId", showDateId);
       makeApiCall();
     });
     $("#timeSelect").change(function () {
       timeId = $(this).val();
-      console.log("timeId", timeId);
       makeApiCall();
     });
     function makeApiCall() {
       if (roomId && showDateId && timeId) {
         const apiUrl = `http://139.180.132.97:3000/seatstatus/seat?roomId=${roomId}&showtimeId=${showDateId}&timeId=${timeId}`;
-        console.log("API URL:", apiUrl);
 
         $.ajax({
           url: apiUrl,
@@ -411,6 +447,7 @@
     $("#viewSeatsBtn").click(function () {
       const token = "<%= token %>";
       const roomId = $("#roomSelect").val();
+
       if (roomId) {
         $.ajax({
           url: `http://139.180.132.97:3000/seats/room/${roomId}`,
@@ -419,6 +456,21 @@
             Authorization: `Bearer ${token}`,
           },
           success: function (data) {
+            if (data.length === 0) {
+              $("#movieTitle").text("");
+              $("#movieName").text("");
+              $("#divMovieNote").addClass("d-none");
+            } else {
+              for (let i = 0; i < data.length; i++) {
+                if (data[i].room._id === roomId) {
+                  $("#movieTitle").text("Phim đang chiếu:");
+                  $("#movieName").text(data[i].room.movie.name);
+                  $("#divMovieNote").removeClass("d-none");
+                  break;
+                }
+              }
+            }
+
             existingSeats = [];
             // lưu trữ tên ghế từ API vào mảng
             data.forEach((seat) => existingSeats.push(seat.name));
@@ -460,7 +512,6 @@
                 if (seatStatuses[i].seat.name === seat.name) {
                   if (seatStatuses[i].status === "reserved") {
                     seatClass = "btn-success";
-                    console.log(seatStatuses[i].status);
                   } else if (seatStatuses[i].status === "waiting") {
                     seatClass = "btn-warning";
                   }
@@ -477,6 +528,7 @@
           },
         });
       } else {
+        alert("Vui lòng chọn phòng chiếu!");
         console.log("Please select a room.");
       }
     });
