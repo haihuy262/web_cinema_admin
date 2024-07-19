@@ -17,7 +17,8 @@
     </div>
     <div class="mb-3">
       <label for="cinema" class="form-label">Cinema</label>
-      <select class="form-select" id="cinema" name="cinema" multiple required>
+      
+      <select class="form-control" id="cinema" name="cinema[]" multiple required>
       
       </select>
     </div>
@@ -48,8 +49,8 @@
       })
       .then(data => {
         if (data.success) {
-          console.log('cinema', data.getAll);
-          const cinemaSelect = document.getElementById('cinema');
+         
+          const cinemaSelect = document.getElementById('cinema'); 
           data.getAll.forEach(cinema => {
             const option = document.createElement('option');
             option.value = cinema._id;
@@ -64,4 +65,5 @@
         console.error('Error fetching cinema data:', error);
       });
   });
+  
 </script>

@@ -120,7 +120,7 @@ exports.cinemaList = async (req, res, next) => {
   }
 };
 exports.createDiscount = async (req, res, next) => {
-  const { name, percent, type, cinema} = req.body;
+  const { name, percent, type, cinema } = req.body;
   const image = req.file;
 
   // Kiểm tra các trường bắt buộc
@@ -134,17 +134,12 @@ exports.createDiscount = async (req, res, next) => {
     formData.append('name', name);
     formData.append('percent', percent);
     formData.append('type', type);
-    
+
     formData.append('image', fs.createReadStream(image.path));
 
-    
-    if (Array.isArray(cinema)) {
-      cinema.forEach(cinemaId => {
-        formData.append('cinema', cinemaId);
-      });
-    } else {
-      formData.append('cinema', cinema); 
-    }
+    cinema.forEach(cinemaId => {
+      formData.append('cinema', cinemaId);
+    });
 
     const response = await axios.post(
       'http://139.180.132.97:3000/discounts',
@@ -152,7 +147,7 @@ exports.createDiscount = async (req, res, next) => {
       {
         headers: {
           'Authorization': `Bearer ${token}`,
-          ...formData.getHeaders(), 
+          ...formData.getHeaders(),
         },
       }
     );
@@ -161,8 +156,8 @@ exports.createDiscount = async (req, res, next) => {
       fs.unlinkSync(req.file.path);
     }
 
-    console.log('Response data:', cinema,image,name,percent,type);
-    res.render("../views/discount/discount_add.ejs", {    
+    console.log('Response data:', response.data);
+    res.render("../views/discount/discount_add.ejs", {
       success: 'Tạo discount thành công!',
     });
   } catch (error) {
@@ -172,3 +167,4 @@ exports.createDiscount = async (req, res, next) => {
     });
   }
 };
+
