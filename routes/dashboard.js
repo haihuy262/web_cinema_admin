@@ -9,4 +9,10 @@ router.get(
   dashboardController.getOverview
 );
 
+router.get(
+  "/getToken",
+  authMiddleware.requireLogin,
+  dashboardController.getToken
+);
+
 module.exports = router;
