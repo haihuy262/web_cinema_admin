@@ -107,10 +107,10 @@ exports.cinemaList = async (req, res, next) => {
         'Authorization': `Bearer ${token}`
       }
     });
-    const cinemas = response.data.getAll;
+    const cinemas = response.data;
  
 
-    // Trả về dữ liệu danh sách rạp chiếu phim
+  
     res.json({ success: true, getAll: cinemas });
   } catch (error) {
     console.log(error);
@@ -120,11 +120,11 @@ exports.cinemaList = async (req, res, next) => {
   }
 };
 exports.createDiscount = async (req, res, next) => {
-  const { name, percent, type, cinema } = req.body;
+  const { name, percent, type, cinema ,dayEnd,dayStart} = req.body;
   const image = req.file;
 
   // Kiểm tra các trường bắt buộc
-  if (!name || !percent || !type || !image) {
+  if (!name || !percent || !type || !image||!dayStart||!dayEnd) {
     return res.status(400).json({ error: 'Tất cả các trường là bắt buộc.' });
   }
 
@@ -134,12 +134,14 @@ exports.createDiscount = async (req, res, next) => {
     formData.append('name', name);
     formData.append('percent', percent);
     formData.append('type', type);
+    formData.append('dayStart', dayStart);
+    formData.append('dayEnd', dayEnd);
 
     formData.append('image', fs.createReadStream(image.path));
 
-    cinema.forEach(cinemaId => {
-      formData.append('cinema', cinemaId);
-    });
+    for (let i = 0; i < cinema.length; i++) {
+      formData.append(`cinema[${i}]`, cinema[i]);
+    }
 
     const response = await axios.post(
       'http://139.180.132.97:3000/discounts',
@@ -156,7 +158,7 @@ exports.createDiscount = async (req, res, next) => {
       fs.unlinkSync(req.file.path);
     }
 
-    console.log('Response data:', response.data);
+    console.log('Response data:', response);
     res.render("../views/discount/discount_add.ejs", {
       success: 'Tạo discount thành công!',
     });
