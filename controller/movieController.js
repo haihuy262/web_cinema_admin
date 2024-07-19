@@ -1,5 +1,5 @@
 const axios = require('axios');
-const { requireLogin } = require('../middleware/authMiddleware')
+
 const fs = require('fs');
 const FormData = require('form-data');
 exports.movieList = async (req, res, next) => {
@@ -258,7 +258,7 @@ exports.createMovie = async (req, res, next) => {
         }
       });
   
-      const directors = response.data.data.getAll;
+      const directors = response.data;
       res.render("../views/movie/directors/list_directors.ejs", { directors });
     
       console.log('check',directors)
@@ -316,7 +316,45 @@ exports.createMovie = async (req, res, next) => {
       console.log(error);
     }
   };
- 
+  exports.updateDirecters = async (req, res, next) => {
+    const { id } = req.params;
+    const { name } = req.body;
+    const image = req.file;
+  
+    if (!name && !image) {
+      return res.status(400).json({ error: 'Tên hoặc ảnh là bắt buộc để cập nhật.' });
+    }
+  
+    try {
+      
+      const token = req.session.admin.token;
+      const formData = new FormData();
+      
+      if (name) {
+        formData.append('name', name);
+      }
+      if (image) {
+        formData.append('image', fs.createReadStream(image.path));
+      }
+  
+      const response = await axios.put(
+        `http://139.180.132.97:3000/directors/${id}`,
+        formData,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            ...formData.getHeaders(),
+          },
+        }
+      );
+  
+     
+      res.json({ success: true });
+    } catch (error) {
+      console.log(error);
+      res.json({ success: false });
+    }
+  };
  
 
   exports.deleteDirector = async (req, res, next) => {

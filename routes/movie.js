@@ -25,10 +25,22 @@ router.get(
   authMiddleware.requireLogin,
   movieController.listActor
 );
+router.put(
+  "/updateDirecters/:id",
+  authMiddleware.requireLogin,
+  uploadImage.single("image"),
+  movieController.updateDirecters
+);
 router.get(
   "/listDirectors",
   authMiddleware.requireLogin,
   movieController.listDirector
+);
+router.put(
+  "/updateActor/:id",
+  authMiddleware.requireLogin,
+  uploadImage.single("image"),
+  movieController.updateActor
 );
 router.post(
   "/createDirector",
