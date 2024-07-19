@@ -25,6 +25,12 @@ router.put(
   authMiddleware.requireLogin,
   discountController.updateStatus
 );
+router.put(
+  "/updateDiscount/:id",
+  authMiddleware.requireLogin,
+  uploadImage.single("image"),
+  discountController.updateDiscount
+);
 
 router.delete('/deleteDistcount/:id',  
   authMiddleware.requireLogin,

@@ -64,10 +64,10 @@
       </div>
       <div class="modal-body">
         <form id="editForm">
-          <input type="hidden" id="Id" name="Id">
+          <input type="hidden" id="id" name="id">
           <div class="mb-3">
-            <label for="name" class="form-label">Name</label>
-            <input type="text" class="form-control" id="name" name="name" required />
+            <label for="name" class="form-label">Tên</label>
+            <input type="text" class="form-control" id="name" name="name" required>
           </div>
           <div class="mb-3">
             <label for="percent" class="form-label">Percent</label>
@@ -93,8 +93,8 @@
             <input type="date" class="form-control" id="dayEnd" name="dayEnd" required />
           </div>
           <div class="mb-3">
-            <label for="image" class="form-label">Image</label>
-            <input type="file" class="form-control" id="image" name="image" required />
+            <label for="Image" class="form-label">Hình Ảnh</label>
+            <input type="file" class="form-control" id="Image" name="image">
           </div>
         </form>
       </div>
@@ -158,20 +158,23 @@
   });
   function editDiscount(button) {
     const discount = JSON.parse(button.getAttribute('data-discount'));
-    document.getElementById('Id').value = discount._id;
-    document.getElementById('Name').value = discount.name;
-
+    document.getElementById('id').value = discount._id;
+    document.getElementById('name').value = discount.name;
+    document.getElementById('percent').value = discount.percent;
+    document.getElementById('type').value = discount.type;
+    // document.getElementById('cinema').value = discount.cinema;
+    // document.getElementById('Image').value = discount.Image;
     // Hiện modal
     var myModal = new bootstrap.Modal(document.getElementById('editModal'));
     myModal.show();
   }
 
   async function submitEdit() {
-    const Id = document.getElementById('Id').value;
+    const Id = document.getElementById('id').value;
     const formData = new FormData(document.getElementById('editForm'));
 
     try {
-      const response = await fetch(`/genre/updateGenre/${Id}`, {
+      const response = await fetch(`/discount/updateDiscount/${Id}`, {
         method: 'PUT',
         body: formData,
       });
@@ -214,5 +217,4 @@
       });
   });
   
-
 </script>
