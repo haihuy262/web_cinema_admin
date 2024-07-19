@@ -11,6 +11,8 @@ exports.roomAdd = async (req, res, next) => {
   res.render("../views/cinema/room_add.ejs");
 };
 
+
+
 exports.creatCinema = async (req, res, next) => {
   const { name, address, hotline } = req.body;
 
@@ -30,7 +32,7 @@ exports.creatCinema = async (req, res, next) => {
 
     // Tạo FormData để gửi dữ liệu
 
-    // Gửi request POST đến API để tạo cinema
+   
     const response = await axios.post(
       "http://139.180.132.97:3000/cinemas",
       {
