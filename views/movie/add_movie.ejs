@@ -26,16 +26,26 @@
         />
       </div>
       <div class="col-md-6 mb-3">
-        <label for="actor" class="form-label">Diễn viên</label>
-        <select class="form-select" id="actor" name="actor" multiple>
-          <option value=""></option>
-        </select>
+        <label for="censorship" class="form-label">Độ tuổi</label>
+        <input
+          type="text"
+          class="form-control"
+          id="censorship"
+          name="censorship"
+          value="18"
+          required
+        />
       </div>
       <div class="col-md-6 mb-3">
-        <label for="genres" class="form-label">Thể Loại</label>
-        <select id="genres" name="genres" class="form-select" multiple>
-          <option value=""></option>
-        </select>
+        <label for="rate" class="form-label">Đánh giá</label>
+        <input
+          type="text"
+          class="form-control"
+          id="rate"
+          name="rate"
+          value="5"
+          required
+        />
       </div>
       <div class="col-md-6 mb-3">
         <label for="language" class="form-label">Ngôn ngữ</label>
@@ -62,15 +72,10 @@
         />
       </div>
       <div class="col-md-6 mb-3">
-        <label for="censorship" class="form-label">Độ tuổi</label>
-        <input
-          type="text"
-          class="form-control"
-          id="censorship"
-          name="censorship"
-          value="18"
-          required
-        />
+        <label for="storyline" class="form-label">Cốt truyện</label>
+        <textarea name="storyline" id="storyline" class="form-control" rows="4">
+Năm 965, Odin (Anthony Hopkins), vị vua xứ Asgard, phát động chiến tranh chống bọn người khổng lồ băng (Frost Giants) xứ Jotunheim do Laufey (Colm Feore) cầm đầu, để ngăn chặn việc chúng đô hộ Chín Vương Quốc (Nine Realms), bắt đầu từ Trái Đất. Lực lượng Asgard đã đánh bại lũ khổng lồ và tịch thu nguồn năng lượng của chúng là Chiếc tráp mùa đông vĩnh cửu (Casket of Ancient Winters), mặc dù Odin mất mắt phải trong trận đánh cuối cùng ở Jotunheim.</textarea
+        >
       </div>
       <div class="col-md-6 mb-3">
         <label for="director" class="form-label">Nhà sản xuất</label>
@@ -79,21 +84,16 @@
         </select>
       </div>
       <div class="col-md-6 mb-3">
-        <label for="rate" class="form-label">Đánh giá</label>
-        <input
-          type="text"
-          class="form-control"
-          id="rate"
-          name="rate"
-          value="5"
-          required
-        />
+        <label for="genres" class="form-label">Thể Loại</label>
+        <select id="genres" name="genres" class="form-select" multiple>
+          <option value=""></option>
+        </select>
       </div>
       <div class="col-md-6 mb-3">
-        <label for="storyline" class="form-label">Cốt truyện</label>
-        <textarea name="storyline" id="storyline" class="form-control" rows="3">
-Năm 965, Odin (Anthony Hopkins), vị vua xứ Asgard, phát động chiến tranh chống bọn người khổng lồ băng (Frost Giants) xứ Jotunheim do Laufey (Colm Feore) cầm đầu, để ngăn chặn việc chúng đô hộ Chín Vương Quốc (Nine Realms), bắt đầu từ Trái Đất. Lực lượng Asgard đã đánh bại lũ khổng lồ và tịch thu nguồn năng lượng của chúng là Chiếc tráp mùa đông vĩnh cửu (Casket of Ancient Winters), mặc dù Odin mất mắt phải trong trận đánh cuối cùng ở Jotunheim.</textarea
-        >
+        <label for="actor" class="form-label">Diễn viên</label>
+        <select class="form-select" id="actor" name="actor" multiple>
+          <option value=""></option>
+        </select>
       </div>
       <div class="col-md-6 mb-3">
         <label for="movie_format" class="form-label">Định dạng phim</label>
@@ -135,7 +135,7 @@ Năm 965, Odin (Anthony Hopkins), vị vua xứ Asgard, phát động chiến tr
     let token = "";
     // Get Token
     $.ajax({
-      url: "/dashboard/getToken",
+      url: "/token/getToken",
       type: "GET",
       async: false, // đồng bộ
       success: function (data) {
@@ -154,7 +154,6 @@ Năm 965, Odin (Anthony Hopkins), vị vua xứ Asgard, phát động chiến tr
         Authorization: `Bearer ${token}`,
       },
       success: function (data) {
-        console
         $("#actor").empty();
         $("#actor")
           .append("<option>")
@@ -205,17 +204,14 @@ Năm 965, Odin (Anthony Hopkins), vị vua xứ Asgard, phát động chiến tr
         Authorization: `Bearer ${token}`,
       },
       success: function (data) {
-        console.log(data);
         $("#director").empty();
         $("#director")
           .append("<option>")
           .text("Chọn nhà sản xuất...")
           .attr("selected", "selected");
 
-        for (let i = 0; i < data.data.getAll.length; i++) {
-          const option = $("<option>")
-            .val(data.data.getAll[i]._id)
-            .text(data.data.getAll[i].name);
+        for (let i = 0; i < data.length; i++) {
+          const option = $("<option>").val(data[i]._id).text(data[i].name);
           $("#director").append(option);
         }
       },
@@ -285,9 +281,11 @@ Năm 965, Odin (Anthony Hopkins), vị vua xứ Asgard, phát động chiến tr
         contentType: false,
         success: function (response) {
           console.log(response);
+          alert("Thêm phim thành công!");
         },
         error: function (jqXHR, textStatus, errorThrown) {
           console.log("Lỗi: " + jqXHR.responseJSON.message);
+          alert("Thêm phim thất bại!");
         },
       });
     });
