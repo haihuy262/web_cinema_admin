@@ -28,19 +28,13 @@
       <div class="col-md-6 mb-3">
         <label for="actor" class="form-label">Diễn viên</label>
         <select class="form-select" id="actor" name="actor" multiple>
-          <option value="666dcdf52262470e147ad070">Chris Hemsworth</option>
-          <option value="666dce022262470e147ad073">Christian Bale</option>
-          <option value="668e8c681c6554246d5342e0">Natalie Portman</option>
-          <!-- Thêm các lựa chọn khác nếu cần -->
+          <option value=""></option>
         </select>
       </div>
       <div class="col-md-6 mb-3">
         <label for="genres" class="form-label">Thể Loại</label>
         <select id="genres" name="genres" class="form-select" multiple>
-          <option value="66729b01d5a16c913b7ec49b">Action</option>
-          <option value="66729b14d5a16c913b7ec49e">Comedy</option>
-          <option value="66939184080aa5204d6b7a72">Drama</option>
-          <option value="66939d7a080aa5204d6b7c83">Horror</option>
+          <option value=""></option>
         </select>
       </div>
       <div class="col-md-6 mb-3">
@@ -81,8 +75,7 @@
       <div class="col-md-6 mb-3">
         <label for="director" class="form-label">Nhà sản xuất</label>
         <select id="director" name="director" class="form-select" multiple>
-          <option value="668e87941c6554246d534215">NSX1</option>
-          <option value="666dcf4a2262470e147ad087">NSX2</option>
+          <option value=""></option>
         </select>
       </div>
       <div class="col-md-6 mb-3">
@@ -140,6 +133,97 @@ Năm 965, Odin (Anthony Hopkins), vị vua xứ Asgard, phát động chiến tr
 <script>
   $(document).ready(function () {
     let token = "";
+    // Get Token
+    $.ajax({
+      url: "/dashboard/getToken",
+      type: "GET",
+      async: false, // đồng bộ
+      success: function (data) {
+        token = data.token;
+      },
+      error: function (error) {
+        console.log(error);
+      },
+    });
+
+    // Get Actor ( Diễn viên )
+    $.ajax({
+      url: "http://139.180.132.97:3000/actors",
+      type: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      success: function (data) {
+        console
+        $("#actor").empty();
+        $("#actor")
+          .append("<option>")
+          .text("Chọn diễn viên...")
+          .attr("selected", "selected");
+
+        for (let i = 0; i < data.getAll.length; i++) {
+          const option = $("<option>")
+            .val(data.getAll[i]._id)
+            .text(data.getAll[i].name);
+          $("#actor").append(option);
+        }
+      },
+      error: function (error) {
+        console.log(error);
+      },
+    });
+
+    // Get Genres ( Thể loại )
+    $.ajax({
+      url: "http://139.180.132.97:3000/genres",
+      type: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      success: function (data) {
+        $("#genres").empty();
+        $("#genres")
+          .append("<option>")
+          .text("Chọn diễn viên...")
+          .attr("selected", "selected");
+
+        for (let i = 0; i < data.length; i++) {
+          const option = $("<option>").val(data[i]._id).text(data[i].name);
+          $("#genres").append(option);
+        }
+      },
+      error: function (error) {
+        console.log(error);
+      },
+    });
+
+    // Get director ( Nhà sản xuất )
+    $.ajax({
+      url: "http://139.180.132.97:3000/directors",
+      type: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      success: function (data) {
+        console.log(data);
+        $("#director").empty();
+        $("#director")
+          .append("<option>")
+          .text("Chọn nhà sản xuất...")
+          .attr("selected", "selected");
+
+        for (let i = 0; i < data.data.getAll.length; i++) {
+          const option = $("<option>")
+            .val(data.data.getAll[i]._id)
+            .text(data.data.getAll[i].name);
+          $("#director").append(option);
+        }
+      },
+      error: function (error) {
+        console.log(error);
+      },
+    });
+
     $("#addMovieForm").submit(function (event) {
       event.preventDefault();
 
@@ -189,18 +273,6 @@ Năm 965, Odin (Anthony Hopkins), vị vua xứ Asgard, phát động chiến tr
         const day = String(d.getDate()).padStart(2, "0");
         return `${year}-${month}-${day}`;
       }
-
-      $.ajax({
-        url: "/dashboard/getToken",
-        type: "GET",
-        async: false, // đồng bộ
-        success: function (data) {
-          token = data.token;
-        },
-        error: function (error) {
-          console.log(error);
-        },
-      });
 
       $.ajax({
         url: "http://139.180.132.97:3000/movies",
