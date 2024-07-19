@@ -102,9 +102,60 @@ exports.createMovie = async (req, res, next) => {
   }
 };
 
-  exports.updateMovie = async (req, res, next) => {
+  exports.udMovie = async (req, res, next) => {
     res.render("../views/movie/update_movie.ejs"); 
   };
+  exports.updateMovie= async (req, res, next) => {
+    const { id } = req.params; // Lấy ID từ tham số yêu cầu
+    const { name, duration, subtitle, censorship, rate,  release_date } = req.body;
+    const image = req.file;
+    const videos = req.files;
+    // Kiểm tra các trường bắt buộc
+    if (!name || !duration ||  !subtitle || !censorship || !rate ||  !release_date || !image || !videos) {
+      return res.status(400).json({ error: 'Tất cả các trường là bắt buộc.' });
+    }
+  
+
+    try {
+        const token = req.session.admin.token;
+        const formData = new FormData();
+        formData.append('name', name);
+        formData.append('duration', duration);
+        formData.append('subtitle', subtitle);
+        formData.append('censorship', censorship);
+        formData.append('rate', rate);
+        formData.append('release_date', release_date);
+        if (image) {
+            formData.append('image', fs.createReadStream(image.path));
+        }
+        if (videos) {
+          formData.append('videos', fs.createReadStream(videos.path));
+      }
+
+        const response = await axios.put(
+            `http://139.180.132.97:3000/movies/${id}`,
+            formData,
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    ...formData.getHeaders(),
+                },
+            }
+        );
+
+        if (image) {
+            fs.unlinkSync(image.path);
+        }
+        if (videos) {
+          fs.unlinkSync(videos.path);
+      }
+      console.log('dtaa',response)
+        res.json({ success: true });
+    } catch (error) {
+      console.log(error);
+      res.json({ success: false });
+    }
+};
   exports.deleteMovie = async (req, res, next) => {
     const id = req.params.id;
     const token = req.session.admin.token;

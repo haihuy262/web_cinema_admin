@@ -13,8 +13,15 @@ router.post(
   uploadImage.single("videos"),
   movieController.createMovie
 );
-router.get("/update/:id", authMiddleware.requireLogin, movieController.updateMovie);
-router.delete('/updateMovie/:id', movieController.deleteMovie);
+router.put(
+  "/updateMovie/:id",
+  authMiddleware.requireLogin,
+  uploadImage.single("image"),
+  uploadImage.single("videos"),
+  movieController.updateMovie
+);
+router.get("/update/:id", authMiddleware.requireLogin, movieController.udMovie);
+router.delete('/deleteMovie/:id', movieController.deleteMovie);
 router.get("/actor", authMiddleware.requireLogin, movieController.addActor);
 router.get(
   "/addDirectors",
