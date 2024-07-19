@@ -17,7 +17,9 @@ var cinemaRouter = require("./routes/cinema");
 var discountRouter = require("./routes/discount");
 var serviceRouter = require("./routes/service");
 var loginRouter = require("./routes/login");
+var tokenRouter = require("./routes/token");
 var genreRouter = require("./routes/genre");
+
 var app = express();
 
 // view engine setup
@@ -49,6 +51,7 @@ app.use((req, res, next) => {
 });
 
 app.use("/", loginRouter);
+app.use("/token", tokenRouter);
 app.use("/dashboard", dashboardRouter);
 app.use("/employee", employeeRouter);
 app.use("/customer", customerRouter);

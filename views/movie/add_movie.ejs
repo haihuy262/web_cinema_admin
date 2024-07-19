@@ -26,22 +26,26 @@
         />
       </div>
       <div class="col-md-6 mb-3">
-        <label for="actor" class="form-label">Diễn viên</label>
-        <select class="form-select" id="actor" name="actor" multiple>
-          <option value="666dcdf52262470e147ad070">Chris Hemsworth</option>
-          <option value="666dce022262470e147ad073">Christian Bale</option>
-          <option value="668e8c681c6554246d5342e0">Natalie Portman</option>
-          <!-- Thêm các lựa chọn khác nếu cần -->
-        </select>
+        <label for="censorship" class="form-label">Độ tuổi</label>
+        <input
+          type="text"
+          class="form-control"
+          id="censorship"
+          name="censorship"
+          value="18"
+          required
+        />
       </div>
       <div class="col-md-6 mb-3">
-        <label for="genres" class="form-label">Thể Loại</label>
-        <select id="genres" name="genres" class="form-select" multiple>
-          <option value="66729b01d5a16c913b7ec49b">Action</option>
-          <option value="66729b14d5a16c913b7ec49e">Comedy</option>
-          <option value="66939184080aa5204d6b7a72">Drama</option>
-          <option value="66939d7a080aa5204d6b7c83">Horror</option>
-        </select>
+        <label for="rate" class="form-label">Đánh giá</label>
+        <input
+          type="text"
+          class="form-control"
+          id="rate"
+          name="rate"
+          value="5"
+          required
+        />
       </div>
       <div class="col-md-6 mb-3">
         <label for="language" class="form-label">Ngôn ngữ</label>
@@ -68,39 +72,28 @@
         />
       </div>
       <div class="col-md-6 mb-3">
-        <label for="censorship" class="form-label">Độ tuổi</label>
-        <input
-          type="text"
-          class="form-control"
-          id="censorship"
-          name="censorship"
-          value="18"
-          required
-        />
+        <label for="storyline" class="form-label">Cốt truyện</label>
+        <textarea name="storyline" id="storyline" class="form-control" rows="4">
+Năm 965, Odin (Anthony Hopkins), vị vua xứ Asgard, phát động chiến tranh chống bọn người khổng lồ băng (Frost Giants) xứ Jotunheim do Laufey (Colm Feore) cầm đầu, để ngăn chặn việc chúng đô hộ Chín Vương Quốc (Nine Realms), bắt đầu từ Trái Đất. Lực lượng Asgard đã đánh bại lũ khổng lồ và tịch thu nguồn năng lượng của chúng là Chiếc tráp mùa đông vĩnh cửu (Casket of Ancient Winters), mặc dù Odin mất mắt phải trong trận đánh cuối cùng ở Jotunheim.</textarea
+        >
       </div>
       <div class="col-md-6 mb-3">
         <label for="director" class="form-label">Nhà sản xuất</label>
         <select id="director" name="director" class="form-select" multiple>
-          <option value="668e87941c6554246d534215">NSX1</option>
-          <option value="666dcf4a2262470e147ad087">NSX2</option>
+          <option value=""></option>
         </select>
       </div>
       <div class="col-md-6 mb-3">
-        <label for="rate" class="form-label">Đánh giá</label>
-        <input
-          type="text"
-          class="form-control"
-          id="rate"
-          name="rate"
-          value="5"
-          required
-        />
+        <label for="genres" class="form-label">Thể Loại</label>
+        <select id="genres" name="genres" class="form-select" multiple>
+          <option value=""></option>
+        </select>
       </div>
       <div class="col-md-6 mb-3">
-        <label for="storyline" class="form-label">Cốt truyện</label>
-        <textarea name="storyline" id="storyline" class="form-control" rows="3">
-Năm 965, Odin (Anthony Hopkins), vị vua xứ Asgard, phát động chiến tranh chống bọn người khổng lồ băng (Frost Giants) xứ Jotunheim do Laufey (Colm Feore) cầm đầu, để ngăn chặn việc chúng đô hộ Chín Vương Quốc (Nine Realms), bắt đầu từ Trái Đất. Lực lượng Asgard đã đánh bại lũ khổng lồ và tịch thu nguồn năng lượng của chúng là Chiếc tráp mùa đông vĩnh cửu (Casket of Ancient Winters), mặc dù Odin mất mắt phải trong trận đánh cuối cùng ở Jotunheim.</textarea
-        >
+        <label for="actor" class="form-label">Diễn viên</label>
+        <select class="form-select" id="actor" name="actor" multiple>
+          <option value=""></option>
+        </select>
       </div>
       <div class="col-md-6 mb-3">
         <label for="movie_format" class="form-label">Định dạng phim</label>
@@ -140,6 +133,93 @@ Năm 965, Odin (Anthony Hopkins), vị vua xứ Asgard, phát động chiến tr
 <script>
   $(document).ready(function () {
     let token = "";
+    // Get Token
+    $.ajax({
+      url: "/token/getToken",
+      type: "GET",
+      async: false, // đồng bộ
+      success: function (data) {
+        token = data.token;
+      },
+      error: function (error) {
+        console.log(error);
+      },
+    });
+
+    // Get Actor ( Diễn viên )
+    $.ajax({
+      url: "http://139.180.132.97:3000/actors",
+      type: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      success: function (data) {
+        $("#actor").empty();
+        $("#actor")
+          .append("<option>")
+          .text("Chọn diễn viên...")
+          .attr("selected", "selected");
+
+        for (let i = 0; i < data.getAll.length; i++) {
+          const option = $("<option>")
+            .val(data.getAll[i]._id)
+            .text(data.getAll[i].name);
+          $("#actor").append(option);
+        }
+      },
+      error: function (error) {
+        console.log(error);
+      },
+    });
+
+    // Get Genres ( Thể loại )
+    $.ajax({
+      url: "http://139.180.132.97:3000/genres",
+      type: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      success: function (data) {
+        $("#genres").empty();
+        $("#genres")
+          .append("<option>")
+          .text("Chọn diễn viên...")
+          .attr("selected", "selected");
+
+        for (let i = 0; i < data.length; i++) {
+          const option = $("<option>").val(data[i]._id).text(data[i].name);
+          $("#genres").append(option);
+        }
+      },
+      error: function (error) {
+        console.log(error);
+      },
+    });
+
+    // Get director ( Nhà sản xuất )
+    $.ajax({
+      url: "http://139.180.132.97:3000/directors",
+      type: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      success: function (data) {
+        $("#director").empty();
+        $("#director")
+          .append("<option>")
+          .text("Chọn nhà sản xuất...")
+          .attr("selected", "selected");
+
+        for (let i = 0; i < data.length; i++) {
+          const option = $("<option>").val(data[i]._id).text(data[i].name);
+          $("#director").append(option);
+        }
+      },
+      error: function (error) {
+        console.log(error);
+      },
+    });
+
     $("#addMovieForm").submit(function (event) {
       event.preventDefault();
 
@@ -191,18 +271,6 @@ Năm 965, Odin (Anthony Hopkins), vị vua xứ Asgard, phát động chiến tr
       }
 
       $.ajax({
-        url: "/dashboard/getToken",
-        type: "GET",
-        async: false, // đồng bộ
-        success: function (data) {
-          token = data.token;
-        },
-        error: function (error) {
-          console.log(error);
-        },
-      });
-
-      $.ajax({
         url: "http://139.180.132.97:3000/movies",
         type: "POST",
         headers: {
@@ -213,9 +281,11 @@ Năm 965, Odin (Anthony Hopkins), vị vua xứ Asgard, phát động chiến tr
         contentType: false,
         success: function (response) {
           console.log(response);
+          alert("Thêm phim thành công!");
         },
         error: function (jqXHR, textStatus, errorThrown) {
           console.log("Lỗi: " + jqXHR.responseJSON.message);
+          alert("Thêm phim thất bại!");
         },
       });
     });
