@@ -11,8 +11,6 @@ exports.roomAdd = async (req, res, next) => {
   res.render("../views/cinema/room_add.ejs");
 };
 
-
-
 exports.creatCinema = async (req, res, next) => {
   const { name, address, hotline } = req.body;
 
@@ -32,7 +30,6 @@ exports.creatCinema = async (req, res, next) => {
 
     // Tạo FormData để gửi dữ liệu
 
-   
     const response = await axios.post(
       "http://139.180.132.97:3000/cinemas",
       {
@@ -151,42 +148,6 @@ exports.roomList = async (req, res, next) => {
   } catch (error) {
     console.error("Error fetching rooms:", error.message);
     res.status(500).send("Error fetching rooms");
-  }
-};
-exports.creatRoom = async (req, res, next) => {
-  const { name, price } = req.body;
-  const image = req.file;
-
-  if (!name || !price || !image) {
-    return res.status(400).json({ error: "Tên, giá và ảnh là bắt buộc." });
-  }
-
-  try {
-    const token = req.session.admin.token;
-    const formData = new FormData();
-    formData.append("name", name);
-    formData.append("price", price);
-
-    const response = await axios.post(
-      "http://139.180.132.97:3000/rooms",
-      formData,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          ...formData.getHeaders(),
-        },
-      }
-    );
-
-    res.redirect("/cinema/roomList");
-    res.render("../views/cinema/cinema.ejs", {
-      success: "Tạo room thành công!",
-    });
-  } catch (error) {
-    res.render("../views/cinema/room_add.ejs", {
-      error: "Đã xảy ra lỗi khi tạo room.",
-    });
-    console.error(error);
   }
 };
 

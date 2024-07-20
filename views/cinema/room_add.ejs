@@ -1,61 +1,150 @@
 <%- include('../partials/header.ejs') %>
-
-
-  <div class="container mt-5" style="padding: 3%;">
-    <h2>Add Room</h2>
-    <form id="addRoomForm">
-      <div class="form-group">
-        <label for="name">Name:</label>
-        <input type="text" class="form-control" id="name" name="name" required>
-      </div>
-      <div class="form-group">
-        <label for="capacity">Capacity:</label>
-        <input type="number" class="form-control" id="capacity" name="capacity" required>
-      </div>
-      <div class="form-group">
-        <label for="status">Status:</label>
-        <select class="form-control" id="status" name="status" required>
-          <option value="Active">Active</option>
-          <option value="Inactive">Inactive</option>
+<div class="container mt-5 p-3">
+  <h2 class="text-center mt-5">Tạo Phòng Chiếu</h2>
+  <form id="addRoomForm">
+    <div class="row">
+      <div class="col-md-12 mb-3">
+        <label for="name" class="form-label">Tên phòng chiếu:</label>
+        <select name="name" id="name" class="form-select" required>
+          <option value="" selected disabled>Chọn tên phòng...</option>
+          <option value="Phòng 1">Phòng 1</option>
+          <option value="Phòng 2">Phòng 2</option>
+          <option value="Phòng 3">Phòng 3</option>
+          <option value="Phòng 4">Phòng 4</option>
         </select>
       </div>
-      <button type="submit" class="btn btn-primary">Add Room</button>
-    </form>
-  </div>
-
-
-
-  <script>
-    // Example: Handle form submission for adding room
-    document.getElementById('addRoomForm').addEventListener('submit', function(event) {
-      event.preventDefault();
-      
-      const name = document.getElementById('name').value;
-      const capacity = document.getElementById('capacity').value;
-      const status = document.getElementById('status').value;
-
-      // Replace with actual AJAX request to backend
-      // Example: Send data to backend API
-      // $.ajax({
-      //   url: '/api/add-room',
-      //   method: 'POST',
-      //   data: { name, capacity, status },
-      //   success: function(response) {
-      //     console.log('Room added successfully:', response);
-      //     // Example: Redirect to rooms list page
-      //     // window.location.href = '/rooms';
-      //   },
-      //   error: function(err) {
-      //     console.error('Error adding room:', err);
-      //     // Handle error
-      //   }
-      // });
-
-      // Example: Logging data for demonstration
-      console.log('Adding new room:', { name, capacity, status });
-
-      // Reset form after submission (optional)
-      this.reset();
+      <div class="col-md-12 mb-3">
+        <label for="capacity" class="form-label">Rạp phim</label>
+        <select name="cinema" id="cinema" class="form-select" required>
+          <option value="" selected disabled>Chọn rạp phim...</option>
+        </select>
+      </div>
+      <div class="col-md-12 mb-3">
+        <label for="capacity" class="form-label">Suất chiếu</label>
+        <select
+          name="showTime"
+          id="showTime"
+          class="form-select"
+          multiple
+          required
+        ></select>
+      </div>
+      <div class="col-md-12 mb-3">
+        <label for="capacity" class="form-label">Phim chiếu</label>
+        <select name="movie" id="movie" class="form-select" required>
+          <option value="" selected disabled>Chọn phim...</option>
+        </select>
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Tạo phòng chiếu</button>
+  </form>
+</div>
+<script>
+  $(document).ready(function () {
+    let token = "";
+    // Get Token
+    $.ajax({
+      url: "/token/getToken",
+      type: "GET",
+      async: false, // đồng bộ
+      success: function (data) {
+        token = data.token;
+      },
+      error: function (error) {
+        console.log(error);
+      },
     });
-  </script>
 
+    // Get Cinema ( Rạp phim )
+    $.ajax({
+      url: "http://139.180.132.97:3000/cinemas",
+      type: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      success: function (data) {
+        for (let i = 0; i < data.length; i++) {
+          const option = $("<option>").val(data[i]._id).text(data[i].name);
+          $("#cinema").append(option);
+        }
+      },
+      error: function (error) {
+        console.log(error);
+      },
+    });
+
+    // Get Showtime ( Suất chiếu )
+    $.ajax({
+      url: "http://139.180.132.97:3000/showtimes",
+      type: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      success: function (data) {
+        for (let i = 0; i < data.getAll.length; i++) {
+          const option = $("<option>")
+            .val(data.getAll[i]._id)
+            .text(new Date(data.getAll[i].date).toLocaleDateString());
+          $("#showTime").append(option);
+        }
+      },
+      error: function (error) {
+        console.log(error);
+      },
+    });
+
+    // Get Movie ( Phim )
+    $.ajax({
+      url: "http://139.180.132.97:3000/movies",
+      type: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      success: function (data) {
+        for (let i = 0; i < data.getall.length; i++) {
+          const option = $("<option>")
+            .val(data.getall[i]._id)
+            .text(data.getall[i].name);
+          $("#movie").append(option);
+        }
+      },
+      error: function (error) {
+        console.log(error);
+      },
+    });
+
+    // Form
+    $("#addRoomForm").submit(function (event) {
+      event.preventDefault();
+
+      const nameForm = $("#name").val();
+      const movieForm = $("#movie").val();
+      const showtimeForm = $("#showTime").val();
+      const cinemaForm = $("#cinema").val();
+      const arrayShowtime = showtimeForm;
+
+      $.ajax({
+        url: "http://139.180.132.97:3000/rooms",
+        type: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        data: {
+          name: nameForm,
+          movie: movieForm,
+          cinema: cinemaForm,
+          showtime: arrayShowtime,
+        },
+
+        success: function (data) {
+          console.log(data);
+          alert("Tạo phòng chiếu thành công!");
+        },
+        error: function (error) {
+          console.log(error);
+          alert("Tạo phòng chiếu thất bại!");
+        },
+      });
+    });
+  });
+</script>
