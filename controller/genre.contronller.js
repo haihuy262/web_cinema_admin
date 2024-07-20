@@ -1,5 +1,5 @@
 const axios = require('axios');
-const { requireLogin } = require('../middleware/authMiddleware')
+
 const fs = require('fs');
 const FormData = require('form-data');
 exports.genreList = async (req, res, next) => {

@@ -1,5 +1,5 @@
 const axios = require('axios');
-const { requireLogin } = require('../middleware/authMiddleware')
+
 const fs = require('fs');
 const FormData = require('form-data');
 exports.movieList = async (req, res, next) => {
@@ -190,7 +190,7 @@ exports.createMovie = async (req, res, next) => {
     }
   
     try {
-      requireLogin(req, res, next);
+     
       const token = req.session.admin.token;
       const formData = new FormData();
       
@@ -212,19 +212,10 @@ exports.createMovie = async (req, res, next) => {
         }
       );
   
-      res.redirect("/movie/actor");
-      res.status(200).json({ message: 'Cập nhật actor thành công', actor: response.data.actor });
+      res.json({ success: true });
     } catch (error) {
-      if (error.response) {
-        console.error('Server Error:', error.response.data);
-        res.status(error.response.status).json({ error: 'Đã xảy ra lỗi khi cập nhật actor.' });
-      } else if (error.request) {
-        console.error('Request Error:', error.request);
-        res.status(500).json({ error: 'Không nhận được phản hồi từ server khi cập nhật actor.' });
-      } else {
-        console.error('Error:', error.message);
-        res.status(500).json({ error: 'Đã xảy ra lỗi khi xử lý yêu cầu cập nhật actor.' });
-      }
+      console.log(error);
+      res.json({ success: false });
     }
   };
   exports.deleteActor = async (req, res, next) => {
@@ -258,7 +249,7 @@ exports.createMovie = async (req, res, next) => {
         }
       });
   
-      const directors = response.data.data.getAll;
+      const directors = response.data;
       res.render("../views/movie/directors/list_directors.ejs", { directors });
     
       console.log('check',directors)
@@ -316,7 +307,45 @@ exports.createMovie = async (req, res, next) => {
       console.log(error);
     }
   };
- 
+  exports.updateDirecters = async (req, res, next) => {
+    const { id } = req.params;
+    const { name } = req.body;
+    const image = req.file;
+  
+    if (!name && !image) {
+      return res.status(400).json({ error: 'Tên hoặc ảnh là bắt buộc để cập nhật.' });
+    }
+  
+    try {
+      
+      const token = req.session.admin.token;
+      const formData = new FormData();
+      
+      if (name) {
+        formData.append('name', name);
+      }
+      if (image) {
+        formData.append('image', fs.createReadStream(image.path));
+      }
+  
+      const response = await axios.put(
+        `http://139.180.132.97:3000/directors/${id}`,
+        formData,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            ...formData.getHeaders(),
+          },
+        }
+      );
+  
+     
+      res.json({ success: true });
+    } catch (error) {
+      console.log(error);
+      res.json({ success: false });
+    }
+  };
  
 
   exports.deleteDirector = async (req, res, next) => {
