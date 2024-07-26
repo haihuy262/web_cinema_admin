@@ -151,6 +151,7 @@
 <script>
   $(document).ready(function () {
     let token = "";
+    let apiUrl = "";
     // Get Token
     $.ajax({
       url: "/token/getToken",
@@ -158,6 +159,7 @@
       async: false, // đồng bộ
       success: function (data) {
         token = data.token;
+        apiUrl = data.apiUrl;
       },
       error: function (error) {
         console.log(error);
@@ -166,7 +168,7 @@
 
     // Get Actor ( Diễn viên )
     $.ajax({
-      url: "http://139.180.132.97:3000/actors",
+      url: `${apiUrl}/actors`,
       type: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -192,7 +194,7 @@
 
     // Get Genres ( Thể loại )
     $.ajax({
-      url: "http://139.180.132.97:3000/genres",
+      url: `${apiUrl}/genres`,
       type: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -216,7 +218,7 @@
 
     // Get director ( Nhà sản xuất )
     $.ajax({
-      url: "http://139.180.132.97:3000/directors",
+      url: `${apiUrl}/directors`,
       type: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -289,7 +291,7 @@
       }
 
       $.ajax({
-        url: "http://139.180.132.97:3000/movies",
+        url: `${apiUrl}/movies`,
         type: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

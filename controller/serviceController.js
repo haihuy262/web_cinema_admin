@@ -6,8 +6,9 @@ const FormData = require("form-data");
 exports.serviceList = async (req, res, next) => {
   try {
     const token = req.session.admin.token;
+    const apiUrl = process.env.API_URL;
 
-    const response = await axios.get("http://139.180.132.97:3000/foods", {
+    const response = await axios.get(`${apiUrl}/foods`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -15,7 +16,7 @@ exports.serviceList = async (req, res, next) => {
 
     const foods = response.data;
 
-    res.render("../views/service/service_list.ejs", { foods });
+    res.render("../views/service/service_list.ejs", { foods, apiUrl });
   } catch (error) {
     if (error.response) {
       console.error("Server Error:", error.response.data);
@@ -51,21 +52,19 @@ exports.createFood = async (req, res, next) => {
 
   try {
     const token = req.session.admin.token;
+    const apiUrl = process.env.API_URL;
+
     const formData = new FormData();
     formData.append("name", name);
     formData.append("price", price);
     formData.append("image", fs.createReadStream(image.path));
 
-    const response = await axios.post(
-      "http://139.180.132.97:3000/foods",
-      formData,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          ...formData.getHeaders(),
-        },
-      }
-    );
+    const response = await axios.post(`${apiUrl}/foods`, formData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        ...formData.getHeaders(),
+      },
+    });
     if (req.file && req.file.fieldname === "image") {
       fs.unlinkSync(req.file.path);
     }
@@ -93,6 +92,8 @@ exports.updateFood = async (req, res, next) => {
 
   try {
     const token = req.session.admin.token;
+    const apiUrl = process.env.API_URL;
+
     const formData = new FormData();
     formData.append("name", name);
     formData.append("price", price);
@@ -101,16 +102,12 @@ exports.updateFood = async (req, res, next) => {
       formData.append("image", fs.createReadStream(image.path));
     }
 
-    const response = await axios.put(
-      `http://139.180.132.97:3000/foods/${id}`,
-      formData,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          ...formData.getHeaders(),
-        },
-      }
-    );
+    const response = await axios.put(`${apiUrl}/foods/${id}`, formData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        ...formData.getHeaders(),
+      },
+    });
 
     if (image) {
       fs.unlinkSync(image.path);
@@ -125,16 +122,14 @@ exports.updateFood = async (req, res, next) => {
 exports.deleteFood = async (req, res, next) => {
   const id = req.params.id;
   const token = req.session.admin.token;
+  const apiUrl = process.env.API_URL;
 
   try {
-    const response = await axios.delete(
-      `http://139.180.132.97:3000/foods/${id}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const response = await axios.delete(`${apiUrl}/foods/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     res.json({ success: true });
   } catch (error) {
     console.log(error);

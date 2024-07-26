@@ -6,6 +6,7 @@ var logger = require("morgan");
 var crypto = require("crypto");
 var session = require("express-session");
 var bodyParser = require("body-parser");
+require("dotenv").config();
 
 var dashboardRouter = require("./routes/dashboard");
 var employeeRouter = require("./routes/employee");

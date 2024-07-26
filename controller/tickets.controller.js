@@ -2,6 +2,7 @@ const { default: axios } = require("axios");
 
 exports.listTickets = async (req, res, next) => {
   const token = req.session.admin.token;
+  const apiUrl = process.env.API_URL;
 
   const arrShortID = [];
   const arrCinema = [];
@@ -13,7 +14,7 @@ exports.listTickets = async (req, res, next) => {
   const arrTotalMoney = [];
 
   try {
-    const response = await axios.get("http://139.180.132.97:3000/tickets", {
+    const response = await axios.get(`${apiUrl}/tickets`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -71,20 +72,18 @@ exports.listTickets = async (req, res, next) => {
 exports.detailsTickets = async (req, res, next) => {
   const id = req.params.id;
   const token = req.session.admin.token;
+  const apiUrl = process.env.API_URL;
 
   const arrUser = [];
   const arrSeat = [];
   const arrFood = [];
 
   try {
-    const response = await axios.get(
-      `http://139.180.132.97:3000/tickets/${id}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const response = await axios.get(`${apiUrl}/tickets/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     // Mã tickets
     const idTickets = response.data.getTicket._id;
     const shorId = idTickets.substring(0, 8).toUpperCase();

@@ -19,203 +19,261 @@
     </thead>
     <tbody>
       <% discounts.getall.forEach((discount, index) => { %>
-        <tr>
-          <td>
-            <div class="form-check form-switch form-check-reverse">
-              <input
-                class="form-check-input status-toggle"
-                type="checkbox"
-                id="toggle<%= index %>"
-                data-id="<%= discount._id %>"
-                <%= discount.status === 'active' ? 'checked' : '' %>
-              />
-              <label class="form-check-label" for="toggle<%= index %>"></label>
-            </div>
-          </td>
-          <td><%= discount.name %></td>
-          <td><%= discount.percent %></td>
-          <td><%= discount.code %></td>
-          <td><%= discount.type %></td>
-          <td><%= discount.dayStart %></td>
-          <td><%= discount.dayEnd %></td>
-          <td>
-            <% discount.cinema.forEach(cinema => { %>
-              <div><%= cinema.name %></div>
-            <% }); %>
-          </td>
-          <td><img src="http://139.180.132.97:3000/images/<%= discount.image %>" alt="Image" width="50" /></td>
-          <td>
-            <button class="btn btn-info" 
-            data-discount='<%= JSON.stringify(discount) %>' 
-            onclick="editDiscount(this)">Sửa</button>
-            <button class="btn btn-danger" onclick="deleteDiscount('<%= discount._id %>')">Xoá</button>
-          </td>
-        </tr>
+      <tr>
+        <td>
+          <div class="form-check form-switch form-check-reverse">
+            <input class="form-check-input status-toggle" type="checkbox"
+            id="toggle<%= index %>" data-id="<%= discount._id %>" <%=
+            discount.status === 'active' ? 'checked' : '' %> />
+            <label class="form-check-label" for="toggle<%= index %>"></label>
+          </div>
+        </td>
+        <td><%= discount.name %></td>
+        <td><%= discount.percent %></td>
+        <td><%= discount.code %></td>
+        <td><%= discount.type %></td>
+        <td><%= discount.dayStart %></td>
+        <td><%= discount.dayEnd %></td>
+        <td>
+          <% discount.cinema.forEach(cinema => { %>
+          <div><%= cinema.name %></div>
+          <% }); %>
+        </td>
+        <td>
+          <img
+            src="<%= apiUrl %>/images/<%= discount.image %>"
+            alt="Image"
+            width="50"
+          />
+        </td>
+        <td>
+          <button
+            class="btn btn-info"
+            data-discount="<%= JSON.stringify(discount) %>"
+            onclick="editDiscount(this)"
+          >
+            Sửa
+          </button>
+          <button
+            class="btn btn-danger"
+            onclick="deleteDiscount('<%= discount._id %>')"
+          >
+            Xoá
+          </button>
+        </td>
+      </tr>
       <% }); %>
     </tbody>
   </table>
 </div>
-<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+<div
+  class="modal fade"
+  id="editModal"
+  tabindex="-1"
+  aria-labelledby="editModalLabel"
+  aria-hidden="true"
+>
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="editModalLabel">Chỉnh Sửa khuyễn Mại</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Đóng"
+        ></button>
       </div>
       <div class="modal-body">
         <form id="editForm">
-          <input type="hidden" id="id" name="id">
+          <input type="hidden" id="id" name="id" />
           <div class="mb-3">
             <label for="name" class="form-label">Tên</label>
-            <input type="text" class="form-control" id="name" name="name" required>
+            <input
+              type="text"
+              class="form-control"
+              id="name"
+              name="name"
+              required
+            />
           </div>
           <div class="mb-3">
             <label for="percent" class="form-label">Percent</label>
-            <input type="text" class="form-control" id="percent" name="percent" required />
+            <input
+              type="text"
+              class="form-control"
+              id="percent"
+              name="percent"
+              required
+            />
           </div>
           <div class="mb-3">
             <label for="type" class="form-label">Type</label>
-            <input type="text" class="form-control" id="type" name="type" required />
+            <input
+              type="text"
+              class="form-control"
+              id="type"
+              name="type"
+              required
+            />
           </div>
           <div class="mb-3">
             <label for="cinema" class="form-label">Cinema</label>
-            
-            <select class="form-control" id="cinema" name="cinema" multiple required>
-            
-            </select>
+
+            <select
+              class="form-control"
+              id="cinema"
+              name="cinema"
+              multiple
+              required
+            ></select>
           </div>
           <div class="mb-3">
             <label for="dayStart" class="form-label">Start Date</label>
-            <input type="date" class="form-control" id="dayStart" name="dayStart" required />
+            <input
+              type="date"
+              class="form-control"
+              id="dayStart"
+              name="dayStart"
+              required
+            />
           </div>
           <div class="mb-3">
             <label for="dayEnd" class="form-label">End Date</label>
-            <input type="date" class="form-control" id="dayEnd" name="dayEnd" required />
+            <input
+              type="date"
+              class="form-control"
+              id="dayEnd"
+              name="dayEnd"
+              required
+            />
           </div>
           <div class="mb-3">
             <label for="Image" class="form-label">Hình Ảnh</label>
-            <input type="file" class="form-control" id="Image" name="image">
+            <input type="file" class="form-control" id="Image" name="image" />
           </div>
         </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-        <button type="button" class="btn btn-primary" onclick="submitEdit()">Lưu thay đổi</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Đóng
+        </button>
+        <button type="button" class="btn btn-primary" onclick="submitEdit()">
+          Lưu thay đổi
+        </button>
       </div>
     </div>
   </div>
 </div>
 <script>
   async function deleteDiscount(id) {
-    if (confirm('Bạn có chắc chắn muốn xoá?')) {
+    if (confirm("Bạn có chắc chắn muốn xoá?")) {
       try {
         const response = await fetch(`/discount/delete/${id}`, {
-          method: 'DELETE',
+          method: "DELETE",
           headers: {
-            'Content-Type': 'application/json'
-          }
+            "Content-Type": "application/json",
+          },
         });
 
         if (response.ok) {
-          alert('Xoá thành công!');
+          alert("Xoá thành công!");
           window.location.reload();
         } else {
-          alert('Đã xảy ra lỗi khi xoá.');
+          alert("Đã xảy ra lỗi khi xoá.");
         }
       } catch (error) {
-        alert('Đã xảy ra lỗi khi xoá.');
+        alert("Đã xảy ra lỗi khi xoá.");
         console.error(error);
       }
     }
   }
 
-  $(function() {
-    $('.status-toggle').change(function() {
-      var discountId = $(this).data('id');
-      var status = $(this).prop('checked')? 'active' : 'inactive';
+  $(function () {
+    $(".status-toggle").change(function () {
+      var discountId = $(this).data("id");
+      var status = $(this).prop("checked") ? "active" : "inactive";
 
       $.ajax({
-        url: '/discount/updateStatus/' + discountId,
-        method: 'PUT',
+        url: "/discount/updateStatus/" + discountId,
+        method: "PUT",
         data: { status: status },
-        success: function(response) {
-          console.log(response); 
+        success: function (response) {
+          console.log(response);
         },
-        error: function(error) {
-          console.error('Error updating status:', error);
-        }
+        error: function (error) {
+          console.error("Error updating status:", error);
+        },
       });
     });
 
     // Kích hoạt Bootstrap Toggle Switch bằng JavaScript
-    $('.status-toggle').bootstrapToggle({
-      size: 'small',
-      on: 'On',
-      off: 'Off',
-      onstyle: 'success',
-      offstyle: 'danger'
+    $(".status-toggle").bootstrapToggle({
+      size: "small",
+      on: "On",
+      off: "Off",
+      onstyle: "success",
+      offstyle: "danger",
     });
   });
   function editDiscount(button) {
-    const discount = JSON.parse(button.getAttribute('data-discount'));
-    document.getElementById('id').value = discount._id;
-    document.getElementById('name').value = discount.name;
-    document.getElementById('percent').value = discount.percent;
-    document.getElementById('type').value = discount.type;
+    const discount = JSON.parse(button.getAttribute("data-discount"));
+    document.getElementById("id").value = discount._id;
+    document.getElementById("name").value = discount.name;
+    document.getElementById("percent").value = discount.percent;
+    document.getElementById("type").value = discount.type;
     // document.getElementById('cinema').value = discount.cinema;
     // document.getElementById('Image').value = discount.Image;
     // Hiện modal
-    var myModal = new bootstrap.Modal(document.getElementById('editModal'));
+    var myModal = new bootstrap.Modal(document.getElementById("editModal"));
     myModal.show();
   }
 
   async function submitEdit() {
-    const Id = document.getElementById('id').value;
-    const formData = new FormData(document.getElementById('editForm'));
+    const Id = document.getElementById("id").value;
+    const formData = new FormData(document.getElementById("editForm"));
 
     try {
       const response = await fetch(`/discount/updateDiscount/${Id}`, {
-        method: 'PUT',
+        method: "PUT",
         body: formData,
       });
 
       if (response.ok) {
-        alert('Cập nhật thành công!');
+        alert("Cập nhật thành công!");
         window.location.reload();
       } else {
-        alert('Đã xảy ra lỗi khi cập nhật.');
+        alert("Đã xảy ra lỗi khi cập nhật.");
       }
     } catch (error) {
-      alert('Đã xảy ra lỗi khi cập nhật.');
+      alert("Đã xảy ra lỗi khi cập nhật.");
       console.error(error);
     }
   }
-  
-  document.addEventListener('DOMContentLoaded', function() {
-    fetch('/discount/cinemaList')
-      .then(response => {
+
+  document.addEventListener("DOMContentLoaded", function () {
+    fetch("/discount/cinemaList")
+      .then((response) => {
         if (!response.ok) {
-          throw new Error('Network response was not ok');
+          throw new Error("Network response was not ok");
         }
         return response.json();
       })
-      .then(data => {
+      .then((data) => {
         if (data.success) {
-         
-          const cinemaSelect = document.getElementById('cinema'); 
-          data.getAll.forEach(cinema => {
-            const option = document.createElement('option');
+          const cinemaSelect = document.getElementById("cinema");
+          data.getAll.forEach((cinema) => {
+            const option = document.createElement("option");
             option.value = cinema._id;
             option.textContent = cinema.name;
             cinemaSelect.appendChild(option);
           });
         } else {
-          console.error('Error fetching cinema data:', data.error);
+          console.error("Error fetching cinema data:", data.error);
         }
       })
-      .catch(error => {
-        console.error('Error fetching cinema data:', error);
+      .catch((error) => {
+        console.error("Error fetching cinema data:", error);
       });
   });
-  
 </script>

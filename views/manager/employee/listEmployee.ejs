@@ -54,7 +54,7 @@
         <td><%= i + 1 %></td>
         <td>
           <img
-            src="http://139.180.132.97:3000/images/<%= staffData[i].image %>"
+            src="<%= apiUrl %>/images/<%= staffData[i].image %>"
             alt="Avatar"
             class="rounded-3"
             width="70"
@@ -142,6 +142,7 @@
 <script>
   $(document).ready(function () {
     let token = "";
+    let apiUrl = "";
     // Get Token
     $.ajax({
       url: "/token/getToken",
@@ -149,6 +150,7 @@
       async: false, // đồng bộ
       success: function (data) {
         token = data.token;
+        apiUrl = data.apiUrl;
       },
       error: function (error) {
         console.log(error);
@@ -161,7 +163,7 @@
 
       // Update status
       $.ajax({
-        url: `http://139.180.132.97:3000/users/staff/status/${id}`,
+        url: `${apiUrl}/users/staff/status/${id}`,
         type: "PUT",
         data: status,
         headers: {

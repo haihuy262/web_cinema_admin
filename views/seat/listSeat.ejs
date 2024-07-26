@@ -180,12 +180,13 @@
 <!-- Sự kiện chọn Rạp, Phòng, Ngày, Giờ -->
 <script>
   const token = "<%= token %>";
+  const apiUrl = "<%= apiUrl %>";
   $(document).ready(function () {
     $("#cinemaSelect").change(function () {
       const selectedCinemaId = $(this).val();
 
       $.ajax({
-        url: `http://139.180.132.97:3000/rooms/room/cinema?cinemaId=${selectedCinemaId}`,
+        url: `${apiUrl}/rooms/room/cinema?cinemaId=${selectedCinemaId}`,
         type: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -275,7 +276,7 @@
     $("#cinemaSelectAdd").change(function () {
       const idCinema = $(this).val();
       $.ajax({
-        url: `http://139.180.132.97:3000/rooms/room/cinema?cinemaId=${idCinema}`,
+        url: `${apiUrl}/rooms/room/cinema?cinemaId=${idCinema}`,
         type: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -312,7 +313,7 @@
         const selectedRoom = idRoomAdd;
 
         $.ajax({
-          url: "http://139.180.132.97:3000/seats",
+          url: `${apiUrl}/seats`,
           type: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -353,7 +354,7 @@
     });
     function makeApiCall() {
       if (roomId && showDateId && timeId) {
-        const apiUrl = `http://139.180.132.97:3000/seatstatus/seat?roomId=${roomId}&showtimeId=${showDateId}&timeId=${timeId}`;
+        const apiUrl = `${apiUrl}/seatstatus/seat?roomId=${roomId}&showtimeId=${showDateId}&timeId=${timeId}`;
 
         $.ajax({
           url: apiUrl,
@@ -444,7 +445,7 @@
 
       if (roomId) {
         $.ajax({
-          url: `http://139.180.132.97:3000/seats/room/${roomId}`,
+          url: `${apiUrl}/seats/room/${roomId}`,
           type: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
