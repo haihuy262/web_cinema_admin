@@ -2,9 +2,10 @@ const axios = require("axios");
 
 exports.listCustomer = async (req, res, next) => {
   const token = req.session.admin.token;
+  const apiUrl = process.env.API_URL;
 
   try {
-    const response = await axios.get("http://139.180.132.97:3000/users", {
+    const response = await axios.get(`${apiUrl}/users`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -12,7 +13,10 @@ exports.listCustomer = async (req, res, next) => {
 
     const userData = response.data.getAll;
 
-    res.render("../views/manager/customer/listCustomer.ejs", { userData });
+    res.render("../views/manager/customer/listCustomer.ejs", {
+      userData,
+      apiUrl,
+    });
   } catch (error) {
     console.log(error);
   }

@@ -27,11 +27,12 @@ exports.creatCinema = async (req, res, next) => {
 
   try {
     const token = req.session.admin.token;
+    const apiUrl = process.env.API_URL;
 
     // Tạo FormData để gửi dữ liệu
 
     const response = await axios.post(
-      "http://139.180.132.97:3000/cinemas",
+      `${apiUrl}/cinemas`,
       {
         name,
         address,
@@ -59,9 +60,9 @@ exports.creatCinema = async (req, res, next) => {
 exports.cinemaList = async (req, res, next) => {
   try {
     const token = req.session.admin.token;
-    console.log("token cinema controoler:", token);
+    const apiUrl = process.env.API_URL;
 
-    const response = await axios.get("http://139.180.132.97:3000/cinemas", {
+    const response = await axios.get(`${apiUrl}/cinemas`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -78,16 +79,14 @@ exports.cinemaList = async (req, res, next) => {
 exports.deleteCinema = async (req, res, next) => {
   const id = req.params.id;
   const token = req.session.admin.token;
+  const apiUrl = process.env.API_URL;
 
   try {
-    const response = await axios.delete(
-      `http://139.180.132.97:3000/cinemas/${id}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const response = await axios.delete(`${apiUrl}/cinemas/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     res.json({ success: true });
   } catch (error) {
     console.log(error);
@@ -106,21 +105,19 @@ exports.updateCinema = async (req, res, next) => {
 
   try {
     const token = req.session.admin.token;
+    const apiUrl = process.env.API_URL;
+
     const formData = new FormData();
     formData.append("name", name);
     formData.append("hotline", hotline);
     formData.append("address", address);
 
-    const response = await axios.put(
-      `http://139.180.132.97:3000/cinemas/${id}`,
-      formData,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          ...formData.getHeaders(),
-        },
-      }
-    );
+    const response = await axios.put(`${apiUrl}/cinemas/${id}`, formData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        ...formData.getHeaders(),
+      },
+    });
     console.log("est", name, address, hotline);
     res.json({ success: true });
   } catch (error) {
@@ -134,9 +131,9 @@ exports.updateCinema = async (req, res, next) => {
 exports.roomList = async (req, res, next) => {
   try {
     const token = req.session.admin.token;
-    console.log("token room controller:", token);
+    const apiUrl = process.env.API_URL;
 
-    const response = await axios.get("http://139.180.132.97:3000/rooms", {
+    const response = await axios.get(`${apiUrl}/rooms`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -156,14 +153,11 @@ exports.deleteRoom = async (req, res, next) => {
   const token = req.session.admin.token;
 
   try {
-    const response = await axios.delete(
-      `http://139.180.132.97:3000/rooms/${id}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const response = await axios.delete(`${apiUrl}/rooms/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     res.json({ success: true });
   } catch (error) {
     console.log(error);

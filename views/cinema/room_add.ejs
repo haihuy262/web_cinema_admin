@@ -42,6 +42,7 @@
 <script>
   $(document).ready(function () {
     let token = "";
+    let apiUrl = "";
     // Get Token
     $.ajax({
       url: "/token/getToken",
@@ -49,6 +50,7 @@
       async: false, // đồng bộ
       success: function (data) {
         token = data.token;
+        apiUrl = data.apiUrl;
       },
       error: function (error) {
         console.log(error);
@@ -57,7 +59,7 @@
 
     // Get Cinema ( Rạp phim )
     $.ajax({
-      url: "http://139.180.132.97:3000/cinemas",
+      url: `${apiUrl}/cinemas`,
       type: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -75,7 +77,7 @@
 
     // Get Showtime ( Suất chiếu )
     $.ajax({
-      url: "http://139.180.132.97:3000/showtimes",
+      url: `${apiUrl}/showtimes`,
       type: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -95,7 +97,7 @@
 
     // Get Movie ( Phim )
     $.ajax({
-      url: "http://139.180.132.97:3000/movies",
+      url: `${apiUrl}/movies`,
       type: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -124,7 +126,7 @@
       const arrayShowtime = showtimeForm;
 
       $.ajax({
-        url: "http://139.180.132.97:3000/rooms",
+        url: `${apiUrl}/rooms`,
         type: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

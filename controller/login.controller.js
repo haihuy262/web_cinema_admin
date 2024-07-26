@@ -18,15 +18,12 @@ exports.getLogout = async (req, res, next) => {
 
 exports.postLogin = async (req, res, next) => {
   const { name, password } = req.body;
-
+  const apiUrl = process.env.API_URL;
   try {
-    const response = await axios.post(
-      "http://139.180.132.97:3000/auth/login-admin",
-      {
-        name,
-        password,
-      }
-    );
+    const response = await axios.post(`${apiUrl}/auth/login-admin`, {
+      name,
+      password,
+    });
     if (
       response.data.admin.name === name &&
       response.data.admin.password === password

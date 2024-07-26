@@ -1,10 +1,10 @@
 <%- include('../partials/header.ejs') %>
 
-<div class="mt-5" style="margin: 8%; padding-top: 5%;">
+<div class="mt-5" style="margin: 8%; padding-top: 5%">
   <h2>Movie Management</h2>
   <table class="table table-bordered">
     <thead>
-      <tr style="background-color: aquamarine;">
+      <tr style="background-color: aquamarine">
         <th>Stt</th>
         <th>Name</th>
         <th>Duration</th>
@@ -13,7 +13,7 @@
         <th>Rate</th>
         <th>Release Date</th>
         <th>Image</th>
-        <th style="width: 15%;">Trailer</th>
+        <th style="width: 15%">Trailer</th>
         <th>Actions</th>
       </tr>
     </thead>
@@ -27,70 +27,139 @@
         <td><%= movie.censorship %></td>
         <td><%= movie.movie_format %></td>
         <td><%= movie.release_date %></td>
-        <td><img src="http://139.180.132.97:3000/images/<%= movie.image %>" alt="Image" width="50"></td>
+        <td>
+          <img
+            src="<%= apiUrl %>/images/<%= movie.image %>"
+            alt="Image"
+            width="50"
+          />
+        </td>
         <td>
           <video width="100%" height="100%" controls>
-            <source src="http://139.180.132.97:3000/videos/<%= movie.trailer %>" width="50">
+            <source
+              src="<%= apiUrl %>/videos/<%= movie.trailer %>"
+              width="50"
+            />
           </video>
         </td>
         <td>
-          <button class="btn btn-info" 
-              data-movie='<%= JSON.stringify(movie) %>' 
-              onclick="editMovie(this)">Sửa</button>
-          <button class="btn btn-danger" onclick="deleteMovie('<%= movie._id %>')">Delete</button>
+          <button
+            class="btn btn-info"
+            data-movie="<%= JSON.stringify(movie) %>"
+            onclick="editMovie(this)"
+          >
+            Sửa
+          </button>
+          <button
+            class="btn btn-danger"
+            onclick="deleteMovie('<%= movie._id %>')"
+          >
+            Delete
+          </button>
         </td>
       </tr>
       <% }); %>
     </tbody>
   </table>
 </div>
-<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+<div
+  class="modal fade"
+  id="editModal"
+  tabindex="-1"
+  aria-labelledby="editModalLabel"
+  aria-hidden="true"
+>
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="editModalLabel">Sửa Phim</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Đóng"
+        ></button>
       </div>
       <div class="modal-body">
         <form id="editForm">
-          <input type="hidden" id="Id" name="Id">
+          <input type="hidden" id="Id" name="Id" />
           <div class="mb-3">
             <label for="name" class="form-label">Tên</label>
-            <input type="text" class="form-control" id="name" name="name" required>
+            <input
+              type="text"
+              class="form-control"
+              id="name"
+              name="name"
+              required
+            />
           </div>
           <div class="mb-3">
             <label for="duration" class="form-label">Duration</label>
-            <input type="text" class="form-control" id="duration" name="duration" required>
+            <input
+              type="text"
+              class="form-control"
+              id="duration"
+              name="duration"
+              required
+            />
           </div>
           <div class="mb-3">
             <label for="subtitle" class="form-label">Subtitle</label>
-            <input type="text" class="form-control" id="subtitle" name="subtitle" required>
+            <input
+              type="text"
+              class="form-control"
+              id="subtitle"
+              name="subtitle"
+              required
+            />
           </div>
           <div class="mb-3">
             <label for="censorship" class="form-label">Censorship</label>
-            <input type="text" class="form-control" id="censorship" name="censorship" required>
+            <input
+              type="text"
+              class="form-control"
+              id="censorship"
+              name="censorship"
+              required
+            />
           </div>
           <div class="mb-3">
             <label for="rate" class="form-label">Rate</label>
-            <input type="text" class="form-control" id="rate" name="rate" required>
+            <input
+              type="text"
+              class="form-control"
+              id="rate"
+              name="rate"
+              required
+            />
           </div>
           <div class="mb-3">
             <label for="release_date" class="form-label">Release Date</label>
-            <input type="date" class="form-control" id="release_date" name="release_date" required>
+            <input
+              type="date"
+              class="form-control"
+              id="release_date"
+              name="release_date"
+              required
+            />
           </div>
           <div class="mb-3">
             <label for="Image" class="form-label">Hình Ảnh</label>
-            <input type="file" class="form-control" id="Image" name="image">
+            <input type="file" class="form-control" id="Image" name="image" />
           </div>
           <div class="mb-3">
             <label for="video" class="form-label">Video</label>
-            <input type="file" class="form-control" id="video" name="video">
+            <input type="file" class="form-control" id="video" name="video" />
           </div>
         </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-        <button type="button" class="btn btn-primary" onclick="submitEdit()">Lưu thay đổi</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Đóng
+        </button>
+        <button type="button" class="btn btn-primary" onclick="submitEdit()">
+          Lưu thay đổi
+        </button>
       </div>
     </div>
   </div>
@@ -98,63 +167,62 @@
 
 <script>
   async function deleteMovie(movieId) {
-    if (confirm('Bạn có chắc chắn muốn xoá ?')) {
+    if (confirm("Bạn có chắc chắn muốn xoá ?")) {
       try {
         const response = await fetch(`/movie/deleteMovie/${movieId}`, {
-          method: 'DELETE',
+          method: "DELETE",
           headers: {
-            'Content-Type': 'application/json'
-          }
+            "Content-Type": "application/json",
+          },
         });
 
         if (response.ok) {
-          alert('Xoá  thành công!');
+          alert("Xoá  thành công!");
           window.location.reload();
         } else {
-          alert('Đã xảy ra lỗi khi xoá .');
+          alert("Đã xảy ra lỗi khi xoá .");
         }
       } catch (error) {
-        alert('Đã xảy ra lỗi khi xoá .');
+        alert("Đã xảy ra lỗi khi xoá .");
         console.error(error);
       }
     }
   }
-  
+
   function editMovie(button) {
-    const movie = JSON.parse(button.getAttribute('data-movie'));
-    document.getElementById('Id').value = movie._id;
-    document.getElementById('name').value = movie.name;
-    document.getElementById('duration').value = movie.duration;
-    document.getElementById('subtitle').value = movie.subtitle;
-    document.getElementById('censorship').value = movie.censorship;
-    document.getElementById('rate').value = movie.rate;
-    document.getElementById('release_date').value = movie.release_date;
+    const movie = JSON.parse(button.getAttribute("data-movie"));
+    document.getElementById("Id").value = movie._id;
+    document.getElementById("name").value = movie.name;
+    document.getElementById("duration").value = movie.duration;
+    document.getElementById("subtitle").value = movie.subtitle;
+    document.getElementById("censorship").value = movie.censorship;
+    document.getElementById("rate").value = movie.rate;
+    document.getElementById("release_date").value = movie.release_date;
 
     // Hiện modal
-    var myModal = new bootstrap.Modal(document.getElementById('editModal'));
+    var myModal = new bootstrap.Modal(document.getElementById("editModal"));
     myModal.show();
   }
 
   async function submitEdit() {
-    const Id = document.getElementById('Id').value;
-    const formData = new FormData(document.getElementById('editForm'));
+    const Id = document.getElementById("Id").value;
+    const formData = new FormData(document.getElementById("editForm"));
 
     try {
       const response = await fetch(`/movie/updateMovie/${Id}`, {
-        method: 'PUT',
+        method: "PUT",
         body: formData,
       });
 
       if (response.ok) {
-        alert('Cập nhật thành công!');
+        alert("Cập nhật thành công!");
         window.location.reload();
       } else {
-        alert('Đã xảy ra lỗi khi cập nhật.');
+        alert("Đã xảy ra lỗi khi cập nhật.");
       }
     } catch (error) {
-      alert('Đã xảy ra lỗi khi cập nhật.');
+      alert("Đã xảy ra lỗi khi cập nhật.");
       console.error(error);
     }
   }
-
 </script>

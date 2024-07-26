@@ -1,6 +1,6 @@
 <%- include('../../partials/header.ejs') %>
 
-<div class="container mt-5" style="padding: 3%;">
+<div class="container mt-5" style="padding: 3%">
   <h2 class="text-center">List of Directors</h2>
   <table class="table table-bordered">
     <thead>
@@ -16,99 +16,130 @@
       <tr>
         <td><%= director._id %></td>
         <td><%= director.name %></td>
-        <td><img src="http://139.180.132.97:3000/images/<%= director.image %>" width="50"></td>
         <td>
-          <button class="btn btn-info" 
-            data-director='<%= JSON.stringify(director) %>' 
-            onclick="editDirector(this)">Sửa</button>
-          <button class="btn btn-danger" onclick="deleteDirector('<%= director._id %>')">Delete</button>
+          <img src="<%= apiUrl %>/images/<%= director.image %>" width="50" />
+        </td>
+        <td>
+          <button
+            class="btn btn-info"
+            data-director="<%= JSON.stringify(director) %>"
+            onclick="editDirector(this)"
+          >
+            Sửa
+          </button>
+          <button
+            class="btn btn-danger"
+            onclick="deleteDirector('<%= director._id %>')"
+          >
+            Delete
+          </button>
         </td>
       </tr>
       <% }); %>
     </tbody>
   </table>
 </div>
-<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+<div
+  class="modal fade"
+  id="editModal"
+  tabindex="-1"
+  aria-labelledby="editModalLabel"
+  aria-hidden="true"
+>
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="editModalLabel">Chỉnh Sửa </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+        <h5 class="modal-title" id="editModalLabel">Chỉnh Sửa</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Đóng"
+        ></button>
       </div>
       <div class="modal-body">
         <form id="editForm">
-          <input type="hidden" id="id" name="id">
+          <input type="hidden" id="id" name="id" />
           <div class="mb-3">
             <label for="name" class="form-label">Tên</label>
-            <input type="text" class="form-control" id="name" name="name" required>
+            <input
+              type="text"
+              class="form-control"
+              id="name"
+              name="name"
+              required
+            />
           </div>
-         
+
           <div class="mb-3">
             <label for="Image" class="form-label">Hình Ảnh</label>
-            <input type="file" class="form-control" id="Image" name="image">
+            <input type="file" class="form-control" id="Image" name="image" />
           </div>
         </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-        <button type="button" class="btn btn-primary" onclick="submitEdit()">Lưu thay đổi</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Đóng
+        </button>
+        <button type="button" class="btn btn-primary" onclick="submitEdit()">
+          Lưu thay đổi
+        </button>
       </div>
     </div>
   </div>
 </div>
 <script>
   async function deleteDirector(directorId) {
-    if (confirm('Bạn có chắc chắn muốn xoá đạo diễn này?')) {
+    if (confirm("Bạn có chắc chắn muốn xoá đạo diễn này?")) {
       try {
         const response = await fetch(`/movie/directors/${directorId}`, {
-          method: 'DELETE',
+          method: "DELETE",
           headers: {
-            'Content-Type': 'application/json'
-          }
+            "Content-Type": "application/json",
+          },
         });
 
         if (response.ok) {
-          alert('Xoá đạo diễn thành công!');
+          alert("Xoá đạo diễn thành công!");
           window.location.reload();
         } else {
-          alert('Đã xảy ra lỗi khi xoá đạo diễn.');
+          alert("Đã xảy ra lỗi khi xoá đạo diễn.");
         }
       } catch (error) {
-        alert('Đã xảy ra lỗi khi xoá đạo diễn.');
+        alert("Đã xảy ra lỗi khi xoá đạo diễn.");
         console.error(error);
       }
     }
   }
   function editDirector(button) {
-    const director = JSON.parse(button.getAttribute('data-director'));
-    document.getElementById('id').value = director._id;
-    document.getElementById('name').value = director.name;
-   
+    const director = JSON.parse(button.getAttribute("data-director"));
+    document.getElementById("id").value = director._id;
+    document.getElementById("name").value = director.name;
+
     // Hiện modal
-    var myModal = new bootstrap.Modal(document.getElementById('editModal'));
+    var myModal = new bootstrap.Modal(document.getElementById("editModal"));
     myModal.show();
   }
 
   async function submitEdit() {
-    const Id = document.getElementById('id').value;
-    const formData = new FormData(document.getElementById('editForm'));
+    const Id = document.getElementById("id").value;
+    const formData = new FormData(document.getElementById("editForm"));
 
     try {
       const response = await fetch(`/movie/updateDirecters/${Id}`, {
-        method: 'PUT',
+        method: "PUT",
         body: formData,
       });
 
       if (response.ok) {
-        alert('Cập nhật thành công!');
+        alert("Cập nhật thành công!");
         window.location.reload();
       } else {
-        alert('Đã xảy ra lỗi khi cập nhật.');
+        alert("Đã xảy ra lỗi khi cập nhật.");
       }
     } catch (error) {
-      alert('Đã xảy ra lỗi khi cập nhật.');
+      alert("Đã xảy ra lỗi khi cập nhật.");
       console.error(error);
     }
   }
-  
 </script>

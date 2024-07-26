@@ -2,21 +2,18 @@ const { default: axios } = require("axios");
 
 exports.listSeat = async (req, res, next) => {
   const token = req.session.admin.token;
+  const apiUrl = process.env.API_URL;
 
   try {
-    const response = await axios.get("http://139.180.132.97:3000/cinemas", {
+    const response = await axios.get(`${apiUrl}/cinemas`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
     const dataCinemas = response.data;
 
-    res.render("../views/seat/listSeat.ejs", { dataCinemas, token });
+    res.render("../views/seat/listSeat.ejs", { dataCinemas, token, apiUrl });
   } catch (error) {
     console.log(error);
   }
-};
-
-exports.addSeat = async (req, res, next) => {
-  res.render("../views/seat/addSeat.ejs");
 };
