@@ -3,6 +3,7 @@
   .role-label {
     background-color: #ffcccc;
   }
+
   .status-label {
     background-color: #ccffcc;
   }
@@ -43,12 +44,12 @@
         <th class="text-center">Họ tên</th>
         <th class="text-center">Email</th>
         <th class="text-center">Số điện thoại</th>
-        <th class="text-center">Quyền</th>
+        <th class="text-center">Hành động</th>
         <th class="text-center">Trạng thái</th>
       </tr>
     </thead>
     <tbody id="tableBody">
-      <% for(var i = 0; i < staffData.length; i++) { %>
+      <% for(var i=0; i < staffData.length; i++) { %>
       <tr>
         <td><%= i + 1 %></td>
         <td>
@@ -65,22 +66,38 @@
           <a
             class="nav-link text-primary"
             href="/employee/details/<%= staffData[i]._id %>"
-            ><%= staffData[i].name %></a
           >
+            <%= staffData[i].name %>
+          </a>
         </td>
         <td><%= staffData[i].email %></td>
         <td><%= staffData[i].number_phone %></td>
         <td class="text-center">
-          <span
-            class="role-label rounded-2 text-danger border border-danger ps-3 pe-3 pt-1 pb-1"
-            ><%= staffData[i].role %></span
+          <div
+            class="form-check form-switch form-check-reverse d-flex justify-content-center"
           >
+            <input class="form-check-input status-toggle" type="checkbox"
+            data-id="<%= staffData[i]._id %>" <%= staffData[i].status ===
+            'active' ? 'checked' : '' %> />
+            <label class="form-check-label" for="toggle"></label>
+          </div>
         </td>
         <td class="text-center">
+          <% if (staffData[i].status === 'active') { %>
           <span
-            class="status-label border border-success rounded-2 text-success ps-3 pe-3 pt-1 pb-1"
-            ><%= staffData[i].status %></span
+            id="status-<%= staffData[i]._id %>"
+            class="status-label rounded-3 text-success border border-success ps-3 pe-3 pt-1 pb-1"
           >
+            Kích hoạt
+          </span>
+          <% } else if (staffData[i].status === 'inactive') { %>
+          <span
+            id="status-<%= staffData[i]._id %>"
+            class="role-label rounded-3 text-danger border border-danger ps-3 pe-3 pt-1 pb-1"
+          >
+            Không kích hoạt
+          </span>
+          <% } %>
         </td>
       </tr>
       <% } %>
@@ -120,4 +137,60 @@
       }
     }
   }
+</script>
+<!-- Toggle checkbox -->
+<script>
+  $(document).ready(function () {
+    let token = "";
+    // Get Token
+    $.ajax({
+      url: "/token/getToken",
+      type: "GET",
+      async: false, // đồng bộ
+      success: function (data) {
+        token = data.token;
+      },
+      error: function (error) {
+        console.log(error);
+      },
+    });
+
+    $(".status-toggle").change(function () {
+      const id = $(this).data("id");
+      const status = $(this).is(":checked") ? "active" : "inactive";
+
+      // Update status
+      $.ajax({
+        url: `http://139.180.132.97:3000/users/staff/status/${id}`,
+        type: "PUT",
+        data: status,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        success: function (data) {
+          if (data.status === "active") {
+            $(`#status-${id}`).text("Kích hoạt");
+            $(`#status-${id}`).removeClass(
+              "text-danger border-danger role-label"
+            );
+            $(`#status-${id}`).addClass(
+              "status-label rounded-3 text-success border border-success ps-3 pe-3 pt-1 pb-1"
+            );
+          } else {
+            $(`#status-${id}`).text("Không kích hoạt");
+            $(`#status-${id}`).removeClass(
+              "text-success border-success status-label"
+            );
+            $(`#status-${id}`).addClass(
+              "role-label rounded-3 text-danger border border-danger ps-3 pe-3 pt-1 pb-1"
+            );
+          }
+        },
+        error: function (error) {
+          console.log(error);
+          alert("Đã có lỗi gì đó sảy ra!");
+        },
+      });
+    });
+  });
 </script>
