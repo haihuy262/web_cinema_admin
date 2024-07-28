@@ -16,7 +16,7 @@ exports.movieList = async (req, res, next) => {
     const movies = response.data.getall;
     res.render("../views/movie/list_movie.ejs", { movies, apiUrl });
 
-    console.log("check", movies);
+  
   } catch (error) {
     if (error.response) {
       console.error("Server Error:", error.response.data);
@@ -138,19 +138,19 @@ exports.udMovie = async (req, res, next) => {
 
 exports.updateMovie = async (req, res, next) => {
   const { id } = req.params; // Lấy ID từ tham số yêu cầu
-  const { name, duration, subtitle, censorship, rate, release_date } = req.body;
-  const image = req.file;
-  const videos = req.files;
+  const { name, duration, subtitle, censorship, rate } = req.body;
+  // const image = req.file;
+  // const videos = req.files;
   // Kiểm tra các trường bắt buộc
   if (
     !name ||
     !duration ||
     !subtitle ||
     !censorship ||
-    !rate ||
-    !release_date ||
-    !image ||
-    !videos
+    !rate 
+    // !release_date ||
+    // !image ||
+    // !videos
   ) {
     return res.status(400).json({ error: "Tất cả các trường là bắt buộc." });
   }
@@ -165,13 +165,13 @@ exports.updateMovie = async (req, res, next) => {
     formData.append("subtitle", subtitle);
     formData.append("censorship", censorship);
     formData.append("rate", rate);
-    formData.append("release_date", release_date);
-    if (image) {
-      formData.append("image", fs.createReadStream(image.path));
-    }
-    if (videos) {
-      formData.append("videos", fs.createReadStream(videos.path));
-    }
+    // formData.append("release_date", release_date);
+    // if (image) {
+    //   formData.append("image", fs.createReadStream(image.path));
+    // }
+    // if (videos) {
+    //   formData.append("videos", fs.createReadStream(videos.path));
+    // }
 
     const response = await axios.put(`${apiUrl}/movies/${id}`, formData, {
       headers: {
@@ -180,13 +180,13 @@ exports.updateMovie = async (req, res, next) => {
       },
     });
 
-    if (image) {
-      fs.unlinkSync(image.path);
-    }
-    if (videos) {
-      fs.unlinkSync(videos.path);
-    }
-
+    // if (image) {
+    //   fs.unlinkSync(image.path);
+    // }
+    // if (videos) {
+    //   fs.unlinkSync(videos.path);
+    // }
+console.log("check",)
     res.json({ success: true });
   } catch (error) {
     console.log(error);

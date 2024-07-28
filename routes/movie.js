@@ -16,8 +16,8 @@ router.post(
 router.put(
   "/updateMovie/:id",
   authMiddleware.requireLogin,
-  uploadImage.single("image"),
-  uploadImage.single("videos"),
+  // uploadImage.single("image"),
+  // uploadImage.single("videos"),
   movieController.updateMovie
 );
 router.get("/update/:id", authMiddleware.requireLogin, movieController.udMovie);
