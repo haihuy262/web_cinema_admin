@@ -337,9 +337,11 @@
 </script>
 <!-- Xem ghế, logic hiển thị add ghế, add ghế, trạng thái ghế -->
 <script>
+  let apiUrlSeat = apiUrl;
   $(document).ready(function () {
     let roomId, showDateId, timeId;
     let seatStatuses = [];
+
     $("#roomSelect").change(function () {
       roomId = $(this).val();
       makeApiCall();
@@ -354,7 +356,7 @@
     });
     function makeApiCall() {
       if (roomId && showDateId && timeId) {
-        const apiUrl = `${apiUrl}/seatstatus/seat?roomId=${roomId}&showtimeId=${showDateId}&timeId=${timeId}`;
+        const apiUrl = `${apiUrlSeat}/seatstatus/seat?roomId=${roomId}&showtimeId=${showDateId}&timeId=${timeId}`;
 
         $.ajax({
           url: apiUrl,
