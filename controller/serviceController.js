@@ -4,31 +4,9 @@ const fs = require("fs");
 const FormData = require("form-data");
 
 exports.serviceList = async (req, res, next) => {
-  try {
-    const apiUrl = process.env.API_URL;
-    res.render("../views/service/service_list.ejs", { apiUrl });
-  } catch (error) {
-    if (error.response) {
-      console.error("Server Error:", error.response.data);
-      res
-        .status(error.response.status)
-        .render("../views/service/service_list.ejs", {
-          error: "Đã xảy ra lỗi khi lấy danh sách diễn viên.",
-        });
-    } else if (error.request) {
-      console.error("Request Error:", error.request);
-      res.status(500).render("../views/service/service_list.ejs", {
-        error:
-          "Không nhận được phản hồi từ server khi lấy danh sách diễn viên.",
-      });
-    } else {
-      console.error("Error:", error.message);
-      res.status(500).render("../views/service/service_list.ejs", {
-        error: "Đã xảy ra lỗi khi xử lý yêu cầu lấy danh sách diễn viên.",
-      });
-    }
-  }
+  res.render("../views/service/service_list.ejs");
 };
+
 exports.serviceAdd = async (req, res, next) => {
   res.render("../views/service/service_add.ejs");
 };
