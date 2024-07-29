@@ -5,18 +5,8 @@ const FormData = require("form-data");
 
 exports.serviceList = async (req, res, next) => {
   try {
-    const token = req.session.admin.token;
     const apiUrl = process.env.API_URL;
-
-    const response = await axios.get(`${apiUrl}/foods`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    const foods = response.data;
-
-    res.render("../views/service/service_list.ejs", { foods, apiUrl });
+    res.render("../views/service/service_list.ejs", { apiUrl });
   } catch (error) {
     if (error.response) {
       console.error("Server Error:", error.response.data);

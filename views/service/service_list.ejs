@@ -80,15 +80,12 @@
       </tr>
     </thead>
     <tbody id="tableBody">
-      <% foods.getall.forEach((food,index) => { %>
       <tr>
-        <td class="text-center"><%= index + 1 %></td>
-        <% const id = food._id %> <% const shorId =
-        id.substring(0,8).toUpperCase() %>
-        <td class="text-center text-primary"><%= shorId %></td>
+        <td class="text-center"></td>
+
+        <td class="text-center text-primary"></td>
         <td class="text-center">
           <img
-            src="<%= apiUrl %>/images/<%= food.image %>"
             alt="Avatar"
             class="rounded-3"
             width="70"
@@ -96,34 +93,33 @@
             onerror="handleImageError(this);"
           />
         </td>
-        <td class="text-center"><%= food.name %></td>
-        <% const price = food.price %> <% const formattedPrice =
-        price.toLocaleString("en-US") %>
-        <td class="text-center"><%= formattedPrice %></td>
+        <td class="text-center"></td>
+
+        <td class="text-center"></td>
         <td class="text-center">
-          <button
-            class="btn btn-info"
-            data-food="<%= JSON.stringify(food) %>"
-            onclick="editFood(this)"
-          >
-            Sửa
-          </button>
-          <button
-            class="btn btn-danger"
-            data-food="<%= JSON.stringify(food) %>"
-            onclick="deleteFood(this)"
-          >
-            Xoá
-          </button>
+          <button class="btn btn-info" onclick="editFood(this)">Sửa</button>
+          <button class="btn btn-danger" onclick="deleteFood(this)">Xoá</button>
         </td>
       </tr>
-      <% }); %>
     </tbody>
   </table>
   <nav>
-    <ul class="pagination justify-content-end" id="pagination"></ul>
+    <ul class="pagination justify-content-end" id="pagination">
+      <li class="page-item" id="prevPage">
+        <a class="page-link" href="#" aria-label="Previous">
+          <span aria-hidden="true">&laquo;</span>
+        </a>
+      </li>
+      <li class="page-item">
+        <a class="page-link" id="currentPageDisplay" href="#">1</a>
+      </li>
+      <li class="page-item" id="nextPage">
+        <a class="page-link" href="#" aria-label="Next">
+          <span aria-hidden="true">&raquo;</span>
+        </a>
+      </li>
+    </ul>
   </nav>
-  <div id="foodData" class="d-none"><%= JSON.stringify(foods.getall) %></div>
 </div>
 
 <!-- Modal Sửa Thực Phẩm -->
@@ -391,11 +387,48 @@
 </script>
 <!-- Pagination (Số trang) -->
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const foodDataElement = document.getElementById("foodData");
-    const foods = JSON.parse(foodDataElement.innerText);
-    const itemsPerPage = 7;
+  $(document).ready(function () {
+    let token = "";
+    let apiUrl = "";
     let currentPage = 1;
+    // Get Token
+    $.ajax({
+      url: "/token/getToken",
+      type: "GET",
+      async: false, // đồng bộ
+      success: function (data) {
+        token = data.token;
+        apiUrl = data.apiUrl;
+      },
+      error: function (error) {
+        console.log(error);
+      },
+    });
+
+    function fetchData(page) {
+      $.ajax({
+        url: `http://139.180.132.97:3000/foods/admin?page=${page}`,
+        type: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        success: function (data) {
+          const itemsPerPage = 10;
+          const foods = data.getall;
+
+          if (foods.length === 0 && page > 1) {
+            currentPage--;
+            return; // Không cập nhật nếu không còn dữ liệu
+          }
+
+          displayTable(foods, page);
+          updatePagination(data.totalPages, page, foods.length);
+        },
+        error: function (error) {
+          console.error("Error fetching data:", error);
+        },
+      });
+    }
 
     function displayTable(data, page) {
       const tableBody = document.getElementById("tableBody");
@@ -404,9 +437,8 @@
         tableBody.removeChild(tableBody.firstChild);
       }
 
-      const startIndex = (page - 1) * itemsPerPage;
-      const endIndex = page * itemsPerPage;
-      const pageData = data.slice(startIndex, endIndex);
+      const startIndex = (page - 1) * 10;
+      const pageData = data;
 
       // Tạo và thêm các dòng vào tableBody
       pageData.forEach((food, index) => {
@@ -424,7 +456,7 @@
 
         const imageCell = document.createElement("td");
         const img = document.createElement("img");
-        img.src = `http://139.180.132.97:3000/images/${food.image}`;
+        img.src = `${apiUrl}/images/${food.image}`;
         img.alt = "Avatar";
         img.classList.add("rounded-3");
         img.width = 70;
@@ -472,60 +504,43 @@
       });
     }
 
-    function displayPagination(data, currentPage) {
-      const pagination = document.getElementById("pagination");
-      pagination.innerHTML = "";
+    function updatePagination(totalPages, page) {
+      const prevButton = document
+        .getElementById("prevPage")
+        .querySelector("button");
+      const nextButton = document
+        .getElementById("nextPage")
+        .querySelector("button");
+      const currentPageDisplay = document.getElementById("currentPageDisplay");
 
-      const totalPages = Math.ceil(data.length / itemsPerPage);
+      currentPageDisplay.textContent = page;
 
-      // Previous button
-      const prevPageItem = document.createElement("li");
-      prevPageItem.classList.add("page-item");
-      if (currentPage === 1) {
-        prevPageItem.classList.add("disabled");
+      if (page === 1) {
+        document.getElementById("prevPage").classList.add("disabled");
       } else {
-        prevPageItem.addEventListener("click", function () {
-          currentPage--;
-          displayTable(data, currentPage);
-          displayPagination(data, currentPage);
-        });
-      }
-      prevPageItem.innerHTML = `<a class="page-link" href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a>`;
-      pagination.appendChild(prevPageItem);
-
-      // Page buttons
-      for (let i = 1; i <= totalPages; i++) {
-        const pageItem = document.createElement("li");
-        pageItem.classList.add("page-item");
-        if (i === currentPage) {
-          pageItem.classList.add("active");
-        }
-        pageItem.innerHTML = `<a class="page-link" href="#">${i}</a>`;
-        pageItem.addEventListener("click", function () {
-          currentPage = i;
-          displayTable(data, currentPage);
-          displayPagination(data, currentPage);
-        });
-        pagination.appendChild(pageItem);
+        document.getElementById("prevPage").classList.remove("disabled");
       }
 
-      // Next button
-      const nextPageItem = document.createElement("li");
-      nextPageItem.classList.add("page-item");
-      if (currentPage === totalPages || totalPages === 0) {
-        nextPageItem.classList.add("disabled");
+      if (page === totalPages) {
+        document.getElementById("nextPage").classList.add("disabled");
       } else {
-        nextPageItem.addEventListener("click", function () {
-          currentPage++;
-          displayTable(data, currentPage);
-          displayPagination(data, currentPage);
-        });
+        document.getElementById("nextPage").classList.remove("disabled");
       }
-      nextPageItem.innerHTML = `<a class="page-link" href="#" aria-label="Next"><span aria-hidden="true">&raquo;</span></a>`;
-      pagination.appendChild(nextPageItem);
     }
 
-    displayTable(foods, currentPage);
-    displayPagination(foods, currentPage);
+    document.getElementById("prevPage").addEventListener("click", function () {
+      if (currentPage > 1) {
+        currentPage--;
+        fetchData(currentPage);
+      }
+    });
+
+    document.getElementById("nextPage").addEventListener("click", function () {
+      currentPage++;
+      fetchData(currentPage);
+    });
+
+    // Lần đầu tiên tải trang, lấy dữ liệu trang đầu tiên
+    fetchData(currentPage);
   });
 </script>
