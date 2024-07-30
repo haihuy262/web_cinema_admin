@@ -1,47 +1,18 @@
 <%- include('../partials/header.ejs') %>
+<style>
+  .role-label {
+    background-color: #ffcccc;
+  }
+  .status-label {
+    background-color: #ccffcc;
+  }
+</style>
 <div class="container mt-5 p-3">
   <div class="row mb-3 mt-5">
     <div class="col-md-3">
       <div class="d-flex">
         <div class="me-3">
           <button id="addService" class="btn btn-primary p-2">Tạo đồ ăn</button>
-        </div>
-
-        <!-- Alert Edit Success -->
-        <div
-          class="alert alert-success p-2 text-center text-success d-flex d-none"
-          role="alert"
-          id="alertEditSuccess"
-        >
-          <i class="bi bi-check-circle-fill me-2"></i>
-          Sửa thành công
-        </div>
-        <!-- Alert Edit Error -->
-        <div
-          class="alert alert-danger p-2 text-center text-danger d-flex d-none"
-          role="alert"
-          id="alertEditError"
-        >
-          <i class="bi bi-exclamation-triangle-fill me-2"></i>
-          Sửa thất bại
-        </div>
-        <!-- Alert Delete Success -->
-        <div
-          class="alert alert-success p-2 text-center text-success d-flex d-none"
-          role="alert"
-          id="alertDeleteSuccess"
-        >
-          <i class="bi bi-check-circle-fill me-2"></i>
-          Xoá thành công
-        </div>
-        <!-- Alert Delete Error -->
-        <div
-          class="alert alert-danger p-2 text-center text-danger d-flex d-none"
-          role="alert"
-          id="alertDeleteError"
-        >
-          <i class="bi bi-exclamation-triangle-fill me-2"></i>
-          Xoá thất bại
         </div>
       </div>
     </div>
@@ -54,17 +25,17 @@
           id="searchInput"
           class="form-control me-2 p-2"
           type="search"
-          placeholder="Search"
+          placeholder="Tìm kiếm..."
           aria-label="Search"
           oninput="searchTable()"
         />
-        <button
+        <!-- <button
           class="btn btn-outline-success"
           type="submit"
           onclick="searchTable()"
         >
           Search
-        </button>
+        </button> -->
       </div>
     </div>
   </div>
@@ -77,53 +48,31 @@
         <th class="text-center">Tên</th>
         <th class="text-center">Giá</th>
         <th class="text-center">Thao tác</th>
+        <th class="text-center">Hành động</th>
+        <th class="text-center">Trạng thái</th>
       </tr>
     </thead>
     <tbody id="tableBody">
-      <% foods.getall.forEach((food,index) => { %>
-      <tr>
-        <td class="text-center"><%= index + 1 %></td>
-        <% const id = food._id %> <% const shorId =
-        id.substring(0,8).toUpperCase() %>
-        <td class="text-center text-primary"><%= shorId %></td>
-        <td class="text-center">
-          <img
-            src="<%= apiUrl %>/images/<%= food.image %>"
-            alt="Avatar"
-            class="rounded-3"
-            width="70"
-            height="70"
-            onerror="handleImageError(this);"
-          />
-        </td>
-        <td class="text-center"><%= food.name %></td>
-        <% const price = food.price %> <% const formattedPrice =
-        price.toLocaleString("en-US") %>
-        <td class="text-center"><%= formattedPrice %></td>
-        <td class="text-center">
-          <button
-            class="btn btn-info"
-            data-food="<%= JSON.stringify(food) %>"
-            onclick="editFood(this)"
-          >
-            Sửa
-          </button>
-          <button
-            class="btn btn-danger"
-            data-food="<%= JSON.stringify(food) %>"
-            onclick="deleteFood(this)"
-          >
-            Xoá
-          </button>
-        </td>
-      </tr>
-      <% }); %>
+      <!--  -->
     </tbody>
   </table>
   <nav>
-    <ul class="pagination justify-content-end" id="pagination"></ul>
+    <ul class="pagination justify-content-end" id="pagination">
+      <li class="page-item" id="prevPage">
+        <a class="page-link" href="#" aria-label="Previous">
+          <span aria-hidden="true">&laquo;</span>
+        </a>
+      </li>
+      <li class="page-item">
+        <a class="page-link" id="currentPageDisplay" href="#">1</a>
+      </li>
+      <li class="page-item" id="nextPage">
+        <a class="page-link" href="#" aria-label="Next">
+          <span aria-hidden="true">&raquo;</span>
+        </a>
+      </li>
+    </ul>
   </nav>
-  <div id="foodData" class="d-none"><%= JSON.stringify(foods.getall) %></div>
 </div>
 
 <!-- Modal Sửa Thực Phẩm -->
@@ -179,6 +128,14 @@
               id="foodImage"
               name="image"
             />
+            <img
+              id="currentImage"
+              src="#"
+              alt="Error"
+              class="mt-3 rounded-3"
+              width="70"
+              height="70"
+            />
           </div>
         </form>
       </div>
@@ -186,11 +143,7 @@
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
           Đóng
         </button>
-        <button
-          type="button"
-          class="btn btn-primary"
-          onclick="submitEditFood()"
-        >
+        <button type="button" class="btn btn-primary" id="updateFood">
           Lưu thay đổi
         </button>
       </div>
@@ -219,134 +172,37 @@
           aria-label="Close"
         ></button>
       </div>
-      <div class="modal-body">Bạn có chắc muốn xoá đồ ăn này?</div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="passDelete" class="form-label">Nhập password</label>
+          <input
+            autocomplete="on"
+            type="password"
+            class="form-control"
+            id="passDeleteFood"
+            name="passDeleteFood"
+            required
+          />
+          <div class="invalid-feedback" id="passwordFeedback">
+            Vui lòng nhập password!
+          </div>
+          <div class="invalid-feedback" id="passwordErrorFeedback">
+            Password sai!
+          </div>
+        </div>
+      </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
           Close
         </button>
-        <button
-          type="button"
-          class="btn btn-danger"
-          onclick="submitDeleteFood()"
-        >
+        <button type="button" class="btn btn-danger" id="deleteFood">
           Xoá
         </button>
       </div>
     </div>
   </div>
 </div>
-<script>
-  function deleteFood(button) {
-    const food = JSON.parse(button.getAttribute("data-food"));
-    document.getElementById("foodId").value = food._id;
 
-    // Hiện modal
-    var myModal = new bootstrap.Modal(document.getElementById("deleteModal"));
-    myModal.show();
-  }
-
-  async function submitDeleteFood() {
-    const foodId = document.getElementById("foodId").value;
-    const deleteFoodModal = bootstrap.Modal.getInstance(
-      document.getElementById("deleteModal")
-    );
-
-    try {
-      const response = await fetch(`/service/foods/${foodId}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (response.ok) {
-        const successAlert = document.getElementById("alertDeleteSuccess");
-        successAlert.classList.remove("d-none");
-
-        deleteFoodModal.hide();
-
-        setTimeout(function () {
-          window.location.reload();
-        }, 1000);
-      } else {
-        const errorAlert = document.getElementById("alertDeleteError");
-        errorAlert.classList.remove("d-none");
-
-        deleteFoodModal.hide();
-
-        setTimeout(function () {
-          window.location.reload();
-        }, 1000);
-      }
-    } catch (error) {
-      const errorAlert = document.getElementById("alertDeleteError");
-      errorAlert.classList.remove("d-none");
-
-      deleteFoodModal.hide();
-
-      setTimeout(function () {
-        window.location.reload();
-      }, 1000);
-      console.error(error);
-    }
-  }
-
-  function editFood(button) {
-    const food = JSON.parse(button.getAttribute("data-food"));
-    document.getElementById("foodId").value = food._id;
-    document.getElementById("foodName").value = food.name;
-    document.getElementById("foodPrice").value = food.price;
-
-    // Hiện modal
-    var myModal = new bootstrap.Modal(document.getElementById("editFoodModal"));
-    myModal.show();
-  }
-
-  async function submitEditFood() {
-    const foodId = document.getElementById("foodId").value;
-    const formData = new FormData(document.getElementById("editFoodForm"));
-    const editFoodModal = bootstrap.Modal.getInstance(
-      document.getElementById("editFoodModal")
-    );
-    try {
-      const response = await fetch(`/service/updateFood/${foodId}`, {
-        method: "PUT",
-        body: formData,
-      });
-      console.log(response);
-
-      if (response.ok) {
-        const successAlert = document.getElementById("alertEditSuccess");
-        successAlert.classList.remove("d-none");
-
-        editFoodModal.hide();
-
-        setTimeout(function () {
-          window.location.reload();
-        }, 1000);
-      } else {
-        const errorAlert = document.getElementById("alertEditError");
-        errorAlert.classList.remove("d-none");
-
-        editFoodModal.hide();
-
-        setTimeout(function () {
-          window.location.reload();
-        }, 1000);
-      }
-    } catch (error) {
-      const errorAlert = document.getElementById("alertEditError");
-      errorAlert.classList.remove("d-none");
-
-      editFoodModal.hide();
-
-      setTimeout(function () {
-        window.location.reload();
-      }, 1000);
-      console.error(error);
-    }
-  }
-</script>
 <!-- Search -->
 <script>
   function searchTable() {
@@ -391,40 +247,80 @@
 </script>
 <!-- Pagination (Số trang) -->
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const foodDataElement = document.getElementById("foodData");
-    const foods = JSON.parse(foodDataElement.innerText);
-    const itemsPerPage = 7;
+  $(document).ready(function () {
+    let token = "";
+    let apiUrl = "";
     let currentPage = 1;
+    // Get Token
+    $.ajax({
+      url: "/token/getToken",
+      type: "GET",
+      async: false, // đồng bộ
+      success: function (data) {
+        token = data.token;
+        apiUrl = data.apiUrl;
+      },
+      error: function (error) {
+        console.log(error);
+      },
+    });
 
-    function displayTable(data, page) {
+    function fetchData(page) {
+      $.ajax({
+        url: `http://139.180.132.97:3000/foods/admin?page=${page}`,
+        type: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        success: function (data) {
+          const itemsPerPage = 10;
+          const foods = data.getall;
+
+          if (foods.length === 0 && page > 1) {
+            currentPage--;
+            return; // Không cập nhật nếu không còn dữ liệu
+          }
+
+          displayTable(foods, page);
+          updatePagination(data.getall, page, foods.length);
+          console.log(data.getall, page);
+        },
+        error: function (error) {
+          console.error("Error fetching data:", error);
+        },
+      });
+    }
+
+    window.displayTable = function (data, page) {
       const tableBody = document.getElementById("tableBody");
       // Xóa các phần tử con trong tableBody hiện tại
       while (tableBody.firstChild) {
         tableBody.removeChild(tableBody.firstChild);
       }
 
-      const startIndex = (page - 1) * itemsPerPage;
-      const endIndex = page * itemsPerPage;
-      const pageData = data.slice(startIndex, endIndex);
+      const startIndex = (page - 1) * 10;
+      const pageData = data;
 
       // Tạo và thêm các dòng vào tableBody
       pageData.forEach((food, index) => {
         const row = document.createElement("tr");
 
+        // Cột số thứ tự
         const sttCell = document.createElement("td");
         sttCell.textContent = startIndex + index + 1;
         sttCell.classList.add("text-center");
         row.appendChild(sttCell);
 
+        // Cột id 8 số
         const idCell = document.createElement("td");
         idCell.textContent = food._id.substring(0, 8).toUpperCase();
         idCell.classList.add("text-center", "text-primary");
         row.appendChild(idCell);
 
+        // Cột avatar
         const imageCell = document.createElement("td");
         const img = document.createElement("img");
-        img.src = `http://139.180.132.97:3000/images/${food.image}`;
+        img.src = `${apiUrl}/images/${food.image}`;
         img.alt = "Avatar";
         img.classList.add("rounded-3");
         img.width = 70;
@@ -436,96 +332,359 @@
         imageCell.appendChild(img);
         row.appendChild(imageCell);
 
+        // Cột Tên
         const nameCell = document.createElement("td");
         nameCell.textContent = food.name;
         nameCell.classList.add("text-center");
         row.appendChild(nameCell);
 
+        // Cột giá
         const priceCell = document.createElement("td");
         priceCell.textContent = food.price.toLocaleString("en-US");
         priceCell.classList.add("text-center");
         row.appendChild(priceCell);
 
+        // Cột thao tác (update, delelte)
         const actionsCell = document.createElement("td");
         actionsCell.classList.add("text-center");
         const editButton = document.createElement("button");
         editButton.classList.add("btn", "btn-info");
-        editButton.setAttribute("data-food", JSON.stringify(food));
         editButton.textContent = "Sửa";
         editButton.onclick = function () {
-          editFood(this);
+          editFood(food._id);
         };
         actionsCell.appendChild(editButton);
 
         const deleteButton = document.createElement("button");
         deleteButton.classList.add("btn", "btn-danger", "ms-2");
-        deleteButton.setAttribute("data-food", JSON.stringify(food));
         deleteButton.textContent = "Xoá";
         deleteButton.onclick = function () {
-          deleteFood(this);
+          deleteFood(food._id);
         };
         actionsCell.appendChild(deleteButton);
-
         row.appendChild(actionsCell);
+
+        // Cột hành động (bật tắt trạng thái)
+        const statusCell = document.createElement("td");
+        statusCell.classList.add("text-center");
+        const statusDiv = document.createElement("div");
+        statusDiv.classList.add(
+          "form-check",
+          "form-switch",
+          "form-check-reverse",
+          "d-flex",
+          "justify-content-center"
+        );
+
+        const statusInput = document.createElement("input");
+        statusInput.classList.add("form-check-input", "status-toggle");
+        statusInput.type = "checkbox";
+        statusInput.dataset.id = food._id;
+        if (food.status === "active") {
+          statusInput.checked = true;
+        }
+
+        const statusLabel = document.createElement("label");
+        statusLabel.classList.add("form-check-label");
+        statusLabel.setAttribute("for", "toggle");
+
+        statusDiv.appendChild(statusInput);
+        statusDiv.appendChild(statusLabel);
+        statusCell.appendChild(statusDiv);
+
+        row.appendChild(statusCell);
+
+        // Cột trạng thái
+        const statusTextCell = document.createElement("td");
+        statusTextCell.classList.add("text-center");
+
+        const statusSpan = document.createElement("span");
+        statusSpan.id = `status-${food._id}`;
+        statusSpan.classList.add("rounded-3", "ps-3", "pe-3", "pt-1", "pb-1");
+
+        if (food.status === "active") {
+          statusSpan.classList.add(
+            "status-label",
+            "text-success",
+            "border",
+            "border-success"
+          );
+          statusSpan.textContent = "Kích hoạt";
+        } else if (food.status === "inactive") {
+          statusSpan.classList.add(
+            "role-label",
+            "text-danger",
+            "border",
+            "border-danger"
+          );
+          statusSpan.textContent = "Không kích hoạt";
+        }
+
+        statusTextCell.appendChild(statusSpan);
+        row.appendChild(statusTextCell);
 
         tableBody.appendChild(row);
       });
+    };
+
+    function updatePagination(totalPages, page) {
+      const prevButton = document
+        .getElementById("prevPage")
+        .querySelector("button");
+      const nextButton = document
+        .getElementById("nextPage")
+        .querySelector("button");
+      const currentPageDisplay = document.getElementById("currentPageDisplay");
+
+      currentPageDisplay.textContent = page;
+
+      if (page === 1) {
+        document.getElementById("prevPage").classList.add("disabled");
+      } else {
+        document.getElementById("prevPage").classList.remove("disabled");
+      }
+
+      if (page === totalPages) {
+        document.getElementById("nextPage").classList.add("disabled");
+      } else {
+        document.getElementById("nextPage").classList.remove("disabled");
+      }
     }
 
-    function displayPagination(data, currentPage) {
-      const pagination = document.getElementById("pagination");
-      pagination.innerHTML = "";
-
-      const totalPages = Math.ceil(data.length / itemsPerPage);
-
-      // Previous button
-      const prevPageItem = document.createElement("li");
-      prevPageItem.classList.add("page-item");
-      if (currentPage === 1) {
-        prevPageItem.classList.add("disabled");
-      } else {
-        prevPageItem.addEventListener("click", function () {
-          currentPage--;
-          displayTable(data, currentPage);
-          displayPagination(data, currentPage);
-        });
+    document.getElementById("prevPage").addEventListener("click", function () {
+      if (currentPage > 1) {
+        currentPage--;
+        fetchData(currentPage);
       }
-      prevPageItem.innerHTML = `<a class="page-link" href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a>`;
-      pagination.appendChild(prevPageItem);
+    });
 
-      // Page buttons
-      for (let i = 1; i <= totalPages; i++) {
-        const pageItem = document.createElement("li");
-        pageItem.classList.add("page-item");
-        if (i === currentPage) {
-          pageItem.classList.add("active");
+    document.getElementById("nextPage").addEventListener("click", function () {
+      currentPage++;
+      fetchData(currentPage);
+    });
+
+    // Lần đầu tiên tải trang, lấy dữ liệu trang đầu tiên
+    fetchData(currentPage);
+
+    // Delete Food
+    window.deleteFood = function (id) {
+      // Hiện modal
+      const myModal = new bootstrap.Modal(
+        document.getElementById("deleteModal")
+      );
+      myModal.show();
+
+      $("#deleteFood").click(function () {
+        const pass = $("#passDeleteFood").val();
+        const deleteFoodModal = bootstrap.Modal.getInstance(
+          document.getElementById("deleteModal")
+        );
+
+        if (pass === "") {
+          $("#passwordFeedback").show();
+          $("#passwordErrorFeedback").hide();
+        } else if (isNaN(pass) || pass !== "8888") {
+          $("#passwordFeedback").hide();
+          $("#passwordErrorFeedback").show();
+        } else {
+          $("#passwordFeedback").hide();
+          $("#passwordErrorFeedback").hide();
+
+          $.ajax({
+            url: `${apiUrl}/foods/${id}?password=${pass}`,
+            type: "DELETE",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            success: function (data) {
+              console.log(data);
+              alert("Xoá thành công!");
+
+              deleteFoodModal.hide();
+
+              setTimeout(function () {
+                window.location.reload();
+              }, 1000);
+            },
+            error: function (error) {
+              console.log(error);
+              alert("Có lỗi gì đó đã sảy ra. Vui lòng thử lại!");
+
+              deleteFoodModal.hide();
+
+              setTimeout(function () {
+                window.location.reload();
+              }, 1000);
+            },
+          });
         }
-        pageItem.innerHTML = `<a class="page-link" href="#">${i}</a>`;
-        pageItem.addEventListener("click", function () {
-          currentPage = i;
-          displayTable(data, currentPage);
-          displayPagination(data, currentPage);
-        });
-        pagination.appendChild(pageItem);
-      }
+      });
+    };
 
-      // Next button
-      const nextPageItem = document.createElement("li");
-      nextPageItem.classList.add("page-item");
-      if (currentPage === totalPages || totalPages === 0) {
-        nextPageItem.classList.add("disabled");
-      } else {
-        nextPageItem.addEventListener("click", function () {
-          currentPage++;
-          displayTable(data, currentPage);
-          displayPagination(data, currentPage);
-        });
-      }
-      nextPageItem.innerHTML = `<a class="page-link" href="#" aria-label="Next"><span aria-hidden="true">&raquo;</span></a>`;
-      pagination.appendChild(nextPageItem);
-    }
+    // Update Food
+    window.editFood = function (id) {
+      var initialName, initialPrice, initialImage;
+      // Hiện modal
+      const myModal = new bootstrap.Modal(
+        document.getElementById("editFoodModal")
+      );
+      myModal.show();
 
-    displayTable(foods, currentPage);
-    displayPagination(foods, currentPage);
+      const editFoodModal = bootstrap.Modal.getInstance(
+        document.getElementById("editFoodModal")
+      );
+
+      $.ajax({
+        url: `http://139.180.132.97:3000/foods/${id}`,
+        type: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        success: function (data) {
+          const details = data.getFood;
+
+          initialName = details.name;
+          initialPrice = details.price;
+          initialImage = details.image;
+
+          $("#foodName").val(details.name);
+          $("#foodPrice").val(details.price);
+          $("#currentImage")
+            .attr("src", `${apiUrl}/images/${details.image}`)
+            .show();
+        },
+        error: function (error) {
+          console.log(error);
+        },
+      });
+
+      $("#updateFood").click(function () {
+        const nameFood = $("#foodName").val();
+        const priceFood = $("#foodPrice").val();
+        const imageFood = $("#foodImage")[0].files[0];
+
+        if (
+          nameFood === initialName &&
+          priceFood == initialPrice &&
+          !imageFood
+        ) {
+          editFoodModal.hide();
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append("name", nameFood);
+        formData.append("price", priceFood);
+        if (imageFood) {
+          formData.append("image", imageFood);
+        } else {
+          formData.append("image", initialImage);
+        }
+
+        $.ajax({
+          url: `http://139.180.132.97:3000/foods/${id}`,
+          type: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          data: formData,
+          processData: false,
+          contentType: false,
+          success: function (data) {
+            console.log(data);
+            alert("Cập nhật thành công!");
+
+            editFoodModal.hide();
+
+            setTimeout(function () {
+              window.location.reload();
+            }, 1000);
+          },
+          error: function (error) {
+            console.log(error);
+            alert("Có lỗi gì đó đã sảy ra. Vui lòng thử lại!");
+
+            editFoodModal.hide();
+
+            setTimeout(function () {
+              window.location.reload();
+            }, 1000);
+          },
+        });
+      });
+    };
+  });
+</script>
+<!-- Preview Image -->
+<script>
+  document
+    .getElementById("foodImage")
+    .addEventListener("change", function (event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const img = document.getElementById("currentImage");
+          img.src = e.target.result;
+          img.classList.remove("d-none");
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+</script>
+<script>
+  $(document).ready(function () {
+    let token = "";
+    let apiUrl = "";
+    // Get Token
+    $.ajax({
+      url: "/token/getToken",
+      type: "GET",
+      async: false, // đồng bộ
+      success: function (data) {
+        token = data.token;
+        apiUrl = data.apiUrl;
+      },
+      error: function (error) {
+        console.log(error);
+      },
+    });
+
+    $(document).on("change", ".status-toggle", function () {
+      const id = $(this).data("id");
+      const status = $(this).is(":checked") ? "active" : "inactive";
+
+      // Update status
+      $.ajax({
+        url: `${apiUrl}/foods/status/${id}`,
+        type: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        success: function (data) {
+          if (data.status === "active") {
+            $(`#status-${id}`).text("Kích hoạt");
+            $(`#status-${id}`).removeClass(
+              "text-danger border-danger role-label"
+            );
+            $(`#status-${id}`).addClass(
+              "status-label rounded-3 text-success border border-success ps-3 pe-3 pt-1 pb-1"
+            );
+          } else {
+            $(`#status-${id}`).text("Không kích hoạt");
+            $(`#status-${id}`).removeClass(
+              "text-success border-success status-label"
+            );
+            $(`#status-${id}`).addClass(
+              "role-label rounded-3 text-danger border border-danger ps-3 pe-3 pt-1 pb-1"
+            );
+          }
+        },
+        error: function (error) {
+          console.log(error);
+          alert("Đã có lỗi gì đó xảy ra!");
+        },
+      });
+    });
   });
 </script>
