@@ -20,13 +20,5 @@ router.post(
   uploadImage.single("image"),
   serviceController.createFood
 );
-router.put(
-  "/updateFood/:id",
-  authMiddleware.requireLogin,
-  uploadImage.single("image"),
-  serviceController.updateFood
-);
 
-
-router.delete('/foods/:id', serviceController.deleteFood);
 module.exports = router;
