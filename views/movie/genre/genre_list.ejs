@@ -2,12 +2,31 @@
 
 
 <div class="container mt-5" style="padding: 3%">
-  <h2 class="text-center">List Genre</h2>
+  <div class="row mb-3 mt-5">
+    <div class="col-md-3"></div>
+    <div class="col-md-6">
+      <h2 class="text-center">Danh sách Thể Loại</h2>
+    </div>
+    <div class="col-md-3">
+      <div class="d-flex">
+        <input
+          id="searchInput"
+          class="form-control me-2 p-2"
+          type="search"
+          placeholder="Tìm kiếm..."
+          aria-label="Search"
+          oninput="searchTable()"
+        />
+       
+      </div>
+    </div>
+  </div>
   <table class="table table-bordered table-hover align-middle" id="genreTable">
     <thead >
       <tr class="table table-secondary" >
-        <th class="text-center">Hình Ảnh</th>
+        
         <th class="text-center">Tên Thể Loại</th>
+        <th class="text-center">Hình Ảnh</th>
         <th class="text-center">Hành Động</th>
       </tr>
     </thead>
@@ -63,6 +82,29 @@
 </div>
 
 <script>
+  function searchTable() {
+    const input = document.getElementById("searchInput").value.toLowerCase();
+    const tableBody = document.querySelector("#genreTable tbody");
+    const rows = tableBody.getElementsByTagName("tr");
+  
+    for (let i = 0; i < rows.length; i++) {
+      const row = rows[i];
+      const cells = row.getElementsByTagName("td");
+      let match = false;
+  
+      for (let j = 0; j < cells.length; j++) {
+        if (cells[j].innerText.toLowerCase().indexOf(input) > -1) {
+          match = true;
+          break;
+        }
+      }
+  
+      row.style.display = match ? "" : "none";
+    }
+  }
+  </script>
+
+<script>
   let currentPage = 1;
 
   async function fetchGenres(page = 1) {
@@ -97,7 +139,15 @@
     genres.forEach(genre => {
       const row = document.createElement('tr');
 
+    
+
+      const cellName = document.createElement('td');
+      cellName.classList.add("text-center");
+      cellName.textContent = genre.name;
+      row.appendChild(cellName);
+
       const cellImage = document.createElement('td');
+      cellImage.classList.add("text-center");
       const image = document.createElement('img');
       image.src = `http://139.180.132.97:3000/images/${genre.image}`;
       image.alt = genre.name;
@@ -105,14 +155,11 @@
       cellImage.appendChild(image);
       row.appendChild(cellImage);
 
-      const cellName = document.createElement('td');
-      cellName.textContent = genre.name;
-      row.appendChild(cellName);
-
       const cellActions = document.createElement('td');
+      cellActions.classList.add("text-center");
       const editButton = document.createElement('button');
-      editButton.className = 'btn btn-primary btn-sm';
-      editButton.textContent = 'Chỉnh sửa';
+      editButton.textContent = 'Sửa';
+      editButton.classList.add("btn", "btn-info");
       editButton.setAttribute('data-genre', JSON.stringify(genre));
       editButton.onclick = () => editGenre(editButton);
       cellActions.appendChild(editButton);
