@@ -1,7 +1,25 @@
 <%- include('../../partials/header.ejs') %>
 
 <div class="container mt-5" style="padding: 3%">
-  <h2 class="text-center">List of Actors</h2>
+  <div class="row mb-3 mt-5">
+    <div class="col-md-3"></div>
+    <div class="col-md-6">
+      <h2 class="text-center">Danh sách Tác Giả</h2>
+    </div>
+    <div class="col-md-3">
+      <div class="d-flex">
+        <input
+          id="searchInput"
+          class="form-control me-2 p-2"
+          type="search"
+          placeholder="Tìm kiếm..."
+          aria-label="Search"
+          oninput="searchTable()"
+        />
+       
+      </div>
+    </div>
+  </div>
   <table class="table table-bordered table-hover align-middle" id="actorTable">
     <thead >
       <tr class="table table-secondary" >
@@ -146,16 +164,19 @@
 
       // Thêm cột ID
       const cellId = document.createElement('td');
+      cellId.classList.add("text-center");
       cellId.textContent = actor._id;
       row.appendChild(cellId);
 
       // Thêm cột tên
       const cellName = document.createElement('td');
+      cellName.classList.add("text-center");
       cellName.textContent = actor.name;
       row.appendChild(cellName);
 
       // Thêm cột hình ảnh
       const cellImage = document.createElement('td');
+      cellImage.classList.add("text-center");
       const image = document.createElement('img');
       image.src = `http://139.180.132.97:3000/images/${actor.image}`;
       image.alt = actor.name;
@@ -165,9 +186,10 @@
 
       // Thêm cột hành động
       const cellActions = document.createElement('td');
+      cellActions.classList.add("text-center");
       const editButton = document.createElement('button');
-      editButton.className = 'btn btn-primary btn-sm';
-      editButton.textContent = 'Chỉnh sửa';
+      editButton.classList.add("btn", "btn-info");
+      editButton.textContent = 'Sửa';
       editButton.setAttribute('data-actor', JSON.stringify(actor));
       editButton.onclick = () => editActor(editButton);
       cellActions.appendChild(editButton);
