@@ -1,75 +1,71 @@
 <%- include('../../partials/header.ejs') %>
 
+
 <div class="container mt-5" style="padding: 3%">
-  <h2 class="text-center">List Genre</h2>
-  <table class="table table-bordered">
-    <thead>
-      <tr>
-        <th>Stt</th>
-        <th>Name</th>
-        <th>Image</th>
-        <th>Actions</th>
+  <div class="row mb-3 mt-5">
+    <div class="col-md-3"></div>
+    <div class="col-md-6">
+      <h2 class="text-center">Danh sách Thể Loại</h2>
+    </div>
+    <div class="col-md-3">
+      <div class="d-flex">
+        <input
+          id="searchInput"
+          class="form-control me-2 p-2"
+          type="search"
+          placeholder="Tìm kiếm..."
+          aria-label="Search"
+          oninput="searchTable()"
+        />
+       
+      </div>
+    </div>
+  </div>
+  <table class="table table-bordered table-hover align-middle" id="genreTable">
+    <thead >
+      <tr class="table table-secondary" >
+        
+        <th class="text-center">Tên Thể Loại</th>
+        <th class="text-center">Hình Ảnh</th>
+        <th class="text-center">Hành Động</th>
       </tr>
     </thead>
     <tbody>
-      <% genres.forEach((genre, index) => { %>
-      <tr>
-        <td><%= index + 1 %></td>
-        <td><%= genre.name %></td>
-        <td>
-          <img src="<%= apiUrl %>/images/<%= genre.image %>" width="50" />
-        </td>
-        <td>
-          <button
-            class="btn btn-info"
-            data-genre="<%= JSON.stringify(genre) %>"
-            onclick="editGenre(this)"
-          >
-            Sửa
-          </button>
-          <button
-            class="btn btn-danger"
-            onclick="deleteGenre('<%= genre._id %>')"
-          >
-            Xóa
-          </button>
-        </td>
-      </tr>
-      <% }); %>
+      <!-- Nội dung bảng sẽ được điền vào đây -->
     </tbody>
   </table>
+  <nav>
+    <ul class="pagination justify-content-end" id="pagination">
+      <li class="page-item" id="prevPage" onclick="changePage(-1)">
+        <a class="page-link" href="#" aria-label="Previous">
+          <span aria-hidden="true">&laquo;</span>
+        </a>
+      </li>
+      <li class="page-item">
+        <a class="page-link" id="currentPage" href="#">1</a>
+      </li>
+      <li class="page-item" id="nextPage" onclick="changePage(1)">
+        <a class="page-link" href="#" aria-label="Next">
+          <span aria-hidden="true">&raquo;</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
 </div>
 
-<div
-  class="modal fade"
-  id="editModal"
-  tabindex="-1"
-  aria-labelledby="editModalLabel"
-  aria-hidden="true"
->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="editModalLabel">Chỉnh sửa Thể Loại</h5>
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal"
-          aria-label="Đóng"
-        ></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
       </div>
       <div class="modal-body">
         <form id="editForm">
           <input type="hidden" id="Id" name="Id" />
           <div class="mb-3">
             <label for="Name" class="form-label">Tên</label>
-            <input
-              type="text"
-              class="form-control"
-              id="Name"
-              name="name"
-              required
-            />
+            <input type="text" class="form-control" id="Name" name="name" required />
           </div>
           <div class="mb-3">
             <label for="Image" class="form-label">Hình Ảnh</label>
@@ -78,70 +74,146 @@
         </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-          Đóng
-        </button>
-        <button type="button" class="btn btn-primary" onclick="submitEdit()">
-          Lưu thay đổi
-        </button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+        <button type="button" class="btn btn-primary" onclick="submitEdit()">Lưu thay đổi</button>
       </div>
     </div>
   </div>
 </div>
 
 <script>
-  async function deleteGenre(Id) {
-    if (confirm("Bạn có chắc chắn muốn xoá?")) {
-      try {
-        const response = await fetch(`/genre/delete/${Id}`, {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-
-        if (response.ok) {
-          alert("Xoá thành công!");
-          window.location.reload();
-        } else {
-          alert("Đã xảy ra lỗi khi xoá.");
+  function searchTable() {
+    const input = document.getElementById("searchInput").value.toLowerCase();
+    const tableBody = document.querySelector("#genreTable tbody");
+    const rows = tableBody.getElementsByTagName("tr");
+  
+    for (let i = 0; i < rows.length; i++) {
+      const row = rows[i];
+      const cells = row.getElementsByTagName("td");
+      let match = false;
+  
+      for (let j = 0; j < cells.length; j++) {
+        if (cells[j].innerText.toLowerCase().indexOf(input) > -1) {
+          match = true;
+          break;
         }
-      } catch (error) {
-        alert("Đã xảy ra lỗi khi xoá.");
-        console.error(error);
       }
+  
+      row.style.display = match ? "" : "none";
+    }
+  }
+  </script>
+
+<script>
+  let currentPage = 1;
+
+  async function fetchGenres(page = 1) {
+    try {
+      const response = await fetch(`/genre/genreListTable?page=${page}`);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const data = await response.json();
+      if (data.success) {
+        populateGenreTable(data.getAll);
+        document.getElementById('currentPage').textContent = page;
+        currentPage = page;
+
+        // Kiểm tra nếu trang tiếp theo có dữ liệu
+        const nextPageResponse = await fetch(`/genre/genreListTable?page=${page + 1}`);
+        const nextPageData = nextPageResponse.ok ? await nextPageResponse.json() : { success: false, getAll: [] };
+        const hasNextPage = nextPageData.success && nextPageData.getAll.length > 0;
+        updatePaginationControls(hasNextPage, page > 1);
+      } else {
+        console.error('Error fetching genre data:', data.error);
+      }
+    } catch (error) {
+      console.error('Error fetching genre data:', error);
+    }
+  }
+
+  function populateGenreTable(genres) {
+    const tableBody = document.querySelector('#genreTable tbody');
+    tableBody.innerHTML = ''; // Clear existing table rows
+
+    genres.forEach(genre => {
+      const row = document.createElement('tr');
+
+    
+
+      const cellName = document.createElement('td');
+      cellName.classList.add("text-center");
+      cellName.textContent = genre.name;
+      row.appendChild(cellName);
+
+      const cellImage = document.createElement('td');
+      cellImage.classList.add("text-center");
+      const image = document.createElement('img');
+      image.src = `http://139.180.132.97:3000/images/${genre.image}`;
+      image.alt = genre.name;
+      image.style.width = '100px'; // Thiết lập kích thước của hình ảnh
+      cellImage.appendChild(image);
+      row.appendChild(cellImage);
+
+      const cellActions = document.createElement('td');
+      cellActions.classList.add("text-center");
+      const editButton = document.createElement('button');
+      editButton.textContent = 'Sửa';
+      editButton.classList.add("btn", "btn-info");
+      editButton.setAttribute('data-genre', JSON.stringify(genre));
+      editButton.onclick = () => editGenre(editButton);
+      cellActions.appendChild(editButton);
+
+      row.appendChild(cellActions);
+      tableBody.appendChild(row);
+    });
+  }
+
+  function updatePaginationControls(hasNextPage, hasPrevPage) {
+    const prevButton = document.getElementById('prevPage');
+    const nextButton = document.getElementById('nextPage');
+
+    prevButton.classList.toggle('disabled', !hasPrevPage);
+    nextButton.classList.toggle('disabled', !hasNextPage);
+  }
+
+  function changePage(direction) {
+    const newPage = currentPage + direction;
+    if (newPage > 0) {
+      fetchGenres(newPage);
     }
   }
 
   function editGenre(button) {
-    const genre = JSON.parse(button.getAttribute("data-genre"));
-    document.getElementById("Id").value = genre._id;
-    document.getElementById("Name").value = genre.name;
+    const genre = JSON.parse(button.getAttribute('data-genre'));
+    document.getElementById('Id').value = genre._id;
+    document.getElementById('Name').value = genre.name;
 
-    // Hiện modal
-    var myModal = new bootstrap.Modal(document.getElementById("editModal"));
+    const myModal = new bootstrap.Modal(document.getElementById('editModal'));
     myModal.show();
   }
 
   async function submitEdit() {
-    const Id = document.getElementById("Id").value;
-    const formData = new FormData(document.getElementById("editForm"));
+    const Id = document.getElementById('Id').value;
+    const formData = new FormData(document.getElementById('editForm'));
 
     try {
       const response = await fetch(`/genre/updateGenre/${Id}`, {
-        method: "PUT",
+        method: 'PUT',
         body: formData,
       });
 
       if (response.ok) {
-        alert("Cập nhật thành công!");
+        alert('Cập nhật thành công!');
         window.location.reload();
       } else {
-        alert("Đã xảy ra lỗi khi cập nhật.");
+        alert('Đã xảy ra lỗi khi cập nhật.');
       }
     } catch (error) {
-      alert("Đã xảy ra lỗi khi cập nhật.");
+      alert('Đã xảy ra lỗi khi cập nhật.');
       console.error(error);
     }
   }
+
+  document.addEventListener('DOMContentLoaded', () => fetchGenres(currentPage));
 </script>

@@ -5,6 +5,7 @@ var authMiddleware = require("../middleware/authMiddleware");
 var multer = require("multer");
 var uploadImage = multer({ dest: "./tmp" });
 router.get("/list", authMiddleware.requireLogin, movieController.movieList);
+router.get("/movieListTable", authMiddleware.requireLogin, movieController.movieListTable);
 router.get("/add", authMiddleware.requireLogin, movieController.addMovie);
 router.post(
   "/createMovie",
@@ -16,11 +17,13 @@ router.post(
 router.put(
   "/updateMovie/:id",
   authMiddleware.requireLogin,
-  // uploadImage.single("image"),
-  // uploadImage.single("videos"),
+  uploadImage.single("image"),
+  uploadImage.array("videos"), // Sử dụng array nếu có nhiều video
   movieController.updateMovie
 );
-router.get("/update/:id", authMiddleware.requireLogin, movieController.udMovie);
+
+
+
 router.delete('/deleteMovie/:id', movieController.deleteMovie);
 router.get("/actor", authMiddleware.requireLogin, movieController.addActor);
 router.get(
@@ -33,11 +36,21 @@ router.get(
   authMiddleware.requireLogin,
   movieController.listActor
 );
+router.get(
+  "/listActorTable",
+  authMiddleware.requireLogin,
+  movieController.listActorTable
+);
 router.put(
   "/updateDirecters/:id",
   authMiddleware.requireLogin,
   uploadImage.single("image"),
   movieController.updateDirecters
+);
+router.get(
+  "/listDirectorTable",
+  authMiddleware.requireLogin,
+  movieController.listDirectorTable
 );
 router.get(
   "/listDirectors",
