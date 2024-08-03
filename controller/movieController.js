@@ -218,26 +218,25 @@ exports.addActor = async (req, res, next) => {
 exports.addDirectors = async (req, res, next) => {
   res.render("../views/movie/directors/add_directors.ejs");
 };
-
 exports.listActor = async (req, res, next) => {
+  res.render("../views/movie/actor/list_actor.ejs");
+};
+exports.listActorTable = async (req, res, next) => {
   try {
     const token = req.session.admin.token;
     const apiUrl = process.env.API_URL;
-
-    const response = await axios.get(`${apiUrl}/actors`, {
+    const page = req.query.page || 1;
+    const response = await axios.get(`${apiUrl}/actors?page=${page}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
 
     const actors = response.data.getAll;
-    res.render("../views/movie/actor/list_actor.ejs", { actors, apiUrl });
-
-    console.log("check", actors);
+   
+    res.json({ success: true, getAll: actors });
   } catch (error) {
     console.log(error);
-
-    // Trả về thông báo lỗi
     res.status(500).json({ success: false, error: error.message });
   }
 };

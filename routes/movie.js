@@ -33,6 +33,11 @@ router.get(
   authMiddleware.requireLogin,
   movieController.listActor
 );
+router.get(
+  "/listActorTable",
+  authMiddleware.requireLogin,
+  movieController.listActorTable
+);
 router.put(
   "/updateDirecters/:id",
   authMiddleware.requireLogin,
