@@ -10,13 +10,14 @@ exports.movieList = async (req, res, next) => {
   try {
     const token = req.session.admin.token;
 
-    const response = await axios.get('http://139.180.132.97:3000/movies', {
+    const response = await axios.get('http://139.180.132.97:3000/movies/no/login', {
       headers: {
         'Authorization': `Bearer ${token}`
       }
     });
 
     const movies = response.data.getall;
+    
     res.json({ success: true, getAll: movies });
   } catch (error) {
     console.log(error);
