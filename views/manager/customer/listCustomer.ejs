@@ -6,32 +6,39 @@
   .status-label {
     background-color: #ccffcc;
   }
+  .search-wrapper {
+    position: relative;
+  }
+  .search-wrapper .bi-search {
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
+    color: #aaa;
+  }
+  .search-wrapper input {
+    padding-left: 2.5rem; /* Adjust padding to make room for the icon */
+  }
 </style>
 <div class="container mt-5 p-3">
   <div class="row mt-5 mb-3">
     <div class="col-md-3">
-      <button id="refresh" class="btn btn-primary">Refresh</button>
+      <button id="refresh" class="btn btn-primary">Tải lại</button>
     </div>
     <div class="col-md-6">
       <h2 class="text-center flex-grow-1">Danh sách khách hàng</h2>
     </div>
     <div class="col-md-3">
-      <div class="d-flex">
+      <div class="search-wrapper">
+        <i class="bi bi-search"></i>
         <input
           id="searchInput"
           class="form-control me-2"
           type="search"
-          placeholder="Search"
+          placeholder="Tìm kiếm..."
           aria-label="Search"
-          oninput="searchTable()"
-        />
-        <button
-          class="btn btn-outline-success"
-          type="submit"
-          onclick="searchTable()"
-        >
-          Search
-        </button>
+          oninput="searchTable()" />
+        <!-- <button class="btn btn-outline-success" type="submit" onclick="searchTable()">Search</button> -->
       </div>
     </div>
   </div>
@@ -48,64 +55,29 @@
       </tr>
     </thead>
     <tbody id="tableBody">
-      <% for(var i = 0; i < userData.length; i++) { %>
-      <tr>
-        <td><%= i + 1 %></td>
-        <td>
-          <img
-            src="<%= apiUrl %>/images/<%= userData[i].image %>"
-            alt="Avatar"
-            class="rounded-3"
-            width="70"
-            height="70"
-            onerror="handleImageError(this);"
-          />
-        </td>
-        <td><%= userData[i].name %></td>
-        <td><%= userData[i].email %></td>
-        <td><%= userData[i].number_phone %></td>
-        <td class="text-center">
-          <!-- <span
-            class="role-label rounded-2 text-danger border border-danger ps-3 pe-3 pt-1 pb-1"
-            ><%= userData[i].role %></span
-          > -->
-          <div
-            class="form-check form-switch form-check-reverse d-flex justify-content-center"
-          >
-            <input class="form-check-input status-toggle" type="checkbox"
-            data-id="<%= userData[i]._id %>" <%= userData[i].status === 'active'
-            ? 'checked' : '' %> />
-            <label class="form-check-label" for="toggle"></label>
-          </div>
-        </td>
-        <td class="text-center">
-          <% if (userData[i].status === 'active') { %>
-          <span
-            id="status-<%= userData[i]._id %>"
-            class="status-label rounded-3 text-success border border-success ps-3 pe-3 pt-1 pb-1"
-          >
-            Kích hoạt
-          </span>
-          <% } else if (userData[i].status === 'inactive') { %>
-          <span
-            id="status-<%= userData[i]._id %>"
-            class="role-label rounded-3 text-danger border border-danger ps-3 pe-3 pt-1 pb-1"
-          >
-            Không kích hoạt
-          </span>
-          <% } %>
-        </td>
-      </tr>
-      <% } %>
+      <!--  -->
     </tbody>
   </table>
+  <nav>
+    <ul class="pagination justify-content-end">
+      <li class="prevPageLi page-item">
+        <a id="prevPage" class="page-link" href="#" aria-label="Previous">
+          <span aria-hidden="true">&laquo;</span>
+        </a>
+      </li>
+      <li class="page-item"><a id="numberPage" class="page-link" href="#">1</a></li>
+      <li class="nextPageLi page-item">
+        <a id="nextPage" class="page-link" href="#" aria-label="Next">
+          <span aria-hidden="true">&raquo;</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
 </div>
 <script>
-  document
-    .getElementById("refresh")
-    .addEventListener("click", async function () {
-      window.location.href = "/customer/list";
-    });
+  document.getElementById("refresh").addEventListener("click", async function () {
+    window.location.href = "/customer/list";
+  });
 </script>
 <!-- Nếu ảnh bị lỗi không load được, thay thế bằng ảnh này -->
 <script>
@@ -141,12 +113,11 @@
     }
   }
 </script>
-<!-- Toggle Checkbox -->
+<!-- getToken, apiUrl -->
 <script>
+  let token = "";
+  let apiUrl = "";
   $(document).ready(function () {
-    let token = "";
-    let apiUrl = "";
-    // Get Token
     $.ajax({
       url: "/token/getToken",
       type: "GET",
@@ -156,17 +127,102 @@
         apiUrl = data.apiUrl;
       },
       error: function (error) {
-        console.log(error);
+        console.log("152", error);
       },
     });
+  });
+</script>
+<!-- Toggle Checkbox -->
+<script>
+  $(document).ready(function () {});
+</script>
+<!-- Pagiantion -->
+<script>
+  $(document).ready(function () {
+    let currentIndex = 1;
 
-    $(".status-toggle").change(function () {
+    function fetData(currentIndex) {
+      $.ajax({
+        url: `${apiUrl}/users?page=${currentIndex}`,
+        type: "GET",
+        async: false,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        success: function (data) {
+          let arrCustomer = data.getAll;
+
+          if (arrCustomer.length === 0 && currentIndex > 1) {
+            $(".nextPageLi").addClass("disabled");
+            currentIndex--;
+            return;
+          }
+
+          $("#numberPage").text(currentIndex);
+
+          if (currentIndex === 1) {
+            $(".prevPageLi").addClass("disabled");
+          }
+
+          displayTableRows(arrCustomer);
+        },
+        error: function (error) {
+          console.log(error);
+        },
+      });
+    }
+
+    fetData(currentIndex);
+
+    function displayTableRows(data) {
+      const tbody = document.querySelector("#tableBody");
+
+      while (tableBody.firstChild) {
+        tableBody.removeChild(tableBody.firstChild);
+      }
+
+      const startIndex = (currentIndex - 1) * 10;
+
+      for (let i = 0; i < data.length; i++) {
+        let customer = data[i];
+        const statusClass =
+          customer.status === "active"
+            ? "text-success border border-success status-label"
+            : "text-danger border border-danger role-label";
+        const statusText = customer.status === "active" ? "Kích hoạt" : "Không kích hoạt";
+
+        tbody.innerHTML += `<tr>
+          <td>${startIndex + i + 1}</td>
+          <td><img src="${apiUrl}/images/${customer.image}" width="70" height="70"
+              onerror="handleImageError(this);" 
+              class="rounded-3"/>
+          </td>
+          <td>${customer.name}</td>
+          <td>${customer.email}</td>
+          <td>${customer.number_phone}</td>
+          <td>
+            <div class="form-check form-switch form-check-reverse d-flex justify-content-center">
+              <input class="form-check-input status-toggle" type="checkbox" 
+                     data-id="${customer._id}" ${customer.status === "active" ? "checked" : ""} />
+              <label class="form-check-label" for="toggle"></label>
+            </div>
+          </td>
+          <td>
+            <span id="status-${customer._id}" class="rounded-3 ${statusClass} ps-3 pe-3 pt-1 pb-1">
+            ${statusText}
+            </span>
+          </td>
+         </tr>`;
+      }
+    }
+
+    $(document).on("change", ".status-toggle", function () {
       const id = $(this).data("id");
       const status = $(this).is(":checked") ? "active" : "inactive";
 
       // Update status
       $.ajax({
-        url: `${apiUrl}/users/status/${id}`,
+        url: `${apiUrl}/users/staff/status/${id}`,
         type: "PUT",
         data: status,
         headers: {
@@ -175,17 +231,13 @@
         success: function (data) {
           if (data.status === "active") {
             $(`#status-${id}`).text("Kích hoạt");
-            $(`#status-${id}`).removeClass(
-              "text-danger border-danger role-label"
-            );
+            $(`#status-${id}`).removeClass("text-danger border-danger role-label");
             $(`#status-${id}`).addClass(
               "status-label rounded-3 text-success border border-success ps-3 pe-3 pt-1 pb-1"
             );
           } else {
             $(`#status-${id}`).text("Không kích hoạt");
-            $(`#status-${id}`).removeClass(
-              "text-success border-success status-label"
-            );
+            $(`#status-${id}`).removeClass("text-success border-success status-label");
             $(`#status-${id}`).addClass(
               "role-label rounded-3 text-danger border border-danger ps-3 pe-3 pt-1 pb-1"
             );
@@ -196,6 +248,24 @@
           alert("Đã có lỗi gì đó sảy ra!");
         },
       });
+    });
+
+    $("#nextPage").click(function () {
+      currentIndex++;
+      fetData(currentIndex);
+
+      if (currentIndex > 1) {
+        $(".prevPageLi").removeClass("disabled");
+      }
+    });
+
+    $("#prevPage").click(function () {
+      if (currentIndex > 1) {
+        currentIndex--;
+        $("#numberPage").text(currentIndex);
+        fetData(currentIndex);
+        $(".nextPageLi").removeClass("disabled");
+      }
     });
   });
 </script>

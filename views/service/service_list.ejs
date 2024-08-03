@@ -6,6 +6,19 @@
   .status-label {
     background-color: #ccffcc;
   }
+  .search-wrapper {
+    position: relative;
+  }
+  .search-wrapper .bi-search {
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
+    color: #aaa;
+  }
+  .search-wrapper input {
+    padding-left: 2.5rem; /* Adjust padding to make room for the icon */
+  }
 </style>
 <div class="container mt-5 p-3">
   <div class="row mb-3 mt-5">
@@ -20,22 +33,16 @@
       <h2 class="text-center">Danh sách đồ ăn</h2>
     </div>
     <div class="col-md-3">
-      <div class="d-flex">
+      <div class="search-wrapper">
+        <i class="bi bi-search"></i>
         <input
           id="searchInput"
-          class="form-control me-2 p-2"
+          class="form-control me-2"
           type="search"
           placeholder="Tìm kiếm..."
           aria-label="Search"
-          oninput="searchTable()"
-        />
-        <!-- <button
-          class="btn btn-outline-success"
-          type="submit"
-          onclick="searchTable()"
-        >
-          Search
-        </button> -->
+          oninput="searchTable()" />
+        <!-- <button class="btn btn-outline-success" type="submit" onclick="searchTable()">Search</button> -->
       </div>
     </div>
   </div>
@@ -81,8 +88,7 @@
   id="editFoodModal"
   tabindex="-1"
   aria-labelledby="editFoodModalLabel"
-  aria-hidden="true"
->
+  aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
@@ -90,74 +96,35 @@
           <i class="fas fa-solid fa-pen-to-square text-danger"></i>
           Sửa đồ ăn
         </h5>
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal"
-          aria-label="Đóng"
-        ></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
       </div>
       <div class="modal-body">
         <form id="editFoodForm">
           <input type="hidden" id="foodId" name="foodId" />
           <div class="mb-3">
             <label for="foodName" class="form-label">Tên</label>
-            <input
-              type="text"
-              class="form-control"
-              id="foodName"
-              name="name"
-              required
-            />
+            <input type="text" class="form-control" id="foodName" name="name" required />
           </div>
           <div class="mb-3">
             <label for="foodPrice" class="form-label">Giá</label>
-            <input
-              type="number"
-              class="form-control"
-              id="foodPrice"
-              name="price"
-              required
-            />
+            <input type="number" class="form-control" id="foodPrice" name="price" required />
           </div>
           <div class="mb-3">
             <label for="foodImage" class="form-label">Hình Ảnh</label>
-            <input
-              type="file"
-              class="form-control"
-              id="foodImage"
-              name="image"
-            />
-            <img
-              id="currentImage"
-              src="#"
-              alt="Error"
-              class="mt-3 rounded-3"
-              width="70"
-              height="70"
-            />
+            <input type="file" class="form-control" id="foodImage" name="image" />
+            <img id="currentImage" src="#" alt="Error" class="mt-3 rounded-3" width="70" height="70" />
           </div>
         </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-          Đóng
-        </button>
-        <button type="button" class="btn btn-primary" id="updateFood">
-          Lưu thay đổi
-        </button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+        <button type="button" class="btn btn-primary" id="updateFood">Lưu thay đổi</button>
       </div>
     </div>
   </div>
 </div>
 <!-- Modal Delete -->
-<div
-  class="modal fade"
-  id="deleteModal"
-  tabindex="-1"
-  aria-labelledby="deleteModalLabel"
-  aria-hidden="true"
->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
@@ -165,12 +132,7 @@
           <i class="fas fa-exclamation-triangle text-danger"></i>
           Xoá đồ ăn
         </h1>
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal"
-          aria-label="Close"
-        ></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <div class="mb-3">
@@ -181,23 +143,14 @@
             class="form-control"
             id="passDeleteFood"
             name="passDeleteFood"
-            required
-          />
-          <div class="invalid-feedback" id="passwordFeedback">
-            Vui lòng nhập password!
-          </div>
-          <div class="invalid-feedback" id="passwordErrorFeedback">
-            Password sai!
-          </div>
+            required />
+          <div class="invalid-feedback" id="passwordFeedback">Vui lòng nhập password!</div>
+          <div class="invalid-feedback" id="passwordErrorFeedback">Password sai!</div>
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-          Close
-        </button>
-        <button type="button" class="btn btn-danger" id="deleteFood">
-          Xoá
-        </button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-danger" id="deleteFood">Xoá</button>
       </div>
     </div>
   </div>
@@ -232,11 +185,9 @@
 </script>
 <!-- Refresh -->
 <script>
-  document
-    .getElementById("addService")
-    .addEventListener("click", async function () {
-      window.location.href = "/service/serviceAdd";
-    });
+  document.getElementById("addService").addEventListener("click", async function () {
+    window.location.href = "/service/serviceAdd";
+  });
 </script>
 <!-- Nếu ảnh bị lỗi không load được, thay thế bằng ảnh này -->
 <script>
@@ -403,20 +354,10 @@
         statusSpan.classList.add("rounded-3", "ps-3", "pe-3", "pt-1", "pb-1");
 
         if (food.status === "active") {
-          statusSpan.classList.add(
-            "status-label",
-            "text-success",
-            "border",
-            "border-success"
-          );
+          statusSpan.classList.add("status-label", "text-success", "border", "border-success");
           statusSpan.textContent = "Kích hoạt";
         } else if (food.status === "inactive") {
-          statusSpan.classList.add(
-            "role-label",
-            "text-danger",
-            "border",
-            "border-danger"
-          );
+          statusSpan.classList.add("role-label", "text-danger", "border", "border-danger");
           statusSpan.textContent = "Không kích hoạt";
         }
 
@@ -428,12 +369,8 @@
     };
 
     function updatePagination(totalPages, page) {
-      const prevButton = document
-        .getElementById("prevPage")
-        .querySelector("button");
-      const nextButton = document
-        .getElementById("nextPage")
-        .querySelector("button");
+      const prevButton = document.getElementById("prevPage").querySelector("button");
+      const nextButton = document.getElementById("nextPage").querySelector("button");
       const currentPageDisplay = document.getElementById("currentPageDisplay");
 
       currentPageDisplay.textContent = page;
@@ -469,16 +406,12 @@
     // Delete Food
     window.deleteFood = function (id) {
       // Hiện modal
-      const myModal = new bootstrap.Modal(
-        document.getElementById("deleteModal")
-      );
+      const myModal = new bootstrap.Modal(document.getElementById("deleteModal"));
       myModal.show();
 
       $("#deleteFood").click(function () {
         const pass = $("#passDeleteFood").val();
-        const deleteFoodModal = bootstrap.Modal.getInstance(
-          document.getElementById("deleteModal")
-        );
+        const deleteFoodModal = bootstrap.Modal.getInstance(document.getElementById("deleteModal"));
 
         if (pass === "") {
           $("#passwordFeedback").show();
@@ -525,14 +458,10 @@
     window.editFood = function (id) {
       var initialName, initialPrice, initialImage;
       // Hiện modal
-      const myModal = new bootstrap.Modal(
-        document.getElementById("editFoodModal")
-      );
+      const myModal = new bootstrap.Modal(document.getElementById("editFoodModal"));
       myModal.show();
 
-      const editFoodModal = bootstrap.Modal.getInstance(
-        document.getElementById("editFoodModal")
-      );
+      const editFoodModal = bootstrap.Modal.getInstance(document.getElementById("editFoodModal"));
 
       $.ajax({
         url: `http://139.180.132.97:3000/foods/${id}`,
@@ -549,9 +478,7 @@
 
           $("#foodName").val(details.name);
           $("#foodPrice").val(details.price);
-          $("#currentImage")
-            .attr("src", `${apiUrl}/images/${details.image}`)
-            .show();
+          $("#currentImage").attr("src", `${apiUrl}/images/${details.image}`).show();
         },
         error: function (error) {
           console.log(error);
@@ -563,11 +490,7 @@
         const priceFood = $("#foodPrice").val();
         const imageFood = $("#foodImage")[0].files[0];
 
-        if (
-          nameFood === initialName &&
-          priceFood == initialPrice &&
-          !imageFood
-        ) {
+        if (nameFood === initialName && priceFood == initialPrice && !imageFood) {
           editFoodModal.hide();
           return;
         }
@@ -617,20 +540,18 @@
 </script>
 <!-- Preview Image -->
 <script>
-  document
-    .getElementById("foodImage")
-    .addEventListener("change", function (event) {
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-          const img = document.getElementById("currentImage");
-          img.src = e.target.result;
-          img.classList.remove("d-none");
-        };
-        reader.readAsDataURL(file);
-      }
-    });
+  document.getElementById("foodImage").addEventListener("change", function (event) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const img = document.getElementById("currentImage");
+        img.src = e.target.result;
+        img.classList.remove("d-none");
+      };
+      reader.readAsDataURL(file);
+    }
+  });
 </script>
 <script>
   $(document).ready(function () {
@@ -664,17 +585,13 @@
         success: function (data) {
           if (data.status === "active") {
             $(`#status-${id}`).text("Kích hoạt");
-            $(`#status-${id}`).removeClass(
-              "text-danger border-danger role-label"
-            );
+            $(`#status-${id}`).removeClass("text-danger border-danger role-label");
             $(`#status-${id}`).addClass(
               "status-label rounded-3 text-success border border-success ps-3 pe-3 pt-1 pb-1"
             );
           } else {
             $(`#status-${id}`).text("Không kích hoạt");
-            $(`#status-${id}`).removeClass(
-              "text-success border-success status-label"
-            );
+            $(`#status-${id}`).removeClass("text-success border-success status-label");
             $(`#status-${id}`).addClass(
               "role-label rounded-3 text-danger border border-danger ps-3 pe-3 pt-1 pb-1"
             );
