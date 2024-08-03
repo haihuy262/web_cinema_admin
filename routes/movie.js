@@ -18,9 +18,11 @@ router.put(
   "/updateMovie/:id",
   authMiddleware.requireLogin,
   uploadImage.single("image"),
-  uploadImage.single("videos"),
+  uploadImage.array("videos"), // Sử dụng array nếu có nhiều video
   movieController.updateMovie
 );
+
+
 
 router.delete('/deleteMovie/:id', movieController.deleteMovie);
 router.get("/actor", authMiddleware.requireLogin, movieController.addActor);

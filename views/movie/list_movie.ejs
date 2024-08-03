@@ -1,11 +1,29 @@
 <%- include('../partials/header.ejs') %>
 
 <div class="mt-5" style="margin: 8%; padding-top: 5%">
-  <h2 class="text-center">Movie Management</h2>
+  <div class="row mb-3 mt-5">
+    <div class="col-md-3"></div>
+    <div class="col-md-6">
+      <h2 class="text-center">Danh sách Phim</h2>
+    </div>
+    <div class="col-md-3">
+      <div class="d-flex">
+        <input
+          id="searchInput"
+          class="form-control me-2 p-2"
+          type="search"
+          placeholder="Tìm kiếm..."
+          aria-label="Search"
+          oninput="searchTable()"
+        />
+       
+      </div>
+    </div>
+  </div>
   <table class="table table-bordered table-hover align-middle" id="movieTable">
     <thead>
       <tr class="table table-secondary">
-        <th class="text-center">Id</th>
+        
         <th class="text-center">Name</th>
         <th class="text-center">Duration</th>
         <th class="text-center">Subtitle</th>
@@ -120,14 +138,14 @@
               required
             />
           </div>
-          <div class="mb-3">
+          <!-- <div class="mb-3">
             <label for="image" class="form-label">Hình Ảnh</label>
             <input type="file" class="form-control" id="image" name="image" />
           </div>
           <div class="mb-3">
             <label for="trailer" class="form-label">Trailer</label>
             <input type="file" class="form-control" id="trailer" name="trailer" />
-          </div>
+          </div> -->
         </form>
       </div>
       <div class="modal-footer">
@@ -141,7 +159,28 @@
     </div>
   </div>
 </div>
+<script>
+function searchTable() {
+  const input = document.getElementById("searchInput").value.toLowerCase();
+  const tableBody = document.querySelector("#movieTable tbody");
+  const rows = tableBody.getElementsByTagName("tr");
 
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
+    const cells = row.getElementsByTagName("td");
+    let match = false;
+
+    for (let j = 0; j < cells.length; j++) {
+      if (cells[j].innerText.toLowerCase().indexOf(input) > -1) {
+        match = true;
+        break;
+      }
+    }
+
+    row.style.display = match ? "" : "none";
+  }
+}
+</script>
 <script>
 let currentPage = 1;
 
@@ -199,10 +238,7 @@ function populateMovieTable(movies) {
   movies.forEach((movie) => {
     const row = document.createElement('tr');
 
-    const cellId = document.createElement('td');
-    cellId.textContent = movie._id;
-    row.appendChild(cellId);
-
+  
     const cellName = document.createElement('td');
     cellName.textContent = movie.name;
     row.appendChild(cellName);
@@ -272,11 +308,12 @@ function editMovie(button) {
 }
 
 async function submitEdit() {
+  const id = document.getElementById('Id').value;
   const form = document.getElementById('editForm');
   const formData = new FormData(form);
 
   try {
-    const response = await fetch('/movie/editMovie', {
+    const response = await fetch(`/movie/updateMovie/${id}`, {
       method: 'PUT',
       body: formData
     });
@@ -297,4 +334,5 @@ async function submitEdit() {
     console.error('Lỗi khi gửi yêu cầu:', error);
   }
 }
+
 </script>

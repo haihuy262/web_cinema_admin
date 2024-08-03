@@ -120,12 +120,12 @@ exports.createMovie = async (req, res, next) => {
 };
 
 
-
 exports.updateMovie = async (req, res, next) => {
   const { id } = req.params; // Lấy ID từ tham số yêu cầu
-  const { name, duration, subtitle, censorship, rate,release_date } = req.body;
-  const image = req.file;
-  const videos = req.files;
+  const { name, duration, subtitle, censorship, rate, release_date } = req.body;
+  // const image = req.file; // Xử lý hình ảnh
+  // const videos = req.files.videos; // Xử lý video
+
   // Kiểm tra các trường bắt buộc
   if (
     !name ||
@@ -133,9 +133,10 @@ exports.updateMovie = async (req, res, next) => {
     !subtitle ||
     !censorship ||
     !rate ||
-    !release_date ||
-    !image ||
-    !videos
+    !release_date 
+    // !image ||
+    // !videos || // Kiểm tra nếu video không được gửi thì lỗi
+    // videos.length === 0
   ) {
     return res.status(400).json({ error: "Tất cả các trường là bắt buộc." });
   }
@@ -151,12 +152,18 @@ exports.updateMovie = async (req, res, next) => {
     formData.append("censorship", censorship);
     formData.append("rate", rate);
     formData.append("release_date", release_date);
-    if (image) {
-      formData.append("image", fs.createReadStream(image.path));
-    }
-    if (videos) {
-      formData.append("videos", fs.createReadStream(videos.path));
-    }
+
+    // Xử lý hình ảnh
+    // if (image) {
+    //   formData.append("image", fs.createReadStream(image.path));
+    // }
+
+    // // Xử lý video
+    // if (videos) {
+    //   videos.forEach(video => {
+    //     formData.append("videos", fs.createReadStream(video.path));
+    //   });
+    // }
 
     const response = await axios.put(`${apiUrl}/movies/${id}`, formData, {
       headers: {
@@ -165,19 +172,21 @@ exports.updateMovie = async (req, res, next) => {
       },
     });
 
-    if (image) {
-      fs.unlinkSync(image.path);
-    }
-    if (videos) {
-      fs.unlinkSync(videos.path);
-    }
-console.log("check",)
+    // Xóa các file tạm
+    // if (image) {
+    //   fs.unlinkSync(image.path);
+    // }
+    // if (videos) {
+    //   videos.forEach(video => fs.unlinkSync(video.path));
+    // }
+
     res.json({ success: true });
   } catch (error) {
-    console.log(error);
+    console.error('Lỗi khi cập nhật phim:', error);
     res.json({ success: false });
   }
 };
+
 exports.deleteMovie = async (req, res, next) => {
   const id = req.params.id;
   const token = req.session.admin.token;
