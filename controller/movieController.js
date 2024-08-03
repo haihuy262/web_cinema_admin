@@ -1,42 +1,29 @@
 const axios = require("axios");
 const fs = require("fs");
 const FormData = require("form-data");
-
 exports.movieList = async (req, res, next) => {
+  res.render("../views/movie/list_movie.ejs");
+};
+exports.movieListTable = async (req, res, next) => {
   try {
     const token = req.session.admin.token;
     const apiUrl = process.env.API_URL;
-
-    const response = await axios.get(`${apiUrl}/movies`, {
+    const page = req.query.page || 1;
+    const response = await axios.get(`${apiUrl}/movies/admin?page=${page}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
 
     const movies = response.data.getall;
-    res.render("../views/movie/list_movie.ejs", { movies, apiUrl });
+    res.json({ success: true, getAll: movies });
 
-  
+    console.log("check", movies);
   } catch (error) {
-    if (error.response) {
-      console.error("Server Error:", error.response.data);
-      res.status(error.response.status).render("../views/movie/list_movie.ejs"),
-        {
-          error: "Đã xảy ra lỗi khi lấy danh sách phim.",
-        };
-    } else if (error.request) {
-      console.error("Request Error:", error.request);
-      res.status(500).render("../views/movie/list_movie.ejs"),
-        {
-          error: "Không nhận được phản hồi từ server khi lấy danh sách phim.",
-        };
-    } else {
-      console.error("Error:", error.message);
-      res.status(500).render("../views/movie/list_movie.ejs"),
-        {
-          error: "Đã xảy ra lỗi khi xử lý yêu cầu lấy danh sách phim.",
-        };
-    }
+    console.log(error);
+
+    // Trả về thông báo lỗi
+    res.status(500).json({ success: false, error: error.message });
   }
 };
 
@@ -132,25 +119,23 @@ exports.createMovie = async (req, res, next) => {
   }
 };
 
-exports.udMovie = async (req, res, next) => {
-  res.render("../views/movie/update_movie.ejs");
-};
+
 
 exports.updateMovie = async (req, res, next) => {
   const { id } = req.params; // Lấy ID từ tham số yêu cầu
-  const { name, duration, subtitle, censorship, rate } = req.body;
-  // const image = req.file;
-  // const videos = req.files;
+  const { name, duration, subtitle, censorship, rate,release_date } = req.body;
+  const image = req.file;
+  const videos = req.files;
   // Kiểm tra các trường bắt buộc
   if (
     !name ||
     !duration ||
     !subtitle ||
     !censorship ||
-    !rate 
-    // !release_date ||
-    // !image ||
-    // !videos
+    !rate ||
+    !release_date ||
+    !image ||
+    !videos
   ) {
     return res.status(400).json({ error: "Tất cả các trường là bắt buộc." });
   }
@@ -165,13 +150,13 @@ exports.updateMovie = async (req, res, next) => {
     formData.append("subtitle", subtitle);
     formData.append("censorship", censorship);
     formData.append("rate", rate);
-    // formData.append("release_date", release_date);
-    // if (image) {
-    //   formData.append("image", fs.createReadStream(image.path));
-    // }
-    // if (videos) {
-    //   formData.append("videos", fs.createReadStream(videos.path));
-    // }
+    formData.append("release_date", release_date);
+    if (image) {
+      formData.append("image", fs.createReadStream(image.path));
+    }
+    if (videos) {
+      formData.append("videos", fs.createReadStream(videos.path));
+    }
 
     const response = await axios.put(`${apiUrl}/movies/${id}`, formData, {
       headers: {
@@ -180,12 +165,12 @@ exports.updateMovie = async (req, res, next) => {
       },
     });
 
-    // if (image) {
-    //   fs.unlinkSync(image.path);
-    // }
-    // if (videos) {
-    //   fs.unlinkSync(videos.path);
-    // }
+    if (image) {
+      fs.unlinkSync(image.path);
+    }
+    if (videos) {
+      fs.unlinkSync(videos.path);
+    }
 console.log("check",)
     res.json({ success: true });
   } catch (error) {
@@ -354,7 +339,7 @@ exports.listDirectorTable = async (req, res, next) => {
 
     const directors = response.data;
     
-    console.log('check',directors)
+  
     res.json({ success: true, getAll: directors });
   } catch (error) {
     console.log(error);
@@ -475,7 +460,7 @@ exports.listDirectorOption = async (req, res, next) => {
     const directors = response.data.data.getAll;
     res.json({ success: true, getAll: directors });
 
-    console.log("check", directors);
+    
   } catch (error) {
     console.log(error);
 

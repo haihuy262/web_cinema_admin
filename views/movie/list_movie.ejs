@@ -1,66 +1,43 @@
 <%- include('../partials/header.ejs') %>
 
 <div class="mt-5" style="margin: 8%; padding-top: 5%">
-  <h2>Movie Management</h2>
-  <table class="table table-bordered">
+  <h2 class="text-center">Movie Management</h2>
+  <table class="table table-bordered table-hover align-middle" id="movieTable">
     <thead>
-      <tr style="background-color: aquamarine">
-        <th>Stt</th>
-        <th>Name</th>
-        <th>Duration</th>
-        <th>Subtitle</th>
-        <th>Censorship</th>
-        <th>Rate</th>
-        <th>Release Date</th>
-        <th>Image</th>
+      <tr class="table table-secondary">
+        <th class="text-center">Id</th>
+        <th class="text-center">Name</th>
+        <th class="text-center">Duration</th>
+        <th class="text-center">Subtitle</th>
+        <th class="text-center">Censorship</th>
+        <th class="text-center">Rate</th>
+        <th class="text-center">Release Date</th>
+        <th class="text-center">Image</th>
         <th style="width: 15%">Trailer</th>
-        <th>Actions</th>
+        <th class="text-center">Actions</th>
       </tr>
     </thead>
     <tbody>
-      <% movies.forEach((movie, index) => { %>
-      <tr>
-        <td><%= index + 1 %></td>
-        <td><%= movie.name %></td>
-        <td><%= movie.duration %></td>
-        <td><%= movie.subtitle %></td>
-        <td><%= movie.censorship %></td>
-        <td><%= movie.movie_format %></td>
-        <td><%= movie.release_date %></td>
-        <td>
-          <img
-            src="<%= apiUrl %>/images/<%= movie.image %>"
-            alt="Image"
-            width="50"
-          />
-        </td>
-        <td>
-          <video width="100%" height="100%" controls>
-            <source
-              src="<%= apiUrl %>/videos/<%= movie.trailer %>"
-              width="50"
-            />
-          </video>
-        </td>
-        <td>
-          <button
-            class="btn btn-info"
-            data-movie="<%= JSON.stringify(movie) %>"
-            onclick="editMovie(this)"
-          >
-            Sửa
-          </button>
-          <button
-            class="btn btn-danger"
-            onclick="deleteMovie('<%= movie._id %>')"
-          >
-            Delete
-          </button>
-        </td>
-      </tr>
-      <% }); %>
+      
     </tbody>
   </table>
+  <nav>
+    <ul class="pagination justify-content-end" id="pagination">
+      <li class="page-item" id="prevPage" onclick="changePage(-1)">
+        <a class="page-link" href="#" aria-label="Previous">
+          <span aria-hidden="true">&laquo;</span>
+        </a>
+      </li>
+      <li class="page-item">
+        <a class="page-link" id="currentPage" href="#">1</a>
+      </li>
+      <li class="page-item" id="nextPage" onclick="changePage(1)">
+        <a class="page-link" href="#" aria-label="Next">
+          <span aria-hidden="true">&raquo;</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
 </div>
 <div
   class="modal fade"
@@ -81,7 +58,7 @@
         ></button>
       </div>
       <div class="modal-body">
-        <form id="editForm">
+        <form id="editForm" enctype="multipart/form-data">
           <input type="hidden" id="Id" name="Id" />
           <div class="mb-3">
             <label for="name" class="form-label">Tên</label>
@@ -133,7 +110,7 @@
               required
             />
           </div>
-          <!-- <div class="mb-3">
+          <div class="mb-3">
             <label for="release_date" class="form-label">Release Date</label>
             <input
               type="date"
@@ -142,15 +119,15 @@
               name="release_date"
               required
             />
-          </div> -->
-          <!-- <div class="mb-3">
-            <label for="Image" class="form-label">Hình Ảnh</label>
-            <input type="file" class="form-control" id="Image" name="image" />
           </div>
           <div class="mb-3">
-            <label for="video" class="form-label">Video</label>
-            <input type="file" class="form-control" id="video" name="video" />
-          </div> -->
+            <label for="image" class="form-label">Hình Ảnh</label>
+            <input type="file" class="form-control" id="image" name="image" />
+          </div>
+          <div class="mb-3">
+            <label for="trailer" class="form-label">Trailer</label>
+            <input type="file" class="form-control" id="trailer" name="trailer" />
+          </div>
         </form>
       </div>
       <div class="modal-footer">
@@ -166,63 +143,158 @@
 </div>
 
 <script>
-  async function deleteMovie(movieId) {
-    if (confirm("Bạn có chắc chắn muốn xoá ?")) {
-      try {
-        const response = await fetch(`/movie/deleteMovie/${movieId}`, {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+let currentPage = 1;
 
-        if (response.ok) {
-          alert("Xoá  thành công!");
-          window.location.reload();
-        } else {
-          alert("Đã xảy ra lỗi khi xoá .");
-        }
-      } catch (error) {
-        alert("Đã xảy ra lỗi khi xoá .");
-        console.error(error);
-      }
+async function fetchMovies(page = 1) {
+  try {
+    const response = await fetch(`/movie/movieListTable?page=${page}`);
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
     }
+    const data = await response.json();
+    if (data.success) {
+      if (data.getAll.length === 0 && page > 1) {
+        changePage(-1);
+        return;
+      }
+      populateMovieTable(data.getAll);
+      document.getElementById('currentPage').textContent = page;
+      currentPage = page;
+
+      const nextPageResponse = await fetch(`/movie/movieListTable?page=${page + 1}`);
+      const nextPageData = nextPageResponse.ok ? await nextPageResponse.json() : { success: false, getAll: [] };
+      const hasNextPage = nextPageData.success && nextPageData.getAll.length > 0;
+      updatePaginationControls(hasNextPage, page > 1);
+    } else {
+      console.error('Error fetching movie data:', data.error);
+      updatePaginationControls(false, false);
+    }
+  } catch (error) {
+    console.error('Error fetching movie data:', error);
+    updatePaginationControls(false, false);
   }
+}
 
-  function editMovie(button) {
-    const movie = JSON.parse(button.getAttribute("data-movie"));
-    document.getElementById("Id").value = movie._id;
-    document.getElementById("name").value = movie.name;
-    document.getElementById("duration").value = movie.duration;
-    document.getElementById("subtitle").value = movie.subtitle;
-    document.getElementById("censorship").value = movie.censorship;
-    document.getElementById("rate").value = movie.rate;
-    // document.getElementById("release_date").value = movie.release_date;
+function updatePaginationControls(hasNextPage, hasPrevPage) {
+  const prevButton = document.getElementById('prevPage');
+  const nextButton = document.getElementById('nextPage');
 
-    // Hiện modal
-    var myModal = new bootstrap.Modal(document.getElementById("editModal"));
-    myModal.show();
+  prevButton.classList.toggle('disabled', !hasPrevPage);
+  nextButton.classList.toggle('disabled', !hasNextPage);
+}
+
+function changePage(direction) {
+  const newPage = currentPage + direction;
+  if (newPage > 0) {
+    fetchMovies(newPage);
   }
+}
 
-  async function submitEdit() {
-    const Id = document.getElementById("Id").value;
-    const formData = new FormData(document.getElementById("editForm"));
+document.addEventListener('DOMContentLoaded', () => fetchMovies(currentPage));
 
-    try {
-      const response = await fetch(`/movie/updateMovie/${Id}`, {
-        method: "PUT",
-        body: formData,
-      });
+function populateMovieTable(movies) {
+  const tableBody = document.querySelector('#movieTable tbody');
+  tableBody.innerHTML = '';
 
-      if (response.ok) {
-        alert("Cập nhật thành công!");
-        window.location.reload();
+  movies.forEach((movie) => {
+    const row = document.createElement('tr');
+
+    const cellId = document.createElement('td');
+    cellId.textContent = movie._id;
+    row.appendChild(cellId);
+
+    const cellName = document.createElement('td');
+    cellName.textContent = movie.name;
+    row.appendChild(cellName);
+
+    const cellDuration = document.createElement('td');
+    cellDuration.textContent = movie.duration;
+    row.appendChild(cellDuration);
+
+    const cellSubtitle = document.createElement('td');
+    cellSubtitle.textContent = movie.subtitle;
+    row.appendChild(cellSubtitle);
+
+    const cellCensorship = document.createElement('td');
+    cellCensorship.textContent = movie.censorship;
+    row.appendChild(cellCensorship);
+
+    const cellRate = document.createElement('td');
+    cellRate.textContent = movie.rate;
+    row.appendChild(cellRate);
+
+    const cellReleaseDate = document.createElement('td');
+    cellReleaseDate.textContent = movie.release_date.substring(0, 10);
+    row.appendChild(cellReleaseDate);
+
+    const cellImage = document.createElement('td');
+    const image = document.createElement('img');
+    image.src = `http://139.180.132.97:3000/images/${movie.image}`;
+    image.alt = movie.name;
+    image.style.width = '100px';
+    cellImage.appendChild(image);
+    row.appendChild(cellImage);
+
+    const cellTrailer = document.createElement('td');
+    const link = document.createElement('a');
+    link.href = `http://139.180.132.97:3000/videos/${movie.trailer}`;
+    link.target = '_blank';
+    link.textContent = 'Xem Trailer';
+    cellTrailer.appendChild(link);
+    row.appendChild(cellTrailer);
+
+    const cellActions = document.createElement('td');
+    const editButton = document.createElement('button');
+    editButton.className = 'btn btn-primary btn-sm';
+    editButton.textContent = 'Chỉnh sửa';
+    editButton.setAttribute('data-movie', JSON.stringify(movie));
+    editButton.onclick = () => editMovie(editButton);
+    cellActions.appendChild(editButton);
+
+    row.appendChild(cellActions);
+    tableBody.appendChild(row);
+  });
+}
+
+function editMovie(button) {
+  const movie = JSON.parse(button.getAttribute('data-movie'));
+
+  document.getElementById('Id').value = movie._id;
+  document.getElementById('name').value = movie.name;
+  document.getElementById('duration').value = movie.duration;
+  document.getElementById('subtitle').value = movie.subtitle;
+  document.getElementById('censorship').value = movie.censorship;
+  document.getElementById('rate').value = movie.rate;
+  document.getElementById('release_date').value = movie.release_date.substring(0, 10);
+
+  const editModal = new bootstrap.Modal(document.getElementById('editModal'));
+  editModal.show();
+}
+
+async function submitEdit() {
+  const form = document.getElementById('editForm');
+  const formData = new FormData(form);
+
+  try {
+    const response = await fetch('/movie/editMovie', {
+      method: 'PUT',
+      body: formData
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+      if (result.success) {
+        const editModal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
+        editModal.hide();
+        await fetchMovies(currentPage); // Tải lại danh sách phim
       } else {
-        alert("Đã xảy ra lỗi khi cập nhật.");
+        console.error('Lỗi khi chỉnh sửa phim:', result.error);
       }
-    } catch (error) {
-      alert("Đã xảy ra lỗi khi cập nhật.");
-      console.error(error);
+    } else {
+      console.error('Lỗi khi gửi yêu cầu:', response.statusText);
     }
+  } catch (error) {
+    console.error('Lỗi khi gửi yêu cầu:', error);
   }
+}
 </script>

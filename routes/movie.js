@@ -5,6 +5,7 @@ var authMiddleware = require("../middleware/authMiddleware");
 var multer = require("multer");
 var uploadImage = multer({ dest: "./tmp" });
 router.get("/list", authMiddleware.requireLogin, movieController.movieList);
+router.get("/movieListTable", authMiddleware.requireLogin, movieController.movieListTable);
 router.get("/add", authMiddleware.requireLogin, movieController.addMovie);
 router.post(
   "/createMovie",
@@ -16,11 +17,11 @@ router.post(
 router.put(
   "/updateMovie/:id",
   authMiddleware.requireLogin,
-  // uploadImage.single("image"),
-  // uploadImage.single("videos"),
+  uploadImage.single("image"),
+  uploadImage.single("videos"),
   movieController.updateMovie
 );
-router.get("/update/:id", authMiddleware.requireLogin, movieController.udMovie);
+
 router.delete('/deleteMovie/:id', movieController.deleteMovie);
 router.get("/actor", authMiddleware.requireLogin, movieController.addActor);
 router.get(
