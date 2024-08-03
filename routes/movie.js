@@ -45,6 +45,11 @@ router.put(
   movieController.updateDirecters
 );
 router.get(
+  "/listDirectorTable",
+  authMiddleware.requireLogin,
+  movieController.listDirectorTable
+);
+router.get(
   "/listDirectors",
   authMiddleware.requireLogin,
   movieController.listDirector

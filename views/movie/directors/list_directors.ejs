@@ -2,143 +2,178 @@
 
 <div class="container mt-5" style="padding: 3%">
   <h2 class="text-center">List of Directors</h2>
-  <table class="table table-bordered">
+  <table class="table table-bordered table-hover align-middle" id="deactorTable">
     <thead>
-      <tr>
-        <th>Stt</th>
-        <th>Name</th>
-        <th>Image</th>
-        <th>Actions</th>
+      <tr class="table table-secondary">
+        <th class="text-center">Id</th>
+        <th class="text-center">Name</th>
+        <th class="text-center">Image</th>
+        <th class="text-center">Actions</th>
       </tr>
     </thead>
     <tbody>
-      <% directors.forEach(director => { %>
-      <tr>
-        <td><%= director._id %></td>
-        <td><%= director.name %></td>
-        <td>
-          <img src="<%= apiUrl %>/images/<%= director.image %>" width="50" />
-        </td>
-        <td>
-          <button
-            class="btn btn-info"
-            data-director="<%= JSON.stringify(director) %>"
-            onclick="editDirector(this)"
-          >
-            Sửa
-          </button>
-          <button
-            class="btn btn-danger"
-            onclick="deleteDirector('<%= director._id %>')"
-          >
-            Delete
-          </button>
-        </td>
-      </tr>
-      <% }); %>
     </tbody>
   </table>
+  <nav>
+    <ul class="pagination justify-content-end" id="pagination">
+      <li class="page-item" id="prevPage" onclick="changePage(-1)">
+        <a class="page-link" href="#" aria-label="Previous">
+          <span aria-hidden="true">&laquo;</span>
+        </a>
+      </li>
+      <li class="page-item">
+        <a class="page-link" id="currentPage" href="#">1</a>
+      </li>
+      <li class="page-item" id="nextPage" onclick="changePage(1)">
+        <a class="page-link" href="#" aria-label="Next">
+          <span aria-hidden="true">&raquo;</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
 </div>
-<div
-  class="modal fade"
-  id="editModal"
-  tabindex="-1"
-  aria-labelledby="editModalLabel"
-  aria-hidden="true"
->
+
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="editModalLabel">Chỉnh Sửa</h5>
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal"
-          aria-label="Đóng"
-        ></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
       </div>
       <div class="modal-body">
         <form id="editForm">
           <input type="hidden" id="id" name="id" />
           <div class="mb-3">
             <label for="name" class="form-label">Tên</label>
-            <input
-              type="text"
-              class="form-control"
-              id="name"
-              name="name"
-              required
-            />
+            <input type="text" class="form-control" id="name" name="name" required />
           </div>
-
           <div class="mb-3">
-            <label for="Image" class="form-label">Hình Ảnh</label>
-            <input type="file" class="form-control" id="Image" name="image" />
+            <label for="image" class="form-label">Hình Ảnh</label>
+            <input type="file" class="form-control" id="image" name="image" />
           </div>
         </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-          Đóng
-        </button>
-        <button type="button" class="btn btn-primary" onclick="submitEdit()">
-          Lưu thay đổi
-        </button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+        <button type="button" class="btn btn-primary" onclick="submitEdit()">Lưu thay đổi</button>
       </div>
     </div>
   </div>
 </div>
-<script>
-  async function deleteDirector(directorId) {
-    if (confirm("Bạn có chắc chắn muốn xoá đạo diễn này?")) {
-      try {
-        const response = await fetch(`/movie/directors/${directorId}`, {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
 
-        if (response.ok) {
-          alert("Xoá đạo diễn thành công!");
-          window.location.reload();
-        } else {
-          alert("Đã xảy ra lỗi khi xoá đạo diễn.");
-        }
-      } catch (error) {
-        alert("Đã xảy ra lỗi khi xoá đạo diễn.");
-        console.error(error);
+<script>
+  let currentPage = 1;
+
+  async function fetchDirectors(page = 1) {
+    try {
+      const response = await fetch(`/movie/listDirectorTable?page=${page}`);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
       }
+      const data = await response.json();
+      if (data.success) {
+        if (data.getAll.length === 0 && page > 1) {
+          changePage(-1);
+          return;
+        }
+        populateDirectorTable(data.getAll);
+        document.getElementById('currentPage').textContent = page;
+        currentPage = page;
+
+        const nextPageResponse = await fetch(`/movie/listDirectorTable?page=${page + 1}`);
+        const nextPageData = nextPageResponse.ok ? await nextPageResponse.json() : { success: false, getAll: [] };
+        const hasNextPage = nextPageData.success && nextPageData.getAll.length > 0;
+        updatePaginationControls(hasNextPage, page > 1);
+      } else {
+        console.error('Error fetching director data:', data.error);
+        updatePaginationControls(false, false);
+      }
+    } catch (error) {
+      console.error('Error fetching director data:', error);
+      updatePaginationControls(false, false);
     }
   }
-  function editDirector(button) {
-    const director = JSON.parse(button.getAttribute("data-director"));
-    document.getElementById("id").value = director._id;
-    document.getElementById("name").value = director.name;
 
-    // Hiện modal
-    var myModal = new bootstrap.Modal(document.getElementById("editModal"));
+  function updatePaginationControls(hasNextPage, hasPrevPage) {
+    const prevButton = document.getElementById('prevPage');
+    const nextButton = document.getElementById('nextPage');
+
+    prevButton.classList.toggle('disabled', !hasPrevPage);
+    nextButton.classList.toggle('disabled', !hasNextPage);
+  }
+
+  function changePage(direction) {
+    const newPage = currentPage + direction;
+    if (newPage > 0) {
+      fetchDirectors(newPage);
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => fetchDirectors(currentPage));
+
+  function populateDirectorTable(directors) {
+    const tableBody = document.querySelector('#deactorTable tbody');
+    tableBody.innerHTML = '';
+
+    directors.forEach((director) => {
+      const row = document.createElement('tr');
+
+      const cellId = document.createElement('td');
+      cellId.textContent = director._id;
+      row.appendChild(cellId);
+
+      const cellName = document.createElement('td');
+      cellName.textContent = director.name;
+      row.appendChild(cellName);
+
+      const cellImage = document.createElement('td');
+      const image = document.createElement('img');
+      image.src = `http://139.180.132.97:3000/images/${director.image}`;
+      image.alt = director.name;
+      image.style.width = '100px';
+      cellImage.appendChild(image);
+      row.appendChild(cellImage);
+
+      const cellActions = document.createElement('td');
+      const editButton = document.createElement('button');
+      editButton.className = 'btn btn-primary btn-sm';
+      editButton.textContent = 'Chỉnh sửa';
+      editButton.setAttribute('data-director', JSON.stringify(director));
+      editButton.onclick = () => editDirector(editButton);
+      cellActions.appendChild(editButton);
+
+      row.appendChild(cellActions);
+      tableBody.appendChild(row);
+    });
+  }
+
+  function editDirector(button) {
+    const director = JSON.parse(button.getAttribute('data-director'));
+    document.getElementById('id').value = director._id;
+    document.getElementById('name').value = director.name;
+
+    var myModal = new bootstrap.Modal(document.getElementById('editModal'));
     myModal.show();
   }
 
   async function submitEdit() {
-    const Id = document.getElementById("id").value;
-    const formData = new FormData(document.getElementById("editForm"));
+    const id = document.getElementById('id').value;
+    const formData = new FormData(document.getElementById('editForm'));
 
     try {
-      const response = await fetch(`/movie/updateDirecters/${Id}`, {
-        method: "PUT",
+      const response = await fetch(`/movie/updateDirecters/${id}`, {
+        method: 'PUT',
         body: formData,
       });
 
       if (response.ok) {
-        alert("Cập nhật thành công!");
+        alert('Cập nhật thành công!');
         window.location.reload();
       } else {
-        alert("Đã xảy ra lỗi khi cập nhật.");
+        alert('Đã xảy ra lỗi khi cập nhật.');
       }
     } catch (error) {
-      alert("Đã xảy ra lỗi khi cập nhật.");
+      alert('Đã xảy ra lỗi khi cập nhật.');
       console.error(error);
     }
   }

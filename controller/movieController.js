@@ -338,21 +338,24 @@ exports.deleteActor = async (req, res, next) => {
 };
 
 exports.listDirector = async (req, res, next) => {
+  res.render("../views/movie/directors/list_directors.ejs");
+};
+
+exports.listDirectorTable = async (req, res, next) => {
   try {
     const token = req.session.admin.token;
     const apiUrl = process.env.API_URL;
-
-    const response = await axios.get(`${apiUrl}/directors`, {
+    const page = req.query.page || 1;
+    const response = await axios.get(`${apiUrl}/directors?page=${page}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
 
     const directors = response.data;
-    res.render("../views/movie/directors/list_directors.ejs", {
-      directors,
-      apiUrl,
-    });
+    
+    console.log('check',directors)
+    res.json({ success: true, getAll: directors });
   } catch (error) {
     console.log(error);
 
