@@ -2,6 +2,7 @@
 
 const axios = require('axios');
 const FormData = require('form-data');
+const { param } = require('../app');
 exports.getOverview = async (req, res, next) => {
   res.render("../views/dashboard/overview.ejs");
 };
@@ -9,13 +10,14 @@ exports.movieList = async (req, res, next) => {
   try {
     const token = req.session.admin.token;
 
-    const response = await axios.get('http://139.180.132.97:3000/movies', {
+    const response = await axios.get('http://139.180.132.97:3000/movies/no/login', {
       headers: {
         'Authorization': `Bearer ${token}`
       }
     });
 
     const movies = response.data.getall;
+    
     res.json({ success: true, getAll: movies });
   } catch (error) {
     console.log(error);
@@ -64,8 +66,8 @@ exports.totalCinema = async (req, res, next) => {
     const total = response.data;
     if (Array.isArray(total) && total.length > 0) {
       const totalRevenue = total[0].totalRevenue;
-      console.log('totalRevenue', total);
-
+      
+      console.log('totalRevenue', movieId,startDate,endDate);
       res.json({ success: true, getAll: totalRevenue, revenueData: total });
     } else {
       console.log('No totalRevenue found in response');
@@ -78,3 +80,46 @@ exports.totalCinema = async (req, res, next) => {
   }
 };
 
+exports.totalMovie = async (req, res, next) => {
+  try {
+    const token = req.session.admin.token;
+
+    const response = await axios.get('http://139.180.132.97:3000/tickets/revenue/movie', {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    const movieTotal = response.data;
+   
+    res.json({ success: true, getAll: movieTotal });
+    
+  } catch (error) {
+    console.log(error);
+
+    // Trả về thông báo lỗi
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+exports.totaListCinema = async (req, res, next) => {
+  try {
+    const token = req.session.admin.token;
+
+    const response = await axios.get('http://139.180.132.97:3000/tickets/revenue/cinema', {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    const cinemaTotal = response.data;
+   
+    res.json({ success: true, getAll: cinemaTotal });
+    
+  } catch (error) {
+    console.log(error);
+
+    // Trả về thông báo lỗi
+    res.status(500).json({ success: false, error: error.message });
+  }
+};

@@ -133,7 +133,7 @@
               required
             />
           </div>
-          <div class="mb-3">
+          <!-- <div class="mb-3">
             <label for="release_date" class="form-label">Release Date</label>
             <input
               type="date"
@@ -142,15 +142,15 @@
               name="release_date"
               required
             />
-          </div>
-          <div class="mb-3">
+          </div> -->
+          <!-- <div class="mb-3">
             <label for="Image" class="form-label">Hình Ảnh</label>
             <input type="file" class="form-control" id="Image" name="image" />
           </div>
           <div class="mb-3">
             <label for="video" class="form-label">Video</label>
             <input type="file" class="form-control" id="video" name="video" />
-          </div>
+          </div> -->
         </form>
       </div>
       <div class="modal-footer">
@@ -197,7 +197,7 @@
     document.getElementById("subtitle").value = movie.subtitle;
     document.getElementById("censorship").value = movie.censorship;
     document.getElementById("rate").value = movie.rate;
-    document.getElementById("release_date").value = movie.release_date;
+    // document.getElementById("release_date").value = movie.release_date;
 
     // Hiện modal
     var myModal = new bootstrap.Modal(document.getElementById("editModal"));

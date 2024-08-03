@@ -1,10 +1,12 @@
 <%- include('../partials/header.ejs') %>
 <div class="container mt-5" style="padding: 3%">
-  <h2 class="text-center mb-5">Revenue Statistics</h2>
+  <h2 class="text-center mb-5">Thống Kê Doanh Thu </h2>
   <div class="row mb-3">
     <div class="col-md-4">
       <label for="movie" class="form-label">Select Movie</label>
-      <select class="form-select" id="movie" name="movie" required></select>
+      <select class="form-select" id="movie" name="movie" required>
+        <option value=""></option>
+      </select>
     </div>
     <div class="col-md-2">
       <label for="startDate" class="form-label">From Date</label>
@@ -32,28 +34,28 @@
   <div class="row mt-5">
     <div class="col-md-6">
       <h3>Doanh thu theo phim</h3>
-      <table class="table table-bordered" id="movieRevenueTable">
+      <table  class="table table-bordered" id="movieTableBody">
         <thead>
           <tr>
             <th>Phim</th>
             <th>Tổng Tiền</th>
             <th>Số Vé</th>
-            <th>Rạp</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody >
+          
         </tbody>
       </table>
     </div>
     <div class="col-md-6">
       <h3>Doanh thu theo rạp</h3>
-      <table class="table table-bordered" id="cinemaRevenueTable">
+      <table class="table table-bordered" id="cinemaTableBody">
         <thead>
-          <tr>
+          <tr >
             <th>Rạp</th>
             <th>Tổng Tiền</th>
-            <th>Số Vé</th>
-            <th>Phim</th>
+            <!-- <th>Số Vé</th>
+            <th>Phim</th> -->
           </tr>
         </thead>
         <tbody>
@@ -64,10 +66,83 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.0/dist/echarts.min.js"></script>
+
 <script>
+  
 let cinemaMap = {};
 
 document.addEventListener('DOMContentLoaded', function() {
+
+  fetch('/dashboard/totalMovie')
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    return response.json();
+  })
+  .then(data => {
+    if (data.success) {
+      const tableBody = document.getElementById('movieTableBody');
+      data.getAll.forEach(movieData => {
+        const row = document.createElement('tr');
+
+        const cellName = document.createElement('td');
+        cellName.textContent = movieData.movie.join(', '); 
+        row.appendChild(cellName);
+
+        const cellRevenue = document.createElement('td');
+        cellRevenue.textContent = movieData.totalRevenue;
+        
+        row.appendChild(cellRevenue);
+
+        const cellCount = document.createElement('td');
+        cellCount.textContent = movieData.count;
+        row.appendChild(cellCount);
+
+        tableBody.appendChild(row);
+      });
+    } else {
+      console.error('Error fetching movie data:', data.error);
+    }
+  })
+  .catch(error => {
+    console.error('Error fetching movie data:', error);
+  });
+
+
+  fetch('/dashboard/totaListCinema')
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    return response.json();
+  })
+  .then(data => {
+    if (data.success) {
+      const tableBody = document.getElementById('cinemaTableBody');
+      data.getAll.forEach(cinemaData => {
+        const row = document.createElement('tr');
+
+        const cellName = document.createElement('td');
+        cellName.textContent = cinemaData.cinema.join(', '); 
+        row.appendChild(cellName);
+
+        const cellRevenue = document.createElement('td');
+        cellRevenue.textContent = cinemaData.totalRevenue;
+        row.appendChild(cellRevenue);
+
+       
+
+        tableBody.appendChild(row);
+      });
+    } else {
+      console.error('Error fetching movie data:', data.error);
+    }
+  })
+  .catch(error => {
+    console.error('Error fetching movie data:', error);
+  });
+
   fetch('/discount/cinemaList')
     .then(response => {
       if (!response.ok) {
@@ -121,10 +196,15 @@ document.addEventListener('DOMContentLoaded', function() {
   fetchRevenueData();
 });
 
+function formatDate(dateString) {
+  const [year, month, day] = dateString.split('-');
+  return `${year}-${month}-${day}`;
+}
+
 function fetchRevenueData() {
   const movieId = document.getElementById('movie').value;
-  const startDate = document.getElementById('startDate').value;
-  const endDate = document.getElementById('endDate').value;
+  const startDate = formatDate(document.getElementById('startDate').value);
+  const endDate = formatDate(document.getElementById('endDate').value);
 
   const url = new URL('/dashboard/totalCinema', window.location.origin);
   const params = {
@@ -148,12 +228,15 @@ function fetchRevenueData() {
         const totalRevenue = revenueData.reduce((acc, item) => acc + item.totalRevenue, 0);
 
         const totalRevenueLabel = document.getElementById('totalRevenueLabel');
-        totalRevenueLabel.textContent = `${totalRevenue}$`;
+const formattedTotalRevenue = Number(totalRevenue).toLocaleString('en-US');
+totalRevenueLabel.textContent = `${formattedTotalRevenue}$`;
+
+
 
         const chartDom = document.getElementById("revenueChart");
         const myChart = echarts.init(chartDom);
 
-        const cinemaNames = revenueData.map(item => cinemaMap[item.cinema]);
+        const cinemaNames = revenueData.map(item => item.cinemaName);
         const seriesData = revenueData.length > 0
           ? revenueData.map(item => item.totalRevenue)
           : [0]; 
@@ -167,7 +250,7 @@ function fetchRevenueData() {
           },
           xAxis: {
             type: "category",
-            data: revenueData.map(item => cinemaMap[item.cinema])
+            data: cinemaNames,
           },
           yAxis: {
             type: "value",
@@ -183,28 +266,6 @@ function fetchRevenueData() {
 
         myChart.setOption(option);
 
-      
-        const movieRevenueTableBody = document.getElementById('movieRevenueTable').getElementsByTagName('tbody')[0];
-        movieRevenueTableBody.innerHTML = ''; 
-        revenueData.forEach(item => {
-          const row = movieRevenueTableBody.insertRow();
-          row.insertCell().textContent = `${item.cinema}`;
-          row.insertCell().textContent = `${item.totalRevenue}$`;
-          row.insertCell().textContent = `${item.ticketCount}`;
-          row.insertCell().textContent = `${item.movie}`;
-        });
-
-       
-        const cinemaRevenueTableBody = document.getElementById('cinemaRevenueTable').getElementsByTagName('tbody')[0];
-        cinemaRevenueTableBody.innerHTML = ''; 
-        revenueData.forEach(item => {
-          const row = cinemaRevenueTableBody.insertRow();
-          row.insertCell().textContent = `${item.cinema}`;
-          row.insertCell().textContent = `${item.totalRevenue}$`;
-          row.insertCell().textContent = `${item.ticketCount}`;
-          row.insertCell().textContent = `${item.movie}`;
-        });
-        
       } else {
         console.error('Error fetching revenue data:', data.error);
         const totalRevenueLabel = document.getElementById('totalRevenueLabel');
@@ -238,9 +299,6 @@ function fetchRevenueData() {
 
         myChart.setOption(option);
 
-        // Xóa dữ liệu trong các bảng
-        document.getElementById('movieRevenueTable').getElementsByTagName('tbody')[0].innerHTML = '';
-        document.getElementById('cinemaRevenueTable').getElementsByTagName('tbody')[0].innerHTML = '';
       }
     })
     .catch(error => {
@@ -277,9 +335,8 @@ function fetchRevenueData() {
 
       myChart.setOption(option);
 
-      // Xóa dữ liệu trong các bảng
-      document.getElementById('movieRevenueTable').getElementsByTagName('tbody')[0].innerHTML = '';
-      document.getElementById('cinemaRevenueTable').getElementsByTagName('tbody')[0].innerHTML = '';
     });
 }
+
+
 </script>
