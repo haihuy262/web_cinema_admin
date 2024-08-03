@@ -1,7 +1,25 @@
 <%- include('../partials/header.ejs') %>
 
 <div class="container mt-5" style="padding: 3%">
-  <h2 class="text-center mb-5">Khuyến Mại</h2>
+  <div class="row mb-3 mt-5">
+    <div class="col-md-3"></div>
+    <div class="col-md-6">
+      <h2 class="text-center">Danh sách Khuyến Mại</h2>
+    </div>
+    <div class="col-md-3">
+      <div class="d-flex">
+        <input
+          id="searchInput"
+          class="form-control me-2 p-2"
+          type="search"
+          placeholder="Tìm kiếm..."
+          aria-label="Search"
+          oninput="searchTable()"
+        />
+       
+      </div>
+    </div>
+  </div>
   <table class="table table-bordered table-hover align-middle" id="discountTable">
     <thead >
       <tr class="table table-secondary" >
@@ -90,6 +108,29 @@
 </div>
 
 <script>
+  function searchTable() {
+    const input = document.getElementById("searchInput").value.toLowerCase();
+    const tableBody = document.querySelector("#discountTable tbody");
+    const rows = tableBody.getElementsByTagName("tr");
+  
+    for (let i = 0; i < rows.length; i++) {
+      const row = rows[i];
+      const cells = row.getElementsByTagName("td");
+      let match = false;
+  
+      for (let j = 0; j < cells.length; j++) {
+        if (cells[j].innerText.toLowerCase().indexOf(input) > -1) {
+          match = true;
+          break;
+        }
+      }
+  
+      row.style.display = match ? "" : "none";
+    }
+  }
+  </script>
+
+<script>
  let currentPage = 1;
 
 async function fetchDiscounts(page = 1) {
@@ -143,6 +184,9 @@ function changePage(direction) {
 document.addEventListener('DOMContentLoaded', () => fetchDiscounts(currentPage));
 
 
+
+let updateInProgress = {}; // Đối tượng để theo dõi các ID đang được cập nhật
+
 function populateDiscountTable(discounts) {
     const tableBody = document.querySelector('#discountTable tbody');
     tableBody.innerHTML = ''; // Clear existing table rows
@@ -150,34 +194,39 @@ function populateDiscountTable(discounts) {
     discounts.forEach((discount, index) => {
         const row = document.createElement('tr');
 
-       
-
         // Các cột dữ liệu khác
         const cellName = document.createElement('td');
+        cellName.classList.add("text-center");
         cellName.textContent = discount.name;
         row.appendChild(cellName);
 
         const cellPercent = document.createElement('td');
+        cellPercent.classList.add("text-center");
         cellPercent.textContent = discount.percent;
         row.appendChild(cellPercent);
 
         const cellCode = document.createElement('td');
+        cellCode.classList.add("text-center");
         cellCode.textContent = discount.code;
         row.appendChild(cellCode);
 
         const cellType = document.createElement('td');
+        cellType.classList.add("text-center");
         cellType.textContent = discount.type;
         row.appendChild(cellType);
 
         const cellStartDate = document.createElement('td');
+        cellStartDate.classList.add("text-center");
         cellStartDate.textContent = discount.dayStart.substring(0, 10); 
         row.appendChild(cellStartDate);
 
         const cellEndDate = document.createElement('td');
+        cellEndDate.classList.add("text-center");
         cellEndDate.textContent = discount.dayEnd.substring(0, 10); 
         row.appendChild(cellEndDate);
 
         const cellCinema = document.createElement('td');
+        cellCinema.classList.add("text-center");
         if (Array.isArray(discount.cinema)) {
             const cinemaNames = discount.cinema.map(cinema => cinema.name || 'Chưa có tên').join('<br>');
             cellCinema.innerHTML = cinemaNames; 
@@ -187,6 +236,7 @@ function populateDiscountTable(discounts) {
         row.appendChild(cellCinema);
 
         const cellImage = document.createElement('td');
+        cellImage.classList.add("text-center");
         const image = document.createElement('img');
         image.src = `http://139.180.132.97:3000/images/${discount.image}`;
         image.alt = discount.name;
@@ -195,8 +245,6 @@ function populateDiscountTable(discounts) {
         row.appendChild(cellImage);
 
         const cellStatus = document.createElement('td');
-        cellStatus.className = 'text-center';
-        
         const switchDiv = document.createElement('div');
         switchDiv.className = 'form-check form-switch form-check-reverse';
 
@@ -215,28 +263,35 @@ function populateDiscountTable(discounts) {
         switchDiv.appendChild(label);
         cellStatus.appendChild(switchDiv);
         row.appendChild(cellStatus);
-        $('.status-toggle').change(async function () {
-        console.log('Toggle changed'); // Xác nhận sự kiện change có được gọi không
-        const discountId = $(this).data("id");
-        const status = $(this).prop("checked") ? "active" : "inactive";
-        console.log('Discount ID:', discountId, 'Status:', status); // Xác nhận giá trị được lấy
 
-        await updateDiscountStatus(discountId, status);
-    });
-
+        tableBody.appendChild(row);
         const cellActions = document.createElement('td');
+        cellActions.classList.add("text-center");
         const editButton = document.createElement('button');
-        editButton.className = 'btn btn-primary btn-sm';
-        editButton.textContent = 'Chỉnh sửa';
+        editButton.classList.add("btn", "btn-info");
+        editButton.textContent = 'Sửa';
         editButton.setAttribute('data-discount', JSON.stringify(discount));
         editButton.onclick = () => editDiscount(editButton);
         cellActions.appendChild(editButton);
 
         row.appendChild(cellActions);
         tableBody.appendChild(row);
-    });
+    
 
-   
+        checkbox.addEventListener('change', async function () {
+            if (updateInProgress[discount._id]) return; 
+
+            updateInProgress[discount._id] = true;
+            const discountId = this.getAttribute('data-id');
+            const status = this.checked ? 'active' : 'inactive';
+
+            console.log('Discount ID:', discountId, 'Status:', status); 
+
+            await updateDiscountStatus(discountId, status);
+            delete updateInProgress[discount._id];
+        });
+        
+    });
 }
 
 async function updateDiscountStatus(discountId, status) {
@@ -258,7 +313,6 @@ async function updateDiscountStatus(discountId, status) {
         console.error("Error updating status:", error);
     }
 }
-
 
 
 
