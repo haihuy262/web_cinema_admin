@@ -1,13 +1,16 @@
 const axios = require("axios");
 const fs = require("fs");
 const FormData = require("form-data");
-
 exports.genreList = async (req, res, next) => {
+  res.render("../views/movie/genre/genre_list.ejs");
+};
+exports.genreListTable = async (req, res, next) => {
   try {
     const token = req.session.admin.token;
+    const page = req.query.page || 1; // Lấy số trang từ query, mặc định là 1 nếu không có
     const apiUrl = process.env.API_URL;
 
-    const response = await axios.get(`${apiUrl}/genres`, {
+    const response = await axios.get(`${apiUrl}/genres/admin?page=${page}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -15,15 +18,13 @@ exports.genreList = async (req, res, next) => {
 
     const genres = response.data;
 
-    res.render("../views/movie/genre/genre_list.ejs", { genres, apiUrl });
-    console.log("check", genres);
+    res.json({ success: true, getAll: genres });
   } catch (error) {
     console.log(error);
-
-    // Trả về thông báo lỗi
     res.status(500).json({ success: false, error: error.message });
   }
 };
+
 exports.addGenre = async (req, res, next) => {
   res.render("../views/movie/genre/genre_add.ejs");
 };

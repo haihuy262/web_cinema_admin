@@ -2,42 +2,23 @@
 
 <div class="container mt-5" style="padding: 3%">
   <h2 class="text-center">List Genre</h2>
-  <table class="table table-bordered">
+  <table class="table table-bordered" id="genreTable">
     <thead>
       <tr>
-        <th>Stt</th>
-        <th>Name</th>
-        <th>Image</th>
-        <th>Actions</th>
+        <th>Hình Ảnh</th>
+        <th>Tên Thể Loại</th>
+        <th>Hành Động</th>
       </tr>
     </thead>
     <tbody>
-      <% genres.forEach((genre, index) => { %>
-      <tr>
-        <td><%= index + 1 %></td>
-        <td><%= genre.name %></td>
-        <td>
-          <img src="<%= apiUrl %>/images/<%= genre.image %>" width="50" />
-        </td>
-        <td>
-          <button
-            class="btn btn-info"
-            data-genre="<%= JSON.stringify(genre) %>"
-            onclick="editGenre(this)"
-          >
-            Sửa
-          </button>
-          <button
-            class="btn btn-danger"
-            onclick="deleteGenre('<%= genre._id %>')"
-          >
-            Xóa
-          </button>
-        </td>
-      </tr>
-      <% }); %>
+      <!-- Nội dung bảng sẽ được điền vào đây -->
     </tbody>
   </table>
+  <div class="d-flex justify-content-end align-items-center mt-3">
+    <button id="prevPage" class="btn btn-primary me-2" onclick="changePage(-1)" disabled>&#8592; </button>
+    <span id="currentPage" class="mx-2">1</span>
+    <button id="nextPage" class="btn btn-primary ms-2" onclick="changePage(1)"> &#8594;</button>
+  </div>
 </div>
 
 <div
@@ -90,58 +71,109 @@
 </div>
 
 <script>
-  async function deleteGenre(Id) {
-    if (confirm("Bạn có chắc chắn muốn xoá?")) {
-      try {
-        const response = await fetch(`/genre/delete/${Id}`, {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+  let currentPage = 1;
+  let totalPages = 1; // Đặt mặc định số trang tối đa là 1
 
-        if (response.ok) {
-          alert("Xoá thành công!");
-          window.location.reload();
-        } else {
-          alert("Đã xảy ra lỗi khi xoá.");
-        }
-      } catch (error) {
-        alert("Đã xảy ra lỗi khi xoá.");
-        console.error(error);
+  async function fetchGenres(page = 1) {
+    try {
+      const response = await fetch(`/genre/genreListTable?page=${page}`);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
       }
+      const data = await response.json();
+      if (data.success) {
+        populateGenreTable(data.getAll);
+        document.getElementById('currentPage').textContent = page;
+        currentPage = page;
+
+        // Cập nhật số trang tối đa
+        totalPages = data.totalPages || 1; // Đảm bảo bạn có `totalPages` trong response hoặc xử lý theo cách khác
+        updatePaginationControls();
+      } else {
+        console.error('Error fetching genre data:', data.error);
+      }
+    } catch (error) {
+      console.error('Error fetching genre data:', error);
+    }
+  }
+
+  function populateGenreTable(genres) {
+    const tableBody = document.querySelector('#genreTable tbody');
+    tableBody.innerHTML = ''; // Clear existing table rows
+
+    genres.forEach(genre => {
+      const row = document.createElement('tr');
+
+      const cellImage = document.createElement('td');
+      const image = document.createElement('img');
+      image.src = `http://139.180.132.97:3000/images/${genre.image}`;
+      image.alt = genre.name;
+      image.style.width = '100px'; // Thiết lập kích thước của hình ảnh
+      cellImage.appendChild(image);
+      row.appendChild(cellImage);
+
+      const cellName = document.createElement('td');
+      cellName.textContent = genre.name;
+      row.appendChild(cellName);
+
+      const cellActions = document.createElement('td');
+      const editButton = document.createElement('button');
+      editButton.className = 'btn btn-primary btn-sm';
+      editButton.textContent = 'Chỉnh sửa';
+      editButton.setAttribute('data-genre', JSON.stringify(genre));
+      editButton.onclick = () => editGenre(editButton);
+      cellActions.appendChild(editButton);
+
+      row.appendChild(cellActions);
+      tableBody.appendChild(row);
+    });
+  }
+
+  function updatePaginationControls() {
+    const prevButton = document.getElementById('prevPage');
+    const nextButton = document.getElementById('nextPage');
+
+    prevButton.disabled = currentPage <= 1;
+    nextButton.disabled = currentPage >= totalPages;
+  }
+
+  function changePage(direction) {
+    const newPage = currentPage + direction;
+    if (newPage > 0 && newPage <= totalPages) {
+      fetchGenres(newPage);
     }
   }
 
   function editGenre(button) {
-    const genre = JSON.parse(button.getAttribute("data-genre"));
-    document.getElementById("Id").value = genre._id;
-    document.getElementById("Name").value = genre.name;
+    const genre = JSON.parse(button.getAttribute('data-genre'));
+    document.getElementById('Id').value = genre._id;
+    document.getElementById('Name').value = genre.name;
 
-    // Hiện modal
-    var myModal = new bootstrap.Modal(document.getElementById("editModal"));
+    const myModal = new bootstrap.Modal(document.getElementById('editModal'));
     myModal.show();
   }
 
   async function submitEdit() {
-    const Id = document.getElementById("Id").value;
-    const formData = new FormData(document.getElementById("editForm"));
+    const Id = document.getElementById('Id').value;
+    const formData = new FormData(document.getElementById('editForm'));
 
     try {
       const response = await fetch(`/genre/updateGenre/${Id}`, {
-        method: "PUT",
+        method: 'PUT',
         body: formData,
       });
 
       if (response.ok) {
-        alert("Cập nhật thành công!");
+        alert('Cập nhật thành công!');
         window.location.reload();
       } else {
-        alert("Đã xảy ra lỗi khi cập nhật.");
+        alert('Đã xảy ra lỗi khi cập nhật.');
       }
     } catch (error) {
-      alert("Đã xảy ra lỗi khi cập nhật.");
+      alert('Đã xảy ra lỗi khi cập nhật.');
       console.error(error);
     }
   }
+
+  document.addEventListener('DOMContentLoaded', () => fetchGenres(currentPage));
 </script>

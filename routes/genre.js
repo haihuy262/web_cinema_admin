@@ -15,6 +15,11 @@ router.get(
   authMiddleware.requireLogin,
   genreController.genreList
 );
+router.get(
+  "/genreListTable",
+  authMiddleware.requireLogin,
+  genreController.genreListTable
+);
 router.post(
     "/createGenre",
     authMiddleware.requireLogin,
