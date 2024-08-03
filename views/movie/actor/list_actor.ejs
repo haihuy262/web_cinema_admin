@@ -62,6 +62,29 @@
 </div>
 
 <script>
+  function searchTable() {
+    const input = document.getElementById("searchInput").value.toLowerCase();
+    const tableBody = document.querySelector("#actorTable tbody");
+    const rows = tableBody.getElementsByTagName("tr");
+  
+    for (let i = 0; i < rows.length; i++) {
+      const row = rows[i];
+      const cells = row.getElementsByTagName("td");
+      let match = false;
+  
+      for (let j = 0; j < cells.length; j++) {
+        if (cells[j].innerText.toLowerCase().indexOf(input) > -1) {
+          match = true;
+          break;
+        }
+      }
+  
+      row.style.display = match ? "" : "none";
+    }
+  }
+  </script>
+
+<script>
   let currentPage = 1;
 
   async function fetchActors(page = 1) {
