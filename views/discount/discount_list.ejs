@@ -2,278 +2,313 @@
 
 <div class="container mt-5" style="padding: 3%">
   <h2 class="text-center mb-5">Khuyến Mại</h2>
-  <table class="table table-bordered">
-    <thead>
-      <tr style="background-color: aquamarine">
-        <th>Trạng Thái</th>
-        <th>Tên</th>
-        <th>Phần Trăm</th>
-        <th>Mã</th>
-        <th>Loại</th>
-        <th>Ngày Bắt đầu</th>
-        <th>Ngày Kết Thúp</th>
-        <th>Rạp</th>
-        <th>Ảnh</th>
-        <th>Hành Động</th>
+  <table class="table table-bordered table-hover align-middle" id="discountTable">
+    <thead >
+      <tr class="table table-secondary" >
+      
+        <th  class="text-center">Tên</th>
+        <th  class="text-center">Phần Trăm</th>
+        <th  class="text-center">Mã</th>
+        <th  class="text-center">Loại</th>
+        <th  class="text-center">Ngày Bắt đầu</th>
+        <th  class="text-center">Ngày Kết Thúc</th>
+        <th  class="text-center">Rạp</th>
+        <th  class="text-center">Ảnh</th>
+        <th  class="text-center">Trạng Thái</th>
+        <th  class="text-center">Hành Động</th>
       </tr>
     </thead>
     <tbody>
-      <% discounts.getall.forEach((discount, index) => { %>
-      <tr>
-        <td>
-          <div class="form-check form-switch form-check-reverse">
-            <input class="form-check-input status-toggle" type="checkbox"
-            id="toggle<%= index %>" data-id="<%= discount._id %>" <%=
-            discount.status === 'active' ? 'checked' : '' %> />
-            <label class="form-check-label" for="toggle<%= index %>"></label>
-          </div>
-        </td>
-        <td><%= discount.name %></td>
-        <td><%= discount.percent %></td>
-        <td><%= discount.code %></td>
-        <td><%= discount.type %></td>
-        <td><%= discount.dayStart %></td>
-        <td><%= discount.dayEnd %></td>
-        <td>
-          <% discount.cinema.forEach(cinema => { %>
-          <div><%= cinema.name %></div>
-          <% }); %>
-        </td>
-        <td>
-          <img
-            src="<%= apiUrl %>/images/<%= discount.image %>"
-            alt="Image"
-            width="50"
-          />
-        </td>
-        <td>
-          <button
-            class="btn btn-info"
-            data-discount="<%= JSON.stringify(discount) %>"
-            onclick="editDiscount(this)"
-          >
-            Sửa
-          </button>
-          <button
-            class="btn btn-danger"
-            onclick="deleteDiscount('<%= discount._id %>')"
-          >
-            Xoá
-          </button>
-        </td>
-      </tr>
-      <% }); %>
+      <!-- Nội dung bảng sẽ được điền vào đây -->
     </tbody>
   </table>
+  <nav>
+    <ul class="pagination justify-content-end" id="pagination">
+      <li class="page-item" id="prevPage" onclick="changePage(-1)">
+        <a class="page-link" href="#" aria-label="Previous">
+          <span aria-hidden="true">&laquo;</span>
+        </a>
+      </li>
+      <li class="page-item">
+        <a class="page-link" id="currentPage" href="#">1</a>
+      </li>
+      <li class="page-item" id="nextPage" onclick="changePage(1)">
+        <a class="page-link" href="#" aria-label="Next">
+          <span aria-hidden="true">&raquo;</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
 </div>
-<div
-  class="modal fade"
-  id="editModal"
-  tabindex="-1"
-  aria-labelledby="editModalLabel"
-  aria-hidden="true"
->
+
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="editModalLabel">Chỉnh Sửa khuyễn Mại</h5>
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal"
-          aria-label="Đóng"
-        ></button>
+        <h5 class="modal-title" id="editModalLabel">Chỉnh Sửa Khuyến Mại</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
       </div>
       <div class="modal-body">
         <form id="editForm">
           <input type="hidden" id="id" name="id" />
           <div class="mb-3">
             <label for="name" class="form-label">Tên</label>
-            <input
-              type="text"
-              class="form-control"
-              id="name"
-              name="name"
-              required
-            />
+            <input type="text" class="form-control" id="name" name="name" required />
           </div>
           <div class="mb-3">
-            <label for="percent" class="form-label">Percent</label>
-            <input
-              type="text"
-              class="form-control"
-              id="percent"
-              name="percent"
-              required
-            />
+            <label for="percent" class="form-label">Phần Trăm</label>
+            <input type="text" class="form-control" id="percent" name="percent" required />
           </div>
           <div class="mb-3">
-            <label for="type" class="form-label">Type</label>
-            <input
-              type="text"
-              class="form-control"
-              id="type"
-              name="type"
-              required
-            />
+            <label for="type" class="form-label">Loại</label>
+            <input type="text" class="form-control" id="type" name="type" required />
           </div>
           <div class="mb-3">
-            <label for="cinema" class="form-label">Cinema</label>
-
-            <select
-              class="form-control"
-              id="cinema"
-              name="cinema"
-              multiple
-              required
-            ></select>
+            <label for="cinema" class="form-label">Rạp</label>
+            <select class="form-control" id="cinema" name="cinema" multiple required></select>
           </div>
           <div class="mb-3">
-            <label for="dayStart" class="form-label">Start Date</label>
-            <input
-              type="date"
-              class="form-control"
-              id="dayStart"
-              name="dayStart"
-              required
-            />
+            <label for="dayStart" class="form-label">Ngày Bắt Đầu</label>
+            <input type="date" class="form-control" id="dayStart" name="dayStart" required />
           </div>
           <div class="mb-3">
-            <label for="dayEnd" class="form-label">End Date</label>
-            <input
-              type="date"
-              class="form-control"
-              id="dayEnd"
-              name="dayEnd"
-              required
-            />
+            <label for="dayEnd" class="form-label">Ngày Kết Thúc</label>
+            <input type="date" class="form-control" id="dayEnd" name="dayEnd" required />
           </div>
           <div class="mb-3">
-            <label for="Image" class="form-label">Hình Ảnh</label>
-            <input type="file" class="form-control" id="Image" name="image" />
+            <label for="image" class="form-label">Ảnh</label>
+            <input type="file" class="form-control" id="image" name="image" />
           </div>
         </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-          Đóng
-        </button>
-        <button type="button" class="btn btn-primary" onclick="submitEdit()">
-          Lưu thay đổi
-        </button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+        <button type="button" class="btn btn-primary" onclick="submitEdit()">Lưu Thay Đổi</button>
       </div>
     </div>
   </div>
 </div>
+
 <script>
-  async function deleteDiscount(id) {
-    if (confirm("Bạn có chắc chắn muốn xoá?")) {
-      try {
-        const response = await fetch(`/discount/delete/${id}`, {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
+ let currentPage = 1;
+
+async function fetchDiscounts(page = 1) {
+    try {
+        const response = await fetch(`/discount/discountListTable?page=${page}`);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        if (data.success) {
+            if (data.getAll.length === 0 && page > 1) {
+                // Nếu không có dữ liệu và không phải là trang đầu tiên, quay về trang trước
+                changePage(-1);
+                return;
+            }
+            populateDiscountTable(data.getAll);
+            document.getElementById('currentPage').textContent = page;
+            currentPage = page;
+
+            // Kiểm tra nếu trang tiếp theo có dữ liệu
+            const nextPageResponse = await fetch(`/discount/discountListTable?page=${page + 1}`);
+            const nextPageData = nextPageResponse.ok ? await nextPageResponse.json() : { success: false, getAll: [] };
+            const hasNextPage = nextPageData.success && nextPageData.getAll.length > 0;
+            updatePaginationControls(hasNextPage, page > 1);
+        } else {
+            console.error('Error fetching discount data:', data.error);
+            updatePaginationControls(false, false); // Không có dữ liệu, không hiển thị nút Next và Previous
+        }
+    } catch (error) {
+        console.error('Error fetching discount data:', error);
+        updatePaginationControls(false, false); // Có lỗi, không hiển thị nút Next và Previous
+    }
+}
+
+function updatePaginationControls(hasNextPage, hasPrevPage) {
+    const prevButton = document.getElementById('prevPage');
+    const nextButton = document.getElementById('nextPage');
+
+    prevButton.classList.toggle('disabled', !hasPrevPage);
+    nextButton.classList.toggle('disabled', !hasNextPage);
+}
+
+function changePage(direction) {
+    const newPage = currentPage + direction;
+    if (newPage > 0) {
+        fetchDiscounts(newPage);
+    }
+}
+
+// Khởi động với trang đầu tiên
+document.addEventListener('DOMContentLoaded', () => fetchDiscounts(currentPage));
+
+
+function populateDiscountTable(discounts) {
+    const tableBody = document.querySelector('#discountTable tbody');
+    tableBody.innerHTML = ''; // Clear existing table rows
+
+    discounts.forEach((discount, index) => {
+        const row = document.createElement('tr');
+
+       
+
+        // Các cột dữ liệu khác
+        const cellName = document.createElement('td');
+        cellName.textContent = discount.name;
+        row.appendChild(cellName);
+
+        const cellPercent = document.createElement('td');
+        cellPercent.textContent = discount.percent;
+        row.appendChild(cellPercent);
+
+        const cellCode = document.createElement('td');
+        cellCode.textContent = discount.code;
+        row.appendChild(cellCode);
+
+        const cellType = document.createElement('td');
+        cellType.textContent = discount.type;
+        row.appendChild(cellType);
+
+        const cellStartDate = document.createElement('td');
+        cellStartDate.textContent = discount.dayStart.substring(0, 10); 
+        row.appendChild(cellStartDate);
+
+        const cellEndDate = document.createElement('td');
+        cellEndDate.textContent = discount.dayEnd.substring(0, 10); 
+        row.appendChild(cellEndDate);
+
+        const cellCinema = document.createElement('td');
+        if (Array.isArray(discount.cinema)) {
+            const cinemaNames = discount.cinema.map(cinema => cinema.name || 'Chưa có tên').join('<br>');
+            cellCinema.innerHTML = cinemaNames; 
+        } else {
+            cellCinema.textContent = 'Thông tin không hợp lệ';
+        }
+        row.appendChild(cellCinema);
+
+        const cellImage = document.createElement('td');
+        const image = document.createElement('img');
+        image.src = `http://139.180.132.97:3000/images/${discount.image}`;
+        image.alt = discount.name;
+        image.style.width = '100px'; // Set the size of the image
+        cellImage.appendChild(image);
+        row.appendChild(cellImage);
+
+        const cellStatus = document.createElement('td');
+        cellStatus.className = 'text-center';
+        
+        const switchDiv = document.createElement('div');
+        switchDiv.className = 'form-check form-switch form-check-reverse';
+
+        const checkbox = document.createElement('input');
+        checkbox.className = 'form-check-input status-toggle';
+        checkbox.type = 'checkbox';
+        checkbox.id = `toggle${index}`;
+        checkbox.setAttribute('data-id', discount._id);
+        checkbox.checked = discount.status === 'active'; 
+
+        const label = document.createElement('label');
+        label.className = 'form-check-label';
+        label.htmlFor = `toggle${index}`;
+
+        switchDiv.appendChild(checkbox);
+        switchDiv.appendChild(label);
+        cellStatus.appendChild(switchDiv);
+        row.appendChild(cellStatus);
+        $('.status-toggle').change(async function () {
+        console.log('Toggle changed'); // Xác nhận sự kiện change có được gọi không
+        const discountId = $(this).data("id");
+        const status = $(this).prop("checked") ? "active" : "inactive";
+        console.log('Discount ID:', discountId, 'Status:', status); // Xác nhận giá trị được lấy
+
+        await updateDiscountStatus(discountId, status);
+    });
+
+        const cellActions = document.createElement('td');
+        const editButton = document.createElement('button');
+        editButton.className = 'btn btn-primary btn-sm';
+        editButton.textContent = 'Chỉnh sửa';
+        editButton.setAttribute('data-discount', JSON.stringify(discount));
+        editButton.onclick = () => editDiscount(editButton);
+        cellActions.appendChild(editButton);
+
+        row.appendChild(cellActions);
+        tableBody.appendChild(row);
+    });
+
+   
+}
+
+async function updateDiscountStatus(discountId, status) {
+    try {
+        const response = await fetch(`/discount/updateStatus/${discountId}`, {
+            method: "PUT",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ status: status }),
         });
 
         if (response.ok) {
-          alert("Xoá thành công!");
-          window.location.reload();
+            console.log("Status updated successfully.");
         } else {
-          alert("Đã xảy ra lỗi khi xoá.");
+            console.error("Error updating status:", await response.text());
         }
-      } catch (error) {
-        alert("Đã xảy ra lỗi khi xoá.");
-        console.error(error);
-      }
+    } catch (error) {
+        console.error("Error updating status:", error);
     }
-  }
+}
 
-  $(function () {
-    $(".status-toggle").change(function () {
-      var discountId = $(this).data("id");
-      var status = $(this).prop("checked") ? "active" : "inactive";
 
-      $.ajax({
-        url: "/discount/updateStatus/" + discountId,
-        method: "PUT",
-        data: { status: status },
-        success: function (response) {
-          console.log(response);
-        },
-        error: function (error) {
-          console.error("Error updating status:", error);
-        },
-      });
-    });
 
-    // Kích hoạt Bootstrap Toggle Switch bằng JavaScript
-    $(".status-toggle").bootstrapToggle({
-      size: "small",
-      on: "On",
-      off: "Off",
-      onstyle: "success",
-      offstyle: "danger",
-    });
-  });
-  function editDiscount(button) {
+
+
+function editDiscount(button) {
     const discount = JSON.parse(button.getAttribute("data-discount"));
     document.getElementById("id").value = discount._id;
     document.getElementById("name").value = discount.name;
     document.getElementById("percent").value = discount.percent;
     document.getElementById("type").value = discount.type;
-    // document.getElementById('cinema').value = discount.cinema;
-    // document.getElementById('Image').value = discount.Image;
+
+    // Tải danh sách rạp vào select box
+    const cinemaSelect = document.getElementById("cinema");
+    cinemaSelect.innerHTML = ''; // Xóa các option cũ
+    discount.cinema.forEach(cinema => {
+        const option = document.createElement("option");
+        option.value = cinema._id; 
+        option.textContent = cinema.name; 
+        cinemaSelect.appendChild(option);
+    });
+
     // Hiện modal
     var myModal = new bootstrap.Modal(document.getElementById("editModal"));
     myModal.show();
-  }
+}
 
-  async function submitEdit() {
+async function submitEdit() {
     const Id = document.getElementById("id").value;
     const formData = new FormData(document.getElementById("editForm"));
 
     try {
-      const response = await fetch(`/discount/updateDiscount/${Id}`, {
-        method: "PUT",
-        body: formData,
-      });
+        const response = await fetch(`/discount/updateDiscount/${Id}`, {
+            method: "PUT",
+            body: formData,
+        });
 
-      if (response.ok) {
-        alert("Cập nhật thành công!");
-        window.location.reload();
-      } else {
-        alert("Đã xảy ra lỗi khi cập nhật.");
-      }
-    } catch (error) {
-      alert("Đã xảy ra lỗi khi cập nhật.");
-      console.error(error);
-    }
-  }
-
-  document.addEventListener("DOMContentLoaded", function () {
-    fetch("/discount/cinemaList")
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        if (data.success) {
-          const cinemaSelect = document.getElementById("cinema");
-          data.getAll.forEach((cinema) => {
-            const option = document.createElement("option");
-            option.value = cinema._id;
-            option.textContent = cinema.name;
-            cinemaSelect.appendChild(option);
-          });
+        if (response.ok) {
+            alert("Cập nhật thành công!");
+            window.location.reload();
         } else {
-          console.error("Error fetching cinema data:", data.error);
+            alert("Đã xảy ra lỗi khi cập nhật.");
         }
-      })
-      .catch((error) => {
-        console.error("Error fetching cinema data:", error);
-      });
-  });
+    } catch (error) {
+        alert("Đã xảy ra lỗi khi cập nhật.");
+        console.error(error);
+    }
+}
+
+
+
 </script>
+
+

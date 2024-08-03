@@ -3,44 +3,32 @@ const { requireLogin } = require("../middleware/authMiddleware");
 const fs = require("fs");
 const FormData = require("form-data");
 exports.discountList = async (req, res, next) => {
+  res.render("../views/discount/discount_list.ejs");
+};
+exports.discountListTable = async (req, res, next) => {
   try {
     const token = req.session.admin.token;
+    const page = req.query.page || 1;
     const apiUrl = process.env.API_URL;
 
-    const response = await axios.get(`${apiUrl}/discounts`, {
+    const response = await axios.get(`${apiUrl}/discounts/admin?page=${page}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
 
-    const discounts = response.data;
+    const discounts = response.data.getall;
 
-    res.render("../views/discount/discount_list.ejs", { discounts, apiUrl });
+    res.json({ success: true, getAll: discounts });
   } catch (error) {
-    if (error.response) {
-      console.error("Server Error:", error.response.data);
-      res
-        .status(error.response.status)
-        .render("../views/movie/actor/list_actor.ejs", {
-          error: "Đã xảy ra lỗi khi lấy danh sách diễn viên.",
-        });
-    } else if (error.request) {
-      console.error("Request Error:", error.request);
-      res.status(500).render("../views/movie/actor/list_actor.ejs", {
-        error:
-          "Không nhận được phản hồi từ server khi lấy danh sách diễn viên.",
-      });
-    } else {
-      console.error("Error:", error.message);
-      res.status(500).render("../views/movie/actor/list_actor.ejs", {
-        error: "Đã xảy ra lỗi khi xử lý yêu cầu lấy danh sách diễn viên.",
-      });
-    }
+    console.log(error);
+    res.status(500).json({ success: false, error: error.message });
   }
 };
 exports.discountAdd = async (req, res, next) => {
   res.render("../views/discount/discount_add.ejs");
 };
+
 exports.updateStatus = async (req, res, next) => {
   const { id } = req.params; // Lấy ID từ tham số yêu cầu
   const { status } = req.body; // Lấy trạng thái từ body yêu cầu
@@ -64,16 +52,19 @@ exports.updateStatus = async (req, res, next) => {
       }
     );
 
-    console.log("Response from server:", response.data);
-
-    return res.redirect("/discount/discount_list");
+    // Kiểm tra nếu phản hồi từ API thành công
+    if (response.status === 200) {
+      return res.status(200).json({ message: "Trạng thái đã được cập nhật thành công." });
+    } else {
+      return res.status(response.status).json({ error: response.data.error || "Lỗi từ server." });
+    }
   } catch (error) {
-    console.error("Error updating food status:", error);
-    return res.render("../views/discount/discount_list.ejs", {
-      error: "Đã xảy ra lỗi khi cập nhật trạng thái food.",
-    });
+    console.error("Error updating status:", error);
+    // Trả về thông báo lỗi chung nếu có lỗi khi gửi yêu cầu
+    return res.status(500).json({ error: "Đã xảy ra lỗi khi cập nhật trạng thái." });
   }
 };
+
 exports.deleteDistcount = async (req, res, next) => {
   const id = req.params.id;
   const token = req.session.admin.token;
@@ -123,6 +114,7 @@ exports.createDiscount = async (req, res, next) => {
 
   try {
     const token = req.session.admin.token;
+    const apiUrl = process.env.API_URL;
     const formData = new FormData();
     formData.append("name", name);
     formData.append("percent", percent);

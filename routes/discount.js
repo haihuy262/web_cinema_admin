@@ -10,6 +10,11 @@ router.get(
   discountController.discountList
 );
 router.get(
+  "/discountListTable",
+  authMiddleware.requireLogin,
+  discountController.discountListTable
+);
+router.get(
   "/discountAdd",
   authMiddleware.requireLogin,
   discountController.discountAdd
