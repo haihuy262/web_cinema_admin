@@ -58,6 +58,7 @@
       <!--  -->
     </tbody>
   </table>
+  <!-- Pagination -->
   <nav>
     <ul class="pagination justify-content-end">
       <li class="prevPageLi page-item">
@@ -131,10 +132,6 @@
       },
     });
   });
-</script>
-<!-- Toggle Checkbox -->
-<script>
-  $(document).ready(function () {});
 </script>
 <!-- Pagiantion -->
 <script>
@@ -222,7 +219,7 @@
 
       // Update status
       $.ajax({
-        url: `${apiUrl}/users/staff/status/${id}`,
+        url: `${apiUrl}/users/status/${id}`,
         type: "PUT",
         data: status,
         headers: {

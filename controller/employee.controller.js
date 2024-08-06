@@ -7,24 +7,7 @@ exports.getEmployee = async (req, res, next) => {
 };
 
 exports.listEmployee = async (req, res, next) => {
-  const token = req.session.admin.token;
-  const apiUrl = process.env.API_URL;
-
-  try {
-    const response = await axios.get(`${apiUrl}/users/staff`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    const staffData = response.data.getall;
-    res.render("../views/manager/employee/listEmployee.ejs", {
-      staffData,
-      apiUrl,
-    });
-  } catch (error) {
-    console.log(error);
-  }
+  res.render("../views/manager/employee/listEmployee.ejs");
 };
 
 exports.addEmployee = async (req, res, next) => {
@@ -42,8 +25,7 @@ exports.addEmployee = async (req, res, next) => {
       });
     }
 
-    const { name, email, password, date_of_birth, number_phone, gender } =
-      req.body;
+    const { name, email, password, date_of_birth, number_phone, gender } = req.body;
 
     form.append("name", name);
     form.append("email", email);
