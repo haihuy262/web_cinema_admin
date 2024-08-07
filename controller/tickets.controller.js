@@ -1,72 +1,7 @@
 const { default: axios } = require("axios");
 
 exports.listTickets = async (req, res, next) => {
-  const token = req.session.admin.token;
-  const apiUrl = process.env.API_URL;
-
-  const arrShortID = [];
-  const arrCinema = [];
-  const arrMovieName = [];
-  const arrGenre = [];
-  const arrStatus = [];
-  const arrDate = [];
-  const arrTime = [];
-  const arrTotalMoney = [];
-
-  try {
-    const response = await axios.get(`${apiUrl}/tickets`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    const ticketsData = response.data.getall;
-
-    for (let i = 0; i < ticketsData.length; i++) {
-      // Thể loại phim
-      const genre = ticketsData[i].movie.genre;
-      const dataGenre = genre.map((g) => g.name).join(", ");
-      arrGenre.push(dataGenre);
-      // Mã tickets
-      const id = ticketsData[i]._id;
-      const shorId = id.substring(0, 8).toUpperCase();
-      arrShortID.push(shorId);
-      // Tên phim
-      arrMovieName.push(ticketsData[i].movie.name);
-      // Rạp chiếu
-      arrCinema.push(ticketsData[i].cinema.name);
-      // Trạng thái
-      arrStatus.push(ticketsData[i].status);
-      // Ngày chiếu
-      const date = ticketsData[i].date;
-      const dateString = date.substring(0, 10);
-      const dateParts = dateString.split("-");
-      const year = dateParts[0];
-      const month = dateParts[1];
-      const day = dateParts[2];
-      const formattedDate = `${day}-${month}-${year}`;
-      arrDate.push(formattedDate);
-      // Ngày chiếu
-      arrTime.push(ticketsData[i].time.time);
-      // Tổng tiền
-      const totalMoney = ticketsData[i].total;
-      const formattedMoney = totalMoney.toLocaleString("en-US");
-      arrTotalMoney.push(formattedMoney);
-    }
-
-    res.render("../views/manager/tickets/listTickets.ejs", {
-      ticketsData,
-      theLoai: arrGenre,
-      maDonHang: arrShortID,
-      tenPhim: arrMovieName,
-      rapChieu: arrCinema,
-      trangThai: arrStatus,
-      ngayDat: arrDate,
-      gioChieu: arrTime,
-      tongTien: arrTotalMoney,
-    });
-  } catch (error) {
-    console.log(error);
-  }
+  res.render("../views/manager/tickets/listTickets.ejs");
 };
 
 exports.detailsTickets = async (req, res, next) => {
@@ -131,11 +66,7 @@ exports.detailsTickets = async (req, res, next) => {
     const food = response.data.getTicket.food;
     for (let i = 0; i < food.length; i++) {
       if (food[i].foodId !== null) {
-        arrFood.push(
-          food[i].foodId.name.toUpperCase(),
-          food[i].quantity,
-          food[i].foodId.price
-        );
+        arrFood.push(food[i].foodId.name.toUpperCase(), food[i].quantity, food[i].foodId.price);
       } else {
         console.log("Dữ liệu", food[i], "trống!");
       }
