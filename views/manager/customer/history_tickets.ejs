@@ -11,7 +11,7 @@
   }
   .search-wrapper .bi-search {
     position: absolute;
-    top: 50%;
+    top: 40%;
     left: 10px;
     transform: translateY(-50%);
     color: #aaa;
@@ -21,14 +21,9 @@
   }
 </style>
 <div class="container mt-5 p-3">
-  <div class="row mb-3 mt-5">
-    <div class="col-md-3">
-      <button id="refreshTickets" class="btn btn-primary">Tải lại</button>
-    </div>
-    <div class="col-md-6">
-      <h2 class="text-center">Danh sách tickets</h2>
-    </div>
-    <div class="col-md-3">
+  <div class="mt-5 mb-3">
+    <div class="d-flex justify-content-between">
+      <h2>Lịch sử mua vé:<span class="text-primary ms-2" id="history_name"></span></h2>
       <div class="search-wrapper">
         <i class="bi bi-search"></i>
         <input
@@ -38,26 +33,23 @@
           placeholder="Tìm kiếm..."
           aria-label="Search"
           oninput="searchTable()" />
-        <!-- <button
-          class="btn btn-outline-success"
-          type="submit"
-          onclick="searchTable()"
-        >
-          Search
-        </button> -->
+        <!-- <button class="btn btn-outline-success" type="submit" onclick="searchTable()">Search</button> -->
       </div>
     </div>
+    <div class="d-flex justify-content-end"></div>
   </div>
-  <table class="table table-bordered table-hover align-middle text-center">
+  <table class="table table-bordered table-hover align-middle">
     <thead class="thead-light">
       <tr class="table table-secondary">
         <th class="text-center">STT</th>
-        <th class="text-center">Mã đơn hàng</th>
-        <th class="text-center">Tên phim</th>
-        <th class="text-center">Rạp chiếu</th>
+        <th class="text-center">Mã đơn</th>
+        <th class="text-center">Phim</th>
+        <th class="text-center">Ngày mua</th>
+        <th class="text-center">Rạp</th>
+        <th class="text-center">Phòng</th>
+        <th class="text-center">Ghế</th>
         <th class="text-center">Trạng thái</th>
         <th class="text-center">Tổng tiền</th>
-        <th class="text-center">Ngày đặt</th>
       </tr>
     </thead>
     <tbody id="tableBody">
@@ -81,12 +73,6 @@
     </ul>
   </nav>
 </div>
-<!-- Refresh -->
-<script>
-  document.getElementById("refreshTickets").addEventListener("click", async function () {
-    window.location.href = "/tickets/list";
-  });
-</script>
 <!-- Search table -->
 <script>
   function searchTable() {
@@ -114,10 +100,12 @@
     }
   }
 </script>
-<!-- getToken apiUrl -->
+<!-- getToken, apiUrl -->
 <script>
   let token = "";
   let apiUrl = "";
+  let id = `<%= id %>`;
+
   $(document).ready(function () {
     $.ajax({
       url: "/token/getToken",
@@ -133,36 +121,39 @@
     });
   });
 </script>
-<!-- Pagination -->
+<!-- Pagiantion -->
 <script>
   $(document).ready(function () {
     let currentIndex = 1;
 
     function fetData(currentIndex) {
       $.ajax({
-        url: `${apiUrl}/tickets/admin?page=${currentIndex}`,
+        url: `${apiUrl}/tickets/user/admin/${id}?page=${currentIndex}`,
         type: "GET",
+        async: false,
         headers: {
           Authorization: `Bearer ${token}`,
         },
         success: function (data) {
-          let ticketsData = data.getall;
+          let arrHistoryTickets = data.getTicket;
 
-          if (ticketsData.length === 0 && currentIndex > 1) {
+          if (arrHistoryTickets.length === 0 && currentIndex > 1) {
             currentIndex--;
             return;
           }
 
-          if (ticketsData.length < 10) {
+          if (arrHistoryTickets.length < 10) {
             $(".nextPageLi").addClass("disabled");
           }
+
+          $("#history_name").text(arrHistoryTickets[0].user.name);
 
           $("#numberPage").text(currentIndex);
 
           if (currentIndex === 1) {
             $(".prevPageLi").addClass("disabled");
           }
-          displayTableRows(ticketsData);
+          displayTableRows(arrHistoryTickets);
         },
         error: function (error) {
           console.log(error);
@@ -181,49 +172,51 @@
       const startIndex = (currentIndex - 1) * 10;
 
       for (let i = 0; i < data.length; i++) {
-        let tickets = data[i];
-        let status = "";
-        let statusClass = "";
-
+        let history_tickets = data[i];
         // Mã đơn hàng
-        const id = tickets._id;
+        const id = history_tickets._id;
         const shortId = id.slice(-8).toUpperCase();
-        // Tổng tiền
-        const totalMoney = tickets.total;
-        const formattedMoney = totalMoney.toLocaleString("en-US");
         // Ngày đặt
-        const date = tickets.date;
+        const date = history_tickets.date;
         const dateString = date.substring(0, 10);
         const dateParts = dateString.split("-");
         const year = dateParts[0];
         const month = dateParts[1];
         const day = dateParts[2];
         const formattedDate = `${day}/${month}/${year}`;
+        // Ghế
+        const seat = history_tickets.seat;
+        const dataSeat = seat.map((g) => g.name).join(", ");
+        // Tổng tiền
+        const total = history_tickets.total;
+        const formattedMoney = total.toLocaleString("en-US");
 
-        if (tickets.status === "active") {
+        if (history_tickets.status === "active") {
           status = "Đã thanh toán";
           statusClass = "status-label rounded-3 text-success border border-success ps-3 pe-3 pt-1 pb-1";
-        } else if (tickets.status === "complete") {
+        } else if (history_tickets.status === "complete") {
           status = "Đã quét vé";
           statusClass = "status-label rounded-3 text-success border border-success ps-3 pe-3 pt-1 pb-1";
         } else {
-          status = "Chưa thanh toán";
+          status = "Huỷ";
           statusClass = "role-label rounded-3 text-danger border border-danger ps-3 pe-3 pt-1 pb-1";
         }
 
         tbody.innerHTML += `
-        <tr>
-          <td>${startIndex + i + 1}</td>
-          <td class="text-primary p-3">
-            <a href="/tickets/details/${tickets._id}" class="nav-link">${shortId}</a>
-          </td>
-          <td class="text-primary text-success-emphasis">${tickets.movie.name}</td>
-          <td>${tickets.cinema.name}</td>
-          <td><span class="${statusClass}">${status}</span></td>
-          <td>${formattedMoney}</td>
-          <td>${formattedDate}</td>
-        </tr>
-          `;
+            <tr>
+                <td class="text-center">${startIndex + i + 1}</td>
+                <td class="text-primary p-3">
+                    <a href="/tickets/details/${history_tickets._id}" class="nav-link">${shortId}</a>
+                </td>
+                <td>${history_tickets.movie.name}</td>
+                <td>${formattedDate}</td>
+                <td>${history_tickets.cinema.name}</td>
+                <td>${history_tickets.room.name}</td>
+                <td>${dataSeat}</td>
+                <td><span class="${statusClass}">${status}</span></td>
+                <td>${formattedMoney}</td>
+            </tr>
+        `;
       }
     }
 

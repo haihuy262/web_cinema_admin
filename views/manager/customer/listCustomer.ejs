@@ -150,9 +150,12 @@
           let arrCustomer = data.getAll;
 
           if (arrCustomer.length === 0 && currentIndex > 1) {
-            $(".nextPageLi").addClass("disabled");
             currentIndex--;
             return;
+          }
+
+          if (arrCustomer.length < 10) {
+            $(".nextPageLi").addClass("disabled");
           }
 
           $("#numberPage").text(currentIndex);
@@ -194,7 +197,9 @@
               onerror="handleImageError(this);" 
               class="rounded-3"/>
           </td>
-          <td>${customer.name}</td>
+          <td class="text-primary">
+            <a class="nav-link" href="/customer/history/${customer._id}">${customer.name}</a>
+          </td>
           <td>${customer.email}</td>
           <td>${customer.number_phone}</td>
           <td>
