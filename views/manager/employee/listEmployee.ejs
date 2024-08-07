@@ -152,9 +152,12 @@
           let arrStaff = data.getall;
 
           if (arrStaff.length === 0 && currentIndex > 1) {
-            $(".nextPageLi").addClass("disabled");
             currentIndex--;
             return;
+          }
+
+          if (arrStaff.length < 10) {
+            $(".nextPageLi").addClass("disabled");
           }
 
           $("#numberPage").text(currentIndex);
