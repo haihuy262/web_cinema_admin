@@ -168,7 +168,7 @@
 
     // Get Actor ( Diễn viên )
     $.ajax({
-      url: `${apiUrl}/actors`,
+      url: `${apiUrl}/actors/no/login`,
       type: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -194,7 +194,7 @@
 
     // Get Genres ( Thể loại )
     $.ajax({
-      url: `${apiUrl}/genres`,
+      url: `${apiUrl}/genres/no/login`,
       type: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -218,7 +218,7 @@
 
     // Get director ( Nhà sản xuất )
     $.ajax({
-      url: `${apiUrl}/directors`,
+      url: `${apiUrl}/directors/no/login`,
       type: "GET",
       headers: {
         Authorization: `Bearer ${token}`,

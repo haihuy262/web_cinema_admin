@@ -1,16 +1,16 @@
 <%- include('../../partials/header.ejs') %>
 
 <div class="container mt-5" style="padding: 3%;">
-  <h2 class="text-center">Add Actor</h2>
+  <h2 class="text-center">Thêm Đạo Diễn</h2>
   <form action="/movie/createActor" method="POST" enctype="multipart/form-data">
     <div class="form-group">
-      <label for="name">Name</label>
+      <label for="name">Tên</label>
       <input type="text" class="form-control" id="name" name="name" required>
     </div>
     <div class="form-group">
-      <label for="image">Image</label>
+      <label for="image">Ảnh</label>
       <input type="file" class="form-control" id="image" name="image" required>
     </div>
-    <button type="submit" class="btn btn-primary">Add Actor</button>
+    <button type="submit" class="btn btn-primary">Lưu</button>
   </form>
 </div>

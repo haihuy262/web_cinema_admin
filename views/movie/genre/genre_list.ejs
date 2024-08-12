@@ -151,7 +151,9 @@
       const image = document.createElement('img');
       image.src = `http://139.180.132.97:3000/images/${genre.image}`;
       image.alt = genre.name;
-      image.style.width = '100px'; // Thiết lập kích thước của hình ảnh
+      image.style.width = '70px';
+      image.style.height = '70px';
+      image.classList.add("rounded-3");
       cellImage.appendChild(image);
       row.appendChild(cellImage);
 

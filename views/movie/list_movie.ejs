@@ -241,37 +241,47 @@ function populateMovieTable(movies) {
   
     const cellName = document.createElement('td');
     cellName.textContent = movie.name;
+    cellName.classList.add("text-center");
     row.appendChild(cellName);
 
     const cellDuration = document.createElement('td');
+    cellDuration.classList.add("text-center");
     cellDuration.textContent = movie.duration;
     row.appendChild(cellDuration);
 
     const cellSubtitle = document.createElement('td');
+    cellSubtitle.classList.add("text-center");
     cellSubtitle.textContent = movie.subtitle;
     row.appendChild(cellSubtitle);
 
     const cellCensorship = document.createElement('td');
+    cellCensorship.classList.add("text-center");
     cellCensorship.textContent = movie.censorship;
     row.appendChild(cellCensorship);
 
     const cellRate = document.createElement('td');
+    cellRate.classList.add("text-center");
     cellRate.textContent = movie.rate;
     row.appendChild(cellRate);
 
     const cellReleaseDate = document.createElement('td');
+    cellReleaseDate.classList.add("text-center");
     cellReleaseDate.textContent = movie.release_date.substring(0, 10);
     row.appendChild(cellReleaseDate);
 
     const cellImage = document.createElement('td');
+    cellImage.classList.add("text-center");
     const image = document.createElement('img');
     image.src = `http://139.180.132.97:3000/images/${movie.image}`;
     image.alt = movie.name;
-    image.style.width = '100px';
+    image.style.width = '70px';
+    image.style.height = '70px';
+    image.classList.add("rounded-3");
     cellImage.appendChild(image);
     row.appendChild(cellImage);
 
     const cellTrailer = document.createElement('td');
+    cellTrailer.classList.add("text-center");
     const link = document.createElement('a');
     link.href = `http://139.180.132.97:3000/videos/${movie.trailer}`;
     link.target = '_blank';
@@ -280,9 +290,10 @@ function populateMovieTable(movies) {
     row.appendChild(cellTrailer);
 
     const cellActions = document.createElement('td');
+    cellActions.classList.add("text-center");
     const editButton = document.createElement('button');
-    editButton.className = 'btn btn-primary btn-sm';
-    editButton.textContent = 'Chỉnh sửa';
+    editButton.textContent = 'Sửa';
+    editButton.classList.add("btn", "btn-info");
     editButton.setAttribute('data-movie', JSON.stringify(movie));
     editButton.onclick = () => editMovie(editButton);
     cellActions.appendChild(editButton);
@@ -295,6 +306,7 @@ function populateMovieTable(movies) {
 function editMovie(button) {
   const movie = JSON.parse(button.getAttribute('data-movie'));
 
+  // Điền dữ liệu vào các trường trong form
   document.getElementById('Id').value = movie._id;
   document.getElementById('name').value = movie.name;
   document.getElementById('duration').value = movie.duration;
@@ -303,6 +315,7 @@ function editMovie(button) {
   document.getElementById('rate').value = movie.rate;
   document.getElementById('release_date').value = movie.release_date.substring(0, 10);
 
+  // Hiển thị modal để chỉnh sửa phim
   const editModal = new bootstrap.Modal(document.getElementById('editModal'));
   editModal.show();
 }
@@ -321,17 +334,23 @@ async function submitEdit() {
     if (response.ok) {
       const result = await response.json();
       if (result.success) {
+        // Ẩn modal sau khi cập nhật thành công
         const editModal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
         editModal.hide();
-        await fetchMovies(currentPage); // Tải lại danh sách phim
+
+        // Tải lại danh sách phim
+        await fetchMovies(currentPage);
       } else {
         console.error('Lỗi khi chỉnh sửa phim:', result.error);
+        alert('Đã xảy ra lỗi khi chỉnh sửa phim: ' + result.error);
       }
     } else {
       console.error('Lỗi khi gửi yêu cầu:', response.statusText);
+      alert('Đã xảy ra lỗi khi gửi yêu cầu: ' + response.statusText);
     }
   } catch (error) {
     console.error('Lỗi khi gửi yêu cầu:', error);
+    alert('Đã xảy ra lỗi khi gửi yêu cầu: ' + error.message);
   }
 }
 

@@ -77,7 +77,7 @@
 
     // Get Showtime ( Suất chiếu )
     $.ajax({
-      url: `${apiUrl}/showtimes`,
+      url: `${apiUrl}/showtimes/user`,
       type: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -97,7 +97,7 @@
 
     // Get Movie ( Phim )
     $.ajax({
-      url: `${apiUrl}/movies`,
+      url: `${apiUrl}/movies/no/login`,
       type: "GET",
       headers: {
         Authorization: `Bearer ${token}`,

@@ -18,7 +18,7 @@ exports.movieListTable = async (req, res, next) => {
     const movies = response.data.getall;
     res.json({ success: true, getAll: movies });
 
-    console.log("check", movies);
+   
   } catch (error) {
     console.log(error);
 
@@ -119,12 +119,11 @@ exports.createMovie = async (req, res, next) => {
   }
 };
 
-
 exports.updateMovie = async (req, res, next) => {
   const { id } = req.params; // Lấy ID từ tham số yêu cầu
   const { name, duration, subtitle, censorship, rate, release_date } = req.body;
-  // const image = req.file; // Xử lý hình ảnh
-  // const videos = req.files.videos; // Xử lý video
+  const image = req.file; // Xử lý hình ảnh
+  const videos = req.files.videos; // Xử lý video
 
   // Kiểm tra các trường bắt buộc
   if (
@@ -133,10 +132,10 @@ exports.updateMovie = async (req, res, next) => {
     !subtitle ||
     !censorship ||
     !rate ||
-    !release_date 
-    // !image ||
-    // !videos || // Kiểm tra nếu video không được gửi thì lỗi
-    // videos.length === 0
+    !release_date ||
+    !image ||
+    !videos || // Kiểm tra nếu video không được gửi thì lỗi
+    videos.length === 0
   ) {
     return res.status(400).json({ error: "Tất cả các trường là bắt buộc." });
   }
@@ -153,17 +152,17 @@ exports.updateMovie = async (req, res, next) => {
     formData.append("rate", rate);
     formData.append("release_date", release_date);
 
-    // Xử lý hình ảnh
-    // if (image) {
-    //   formData.append("image", fs.createReadStream(image.path));
-    // }
+    
+    if (image) {
+      formData.append("image", fs.createReadStream(image.path));
+    }
 
-    // // Xử lý video
-    // if (videos) {
-    //   videos.forEach(video => {
-    //     formData.append("videos", fs.createReadStream(video.path));
-    //   });
-    // }
+    // Xử lý video
+    if (videos) {
+      videos.forEach(video => {
+        formData.append("videos", fs.createReadStream(video.path));
+      });
+    }
 
     const response = await axios.put(`${apiUrl}/movies/${id}`, formData, {
       headers: {
@@ -172,14 +171,14 @@ exports.updateMovie = async (req, res, next) => {
       },
     });
 
-    // Xóa các file tạm
-    // if (image) {
-    //   fs.unlinkSync(image.path);
-    // }
-    // if (videos) {
-    //   videos.forEach(video => fs.unlinkSync(video.path));
-    // }
-
+    
+    if (image) {
+      fs.unlinkSync(image.path);
+    }
+    if (videos) {
+      videos.forEach(video => fs.unlinkSync(video.path));
+    }
+    console.log('check',name)
     res.json({ success: true });
   } catch (error) {
     console.error('Lỗi khi cập nhật phim:', error);

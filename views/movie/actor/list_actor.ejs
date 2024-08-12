@@ -4,7 +4,7 @@
   <div class="row mb-3 mt-5">
     <div class="col-md-3"></div>
     <div class="col-md-6">
-      <h2 class="text-center">Danh sách Tác Giả</h2>
+      <h2 class="text-center">Danh sách Đạo Diễn</h2>
     </div>
     <div class="col-md-3">
       <div class="d-flex">
@@ -165,7 +165,8 @@
       // Thêm cột ID
       const cellId = document.createElement('td');
       cellId.classList.add("text-center");
-      cellId.textContent = actor._id;
+      cellId.textContent = actor._id.slice(-8).toUpperCase();
+    
       row.appendChild(cellId);
 
       // Thêm cột tên
@@ -180,7 +181,9 @@
       const image = document.createElement('img');
       image.src = `http://139.180.132.97:3000/images/${actor.image}`;
       image.alt = actor.name;
-      image.style.width = '100px'; // Set the size of the image
+      image.style.width = '70px';
+      image.style.height = '70px';
+      image.classList.add("rounded-3");
       cellImage.appendChild(image);
       row.appendChild(cellImage);
 
@@ -190,6 +193,7 @@
       const editButton = document.createElement('button');
       editButton.classList.add("btn", "btn-info");
       editButton.textContent = 'Sửa';
+      
       editButton.setAttribute('data-actor', JSON.stringify(actor));
       editButton.onclick = () => editActor(editButton);
       cellActions.appendChild(editButton);
