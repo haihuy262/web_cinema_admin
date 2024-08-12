@@ -20,6 +20,7 @@ var serviceRouter = require("./routes/service");
 var loginRouter = require("./routes/login");
 var tokenRouter = require("./routes/token");
 var genreRouter = require("./routes/genre");
+var showtimeRouter = require("./routes/showtime");
 
 var app = express();
 
@@ -63,6 +64,7 @@ app.use("/cinema", cinemaRouter);
 app.use("/discount", discountRouter);
 app.use("/service", serviceRouter);
 app.use("/genre", genreRouter);
+app.use("/showtime", showtimeRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
