@@ -161,7 +161,7 @@
 
       const cellId = document.createElement('td');
       cellId.classList.add("text-center");
-      cellId.textContent = director._id;
+      cellId.textContent = director._id.slice(-8).toUpperCase();
       row.appendChild(cellId);
 
       const cellName = document.createElement('td');
@@ -174,7 +174,9 @@
       const image = document.createElement('img');
       image.src = `http://139.180.132.97:3000/images/${director.image}`;
       image.alt = director.name;
-      image.style.width = '100px';
+      image.style.width = '70px';
+      image.style.height = '70px';
+      image.classList.add("rounded-3");
       cellImage.appendChild(image);
       row.appendChild(cellImage);
 

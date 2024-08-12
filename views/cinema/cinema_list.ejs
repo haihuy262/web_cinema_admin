@@ -1,25 +1,25 @@
 <%- include('../partials/header.ejs') %>
 
 <div class="container mt-5" style="padding: 3%">
-  <h2>List of Cinemas</h2>
-  <table class="table table-bordered">
+  <h2 class="text-center">Danh Sách Rạp</h2>
+  <table class="table table-bordered table-hover align-middle">
     <thead>
-      <tr>
-        <th>Id</th>
-        <th>Name</th>
-        <th>Address</th>
-        <th>Hotline</th>
-        <th>Actions</th>
+      <tr class="table table-secondary">
+        <th class="text-center">Id</th>
+        <th class="text-center">Tên</th>
+        <th class="text-center">Địa Chỉ</th>
+        <th class="text-center">Số Điện Thoại</th>
+        <th class="text-center">Hành Động</th>
       </tr>
     </thead>
     <tbody>
-      %> <% cinemas.forEach(cinema => { %>
+      <% cinemas.forEach(cinema => { %>
       <tr>
-        <td><%= cinema._id %></td>
-        <td><%= cinema.name %></td>
-        <td><%= cinema.address %></td>
-        <td><%= cinema.hotline %></td>
-        <td>
+        <td class="text-center"><%= cinema._id.slice(-8).toUpperCase() %></td>
+        <td class="text-center"><%= cinema.name %></td>
+        <td class="text-center"><%= cinema.address %></td>
+        <td class="text-center"><%= cinema.hotline %></td>
+        <td class="text-center">
           <button
             class="btn btn-info"
             data-cinema="<%= JSON.stringify(cinema) %>"
@@ -150,12 +150,17 @@
 
   async function submitEditCinema() {
     const cinemaId = document.getElementById("cinemaId").value;
-    const formData = new FormData(document.getElementById("editCinemaForm"));
+    const name = document.getElementById("cinemaName").value;
+    const address = document.getElementById("cinemaAddress").value;
+    const hotline = document.getElementById("cinemaHotline").value;
 
     try {
       const response = await fetch(`/cinema/updateCinema/${cinemaId}`, {
         method: "PUT",
-        body: formData,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name, address, hotline }),
       });
 
       if (response.ok) {

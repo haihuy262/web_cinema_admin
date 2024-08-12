@@ -56,7 +56,7 @@ exports.totalCinema = async (req, res, next) => {
         'Authorization': `Bearer ${token}`
       },
       params: {
-      
+        
         movieId,
         startDate,
         endDate
@@ -67,7 +67,7 @@ exports.totalCinema = async (req, res, next) => {
     if (Array.isArray(total) && total.length > 0) {
       const totalRevenue = total[0].totalRevenue;
       
-      console.log('totalRevenue', movieId,startDate,endDate);
+      console.log('totalRevenue',total);
       res.json({ success: true, getAll: totalRevenue, revenueData: total });
     } else {
       console.log('No totalRevenue found in response');

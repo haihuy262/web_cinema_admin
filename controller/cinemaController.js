@@ -14,23 +14,15 @@ exports.roomAdd = async (req, res, next) => {
 exports.creatCinema = async (req, res, next) => {
   const { name, address, hotline } = req.body;
 
-  console.log("name", req.body.name);
-  console.log("address", req.body.address);
-  console.log("hotline", req.body.hotline);
-
-  // // Kiểm tra các trường bắt buộc
-  // if (!name || !address || !hotline) {
-  //   return res
-  //     .status(400)
-  //     .json({ error: "Name, address, và hotline là bắt buộc." });
-  // }
+  console.log("name", name);
+  console.log("address", address);
+  console.log("hotline", hotline);
 
   try {
     const token = req.session.admin.token;
     const apiUrl = process.env.API_URL;
 
-    // Tạo FormData để gửi dữ liệu
-
+    // Gửi yêu cầu POST tới API để tạo cinema mới
     const response = await axios.post(
       `${apiUrl}/cinemas`,
       {
@@ -45,8 +37,8 @@ exports.creatCinema = async (req, res, next) => {
       }
     );
 
-    // Log để kiểm tra
-    console.log("Cinema created:", name, address, hotline);
+    // Kiểm tra và log thông tin sau khi cinema được tạo
+    console.log("Cinema created:", response.data);
 
     return res.redirect("/cinema/cinemaList");
   } catch (error) {
@@ -56,6 +48,7 @@ exports.creatCinema = async (req, res, next) => {
     });
   }
 };
+
 
 exports.cinemaList = async (req, res, next) => {
   try {
@@ -68,8 +61,7 @@ exports.cinemaList = async (req, res, next) => {
       },
     });
     const cinemas = response.data;
-    console.log(cinemas);
-
+    
     res.render("../views/cinema/cinema_list.ejs", { cinemas });
   } catch (error) {
     console.error("Error fetching cinemas:", error.message);
@@ -93,6 +85,8 @@ exports.deleteCinema = async (req, res, next) => {
     res.json({ success: false });
   }
 };
+
+
 exports.updateCinema = async (req, res, next) => {
   const { id } = req.params; // Lấy ID từ tham số yêu cầu
   const { name, address, hotline } = req.body;
@@ -107,26 +101,22 @@ exports.updateCinema = async (req, res, next) => {
     const token = req.session.admin.token;
     const apiUrl = process.env.API_URL;
 
-    const formData = new FormData();
-    formData.append("name", name);
-    formData.append("hotline", hotline);
-    formData.append("address", address);
-
-    const response = await axios.put(`${apiUrl}/cinemas/${id}`, formData, {
+    const response = await axios.put(`${apiUrl}/cinemas/${id}`, { name, address, hotline }, {
       headers: {
         Authorization: `Bearer ${token}`,
-        ...formData.getHeaders(),
+        'Content-Type': 'application/json',
       },
     });
-    console.log("est", name, address, hotline);
+
     res.json({ success: true });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res
       .status(500)
       .json({ success: false, error: "Đã xảy ra lỗi khi cập nhật." });
   }
 };
+
 
 exports.roomList = async (req, res, next) => {
   try {
@@ -145,6 +135,36 @@ exports.roomList = async (req, res, next) => {
   } catch (error) {
     console.error("Error fetching rooms:", error.message);
     res.status(500).send("Error fetching rooms");
+  }
+};
+
+exports.updateRoom = async (req, res, next) => {
+  const { id } = req.params; // Lấy ID từ tham số yêu cầu
+  const { name, address, hotline } = req.body;
+
+  if (!name || !hotline || !address) {
+    return res
+      .status(400)
+      .json({ error: "Tên, địa chỉ và hotline là bắt buộc." });
+  }
+
+  try {
+    const token = req.session.admin.token;
+    const apiUrl = process.env.API_URL;
+
+    const response = await axios.put(`${apiUrl}/rooms/${id}`, { name, movie,  }, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ success: false, error: "Đã xảy ra lỗi khi cập nhật." });
   }
 };
 
