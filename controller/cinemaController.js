@@ -117,6 +117,35 @@ exports.updateCinema = async (req, res, next) => {
   }
 };
 
+exports.updateRoom = async (req, res, next) => {
+  const { id } = req.params; 
+  const { name,cinema,showtime,movie } = req.body;
+
+  if (!name || !cinema || !showtime ||!movie) {
+    return res
+      .status(400)
+      .json({ error: "Tên, địa chỉ và hotline là bắt buộc." });
+  }
+
+  try {
+    const token = req.session.admin.token;
+    const apiUrl = process.env.API_URL;
+
+    const response = await axios.put(`${apiUrl}/rooms/${id}`, { name,cinema,showtime,movie }, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+console.log('test',name,cinema,showtime,movie)
+    res.json({ success: true });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ success: false, error: "Đã xảy ra lỗi khi cập nhật." });
+  }
+};
 
 exports.roomList = async (req, res, next) => {
   try {
@@ -129,8 +158,7 @@ exports.roomList = async (req, res, next) => {
       },
     });
     const rooms = response.data.getall;
-    console.log(rooms);
-
+    
     res.render("../views/cinema/room_list.ejs", { rooms });
   } catch (error) {
     console.error("Error fetching rooms:", error.message);
@@ -140,19 +168,26 @@ exports.roomList = async (req, res, next) => {
 
 exports.updateRoom = async (req, res, next) => {
   const { id } = req.params; // Lấy ID từ tham số yêu cầu
-  const { name, address, hotline } = req.body;
+  const { name, movie, showtime, cinema } = req.body;
 
-  if (!name || !hotline || !address) {
+  // Kiểm tra các trường bắt buộc
+  if (!name || !movie || !showtime || !cinema) {
     return res
       .status(400)
-      .json({ error: "Tên, địa chỉ và hotline là bắt buộc." });
+      .json({ error: "Tên, phim, thời gian chiếu và rạp là bắt buộc." });
   }
 
   try {
     const token = req.session.admin.token;
     const apiUrl = process.env.API_URL;
 
-    const response = await axios.put(`${apiUrl}/rooms/${id}`, { name, movie,  }, {
+    // Gửi yêu cầu PUT đến API bên ngoài với dữ liệu mới
+    const response = await axios.put(`${apiUrl}/rooms/${id}`, {
+      name,
+      movie,
+      showtime: Array.isArray(showtime) ? showtime : [showtime], // Đảm bảo showtime là mảng
+      cinema
+    }, {
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
@@ -167,6 +202,8 @@ exports.updateRoom = async (req, res, next) => {
       .json({ success: false, error: "Đã xảy ra lỗi khi cập nhật." });
   }
 };
+
+
 
 exports.deleteRoom = async (req, res, next) => {
   const id = req.params.id;
