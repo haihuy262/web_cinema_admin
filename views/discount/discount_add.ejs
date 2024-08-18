@@ -4,37 +4,56 @@
   <h2 class="text-center mb-5">Add New Discount</h2>
   <form action="/discount/createDiscount" method="POST" enctype="multipart/form-data">
     <div class="mb-3">
-      <label for="name" class="form-label">Name</label>
+      <label for="name" class="form-label">Tên</label>
       <input type="text" class="form-control" id="name" name="name" required />
     </div>
     <div class="mb-3">
-      <label for="percent" class="form-label">Percent</label>
-      <input type="text" class="form-control" id="percent" name="percent" required />
+      <label for="percent" class="form-label">Phần Trăm</label>
+      <select class="form-select" id="percent" name="percent" required>
+        <option value="" disabled selected>Chọn phần trăm</option>
+        <option value="0.1">0.1</option>
+        <option value="0.2">0.2</option>
+        <option value="0.3">0.3</option>
+        <option value="0.4">0.4</option>
+        <option value="0.5">0.5</option>
+        <option value="0.6">0.6</option>
+        <option value="0.7">0.7</option>
+        <option value="0.8">0.8</option>
+        <option value="0.9">0.9</option>
+        <option value="1.0">1.0</option>
+      </select>
+    </div>
+    
+    <div class="mb-3">
+      <label for="type" class="form-label">Loại</label>
+      
+      <select class="form-select" id="type" name="type" required>
+        <option value="" disabled selected>Chọn Loại</option>
+        <option value="food">food</option>
+        <option value="ticket">ticket</option>
+       
+      </select>
     </div>
     <div class="mb-3">
-      <label for="type" class="form-label">Type</label>
-      <input type="text" class="form-control" id="type" name="type" required />
-    </div>
-    <div class="mb-3">
-      <label for="cinema" class="form-label">Cinema</label>
+      <label for="cinema" class="form-label">Rạp</label>
       
       <select class="form-control" id="cinema" name="cinema" multiple required>
       
       </select>
     </div>
     <div class="mb-3">
-      <label for="dayStart" class="form-label">Start Date</label>
+      <label for="dayStart" class="form-label">Ngày Bắt Đầu</label>
       <input type="date" class="form-control" id="dayStart" name="dayStart" required />
     </div>
     <div class="mb-3">
-      <label for="dayEnd" class="form-label">End Date</label>
+      <label for="dayEnd" class="form-label">Ngày Kết Thúp</label>
       <input type="date" class="form-control" id="dayEnd" name="dayEnd" required />
     </div>
     <div class="mb-3">
-      <label for="image" class="form-label">Image</label>
+      <label for="image" class="form-label">Ảnh</label>
       <input type="file" class="form-control" id="image" name="image" required />
     </div>
-    <button type="submit" class="btn btn-primary">Submit</button>
+    <button type="submit" class="btn btn-primary">Lưu</button>
   </form>
 </div>
 

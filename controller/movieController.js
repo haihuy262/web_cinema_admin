@@ -121,16 +121,16 @@ exports.createMovie = async (req, res, next) => {
 
 exports.updateMovie = async (req, res, next) => {
   const { id } = req.params;
-  const { name, duration, subtitle, censorship, rate, release_date } = req.body;
+  const { name , duration,subtitle,censorship,rate,release_date} = req.body;
   const token = req.session.admin.token;
   const apiUrl = process.env.API_URL;
-
-  // Kiểm tra các trường bắt buộc
-  if (!name || !duration || !subtitle || !censorship || !rate || !release_date) {
+  const image = req.file;
+  if (!name || !duration || !subtitle || !censorship || !rate || !release_date ||!image ) {
     return res.status(400).json({ error: "Tất cả các trường là bắt buộc." });
   }
 
   try {
+    // Tạo FormData
     const formData = new FormData();
     formData.append("name", name);
     formData.append("duration", duration);
@@ -138,14 +138,23 @@ exports.updateMovie = async (req, res, next) => {
     formData.append("censorship", censorship);
     formData.append("rate", rate);
     formData.append("release_date", release_date);
+    formData.append("image", fs.createReadStream(image.path), {
+      filename: image.originalname,
+    });
+
 
     const response = await axios.put(`${apiUrl}/movies/${id}`, formData, {
       headers: {
-        Authorization: `Bearer ${token}`,
+        'Authorization': `Bearer ${token}`,
         ...formData.getHeaders(),
       },
     });
-    console.log('test',name)
+    if (req.file && req.file.fieldname === "image") {
+      fs.unlinkSync(req.file.path);
+    }
+ 
+
+    console.log('ckeck',name)
     res.json({ success: true });
   } catch (error) {
     console.error('Lỗi khi cập nhật phim:', error.message);

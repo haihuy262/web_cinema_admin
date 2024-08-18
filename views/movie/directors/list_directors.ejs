@@ -23,6 +23,7 @@
   <table class="table table-bordered table-hover align-middle" id="deactorTable">
     <thead>
       <tr class="table table-secondary">
+        <th class="text-center">STT</th>
         <th class="text-center">Id</th>
         <th class="text-center">Name</th>
         <th class="text-center">Image</th>
@@ -104,7 +105,7 @@
 
 <script>
   let currentPage = 1;
-
+  let currentIndex = 1;
   async function fetchDirectors(page = 1) {
     try {
       const response = await fetch(`/movie/listDirectorTable?page=${page}`);
@@ -158,6 +159,10 @@
 
     directors.forEach((director) => {
       const row = document.createElement('tr');
+      const cellSTT = document.createElement('td');
+    cellSTT.textContent = currentIndex++; 
+    cellSTT.classList.add("text-center");
+    row.appendChild(cellSTT);
 
       const cellId = document.createElement('td');
       cellId.classList.add("text-center");
