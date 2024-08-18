@@ -24,7 +24,7 @@
   <table class="table table-bordered table-hover align-middle" id="genreTable">
     <thead >
       <tr class="table table-secondary" >
-        
+        <th class="text-center">STT</th>
         <th class="text-center">Tên Thể Loại</th>
         <th class="text-center">Hình Ảnh</th>
         <th class="text-center">Hành Động</th>
@@ -106,7 +106,7 @@
 
 <script>
   let currentPage = 1;
-
+  let currentIndex = 1;
   async function fetchGenres(page = 1) {
     try {
       const response = await fetch(`/genre/genreListTable?page=${page}`);
@@ -139,8 +139,11 @@
     genres.forEach(genre => {
       const row = document.createElement('tr');
 
-    
-
+      const cellSTT = document.createElement('td');
+      cellSTT.textContent = currentIndex++; 
+      cellSTT.classList.add("text-center");
+      row.appendChild(cellSTT);
+      
       const cellName = document.createElement('td');
       cellName.classList.add("text-center");
       cellName.textContent = genre.name;

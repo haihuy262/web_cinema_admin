@@ -23,7 +23,7 @@
   <table class="table table-bordered table-hover align-middle" id="movieTable">
     <thead>
       <tr class="table table-secondary">
-        
+        <th class="text-center">STT</th>
         <th class="text-center">Tên Phim</th>
         <th class="text-center">Giờ Chiếu</th>
         <th class="text-center">Phụ Đề</th>
@@ -57,108 +57,56 @@
     </ul>
   </nav>
 </div>
-<div
-  class="modal fade"
-  id="editModal"
-  tabindex="-1"
-  aria-labelledby="editModalLabel"
-  aria-hidden="true"
->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="editModalLabel">Sửa Phim</h5>
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal"
-          aria-label="Đóng"
-        ></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
       </div>
       <div class="modal-body">
         <form id="editForm" enctype="multipart/form-data">
           <input type="hidden" id="Id" name="Id" />
           <div class="mb-3">
             <label for="name" class="form-label">Tên</label>
-            <input
-              type="text"
-              class="form-control"
-              id="name"
-              name="name"
-              required
-            />
+            <input type="text" class="form-control" id="name" name="name" required />
           </div>
           <div class="mb-3">
             <label for="duration" class="form-label">Duration</label>
-            <input
-              type="text"
-              class="form-control"
-              id="duration"
-              name="duration"
-              required
-            />
+            <input type="text" class="form-control" id="duration" name="duration" required />
           </div>
           <div class="mb-3">
             <label for="subtitle" class="form-label">Subtitle</label>
-            <input
-              type="text"
-              class="form-control"
-              id="subtitle"
-              name="subtitle"
-              required
-            />
+            <input type="text" class="form-control" id="subtitle" name="subtitle" required />
           </div>
           <div class="mb-3">
             <label for="censorship" class="form-label">Censorship</label>
-            <input
-              type="text"
-              class="form-control"
-              id="censorship"
-              name="censorship"
-              required
-            />
+            <input type="text" class="form-control" id="censorship" name="censorship" required />
           </div>
           <div class="mb-3">
             <label for="rate" class="form-label">Rate</label>
-            <input
-              type="text"
-              class="form-control"
-              id="rate"
-              name="rate"
-              required
-            />
+            <input type="text" class="form-control" id="rate" name="rate" required />
           </div>
           <div class="mb-3">
             <label for="release_date" class="form-label">Release Date</label>
-            <input
-              type="date"
-              class="form-control"
-              id="release_date"
-              name="release_date"
-              required
-            />
+            <input type="date" class="form-control" id="release_date" name="release_date" required />
           </div>
-          <!-- <div class="mb-3">
-            <label for="image" class="form-label">Hình Ảnh</label>
-            <input type="file" class="form-control" id="image" name="image" />
-          </div>
+         
           <div class="mb-3">
-            <label for="trailer" class="form-label">Trailer</label>
-            <input type="file" class="form-control" id="trailer" name="trailer" />
-          </div> -->
+            <label for="Image" class="form-label"> Hình Ảnh </label>
+            <input type="file" class="form-control" id="Image" name="image" />
+          </div>
+          
         </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-          Đóng
-        </button>
-        <button type="button" class="btn btn-primary" onclick="submitEdit()">
-          Lưu thay đổi
-        </button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+        <button type="button" class="btn btn-primary" onclick="submitEdit()">Lưu thay đổi</button>
       </div>
     </div>
   </div>
 </div>
+
 <script>
 function searchTable() {
   const input = document.getElementById("searchInput").value.toLowerCase();
@@ -183,7 +131,7 @@ function searchTable() {
 </script>
 <script>
 let currentPage = 1;
-
+let currentIndex = 1;
 async function fetchMovies(page = 1) {
   try {
     const response = await fetch(`/movie/movieListTable?page=${page}`);
@@ -238,6 +186,10 @@ function populateMovieTable(movies) {
   movies.forEach((movie) => {
     const row = document.createElement('tr');
 
+    const cellSTT = document.createElement('td');
+    cellSTT.textContent = currentIndex++; // Tăng số thứ tự
+    cellSTT.classList.add("text-center");
+    row.appendChild(cellSTT);
   
     const cellName = document.createElement('td');
     cellName.textContent = movie.name;
@@ -308,49 +260,36 @@ function editMovie(button) {
 
   // Điền dữ liệu vào các trường trong form
   document.getElementById('Id').value = movie._id;
-  document.getElementById('name').value = movie.name;
-  document.getElementById('duration').value = movie.duration;
-  document.getElementById('subtitle').value = movie.subtitle;
-  document.getElementById('censorship').value = movie.censorship;
-  document.getElementById('rate').value = movie.rate;
-  document.getElementById('release_date').value = movie.release_date.substring(0, 10);
-
-  // Hiển thị modal để chỉnh sửa phim
+  document.getElementById('name').value = movie.name || '';
+  document.getElementById('duration').value = movie.duration || ''; 
+  document.getElementById('subtitle').value = movie.subtitle || ''; 
+  document.getElementById('censorship').value = movie.censorship || ''; 
+  document.getElementById('rate').value = movie.rate || ''; 
+  document.getElementById('release_date').value = movie.release_date ? movie.release_date.substring(0, 10) : ''; 
   const editModal = new bootstrap.Modal(document.getElementById('editModal'));
   editModal.show();
 }
 
 async function submitEdit() {
-  const id = document.getElementById('Id').value;
-  const form = document.getElementById('editForm');
-  const formData = new FormData(form);
+  const Id = document.getElementById('Id').value;
+  const formData = new FormData(document.getElementById('editForm'));
 
   try {
-    const response = await fetch(`/movie/updateMovie/${id}`, {
+    const response = await fetch(`/movie/updateMovie/${Id}`, {
       method: 'PUT',
-      body: formData
+      body: formData,
     });
 
     if (response.ok) {
-      const result = await response.json();
-      if (result.success) {
-        // Ẩn modal sau khi cập nhật thành công
-        const editModal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
-        editModal.hide();
-
-        // Tải lại danh sách phim
-        await fetchMovies(currentPage);
-      } else {
-        console.error('Lỗi khi chỉnh sửa phim:', result.error);
-        alert('Đã xảy ra lỗi khi chỉnh sửa phim: ' + result.error);
-      }
+      alert('Cập nhật thành công!');
+      window.location.reload();
     } else {
-      console.error('Lỗi khi gửi yêu cầu:', response.statusText);
-      alert('Đã xảy ra lỗi khi gửi yêu cầu: ' + response.statusText);
+      const errorData = await response.json();
+      alert(`Đã xảy ra lỗi khi cập nhật: ${errorData.error || 'Lỗi không xác định'}`);
     }
   } catch (error) {
-    console.error('Lỗi khi gửi yêu cầu:', error);
-    alert('Đã xảy ra lỗi khi gửi yêu cầu: ' + error.message);
+    alert('Đã xảy ra lỗi khi cập nhật.');
+    console.error(error);
   }
 }
 

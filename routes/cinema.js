@@ -13,6 +13,12 @@ router.get(
   authMiddleware.requireLogin,
   cinemaController.cinemaAdd
 );
+router.put(
+  "/updateRoom/:id",
+  authMiddleware.requireLogin,
+  cinemaController.updateRoom
+);
+
 router.get("/roomList", authMiddleware.requireLogin, cinemaController.roomList);
 router.get("/roomAdd", authMiddleware.requireLogin, cinemaController.roomAdd);
 router.post(

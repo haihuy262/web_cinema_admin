@@ -23,7 +23,7 @@
   <table class="table table-bordered table-hover align-middle" id="discountTable">
     <thead >
       <tr class="table table-secondary" >
-      
+        <th class="text-center">STT</th>
         <th  class="text-center">Tên</th>
         <th  class="text-center">Phần Trăm</th>
         <th  class="text-center">Mã</th>
@@ -75,11 +75,30 @@
           </div>
           <div class="mb-3">
             <label for="percent" class="form-label">Phần Trăm</label>
-            <input type="text" class="form-control" id="percent" name="percent" required />
+            <select class="form-select" id="percent" name="percent" required>
+              <option value="" disabled selected>Chọn phần trăm</option>
+              <option value="0.1">0.1</option>
+              <option value="0.2">0.2</option>
+              <option value="0.3">0.3</option>
+              <option value="0.4">0.4</option>
+              <option value="0.5">0.5</option>
+              <option value="0.6">0.6</option>
+              <option value="0.7">0.7</option>
+              <option value="0.8">0.8</option>
+              <option value="0.9">0.9</option>
+              <option value="1.0">1.0</option>
+            </select>
           </div>
+          
           <div class="mb-3">
             <label for="type" class="form-label">Loại</label>
-            <input type="text" class="form-control" id="type" name="type" required />
+            
+            <select class="form-select" id="type" name="type" required>
+              <option value="" disabled selected>Chọn Loại</option>
+              <option value="food">food</option>
+              <option value="ticket">ticket</option>
+             
+            </select>
           </div>
           <div class="mb-3">
             <label for="cinema" class="form-label">Rạp</label>
@@ -186,7 +205,7 @@ document.addEventListener('DOMContentLoaded', () => fetchDiscounts(currentPage))
 
 
 let updateInProgress = {}; // Đối tượng để theo dõi các ID đang được cập nhật
-
+let currentIndex = 1;
 function populateDiscountTable(discounts) {
     const tableBody = document.querySelector('#discountTable tbody');
     tableBody.innerHTML = ''; // Clear existing table rows
@@ -194,6 +213,10 @@ function populateDiscountTable(discounts) {
     discounts.forEach((discount, index) => {
         const row = document.createElement('tr');
 
+        const cellSTT = document.createElement('td');
+        cellSTT.textContent = currentIndex++; 
+        cellSTT.classList.add("text-center");
+        row.appendChild(cellSTT);
         // Các cột dữ liệu khác
         const cellName = document.createElement('td');
         cellName.classList.add("text-center");
@@ -202,8 +225,9 @@ function populateDiscountTable(discounts) {
 
         const cellPercent = document.createElement('td');
         cellPercent.classList.add("text-center");
-        cellPercent.textContent = discount.percent;
+        cellPercent.textContent = `${discount.percent *100}%`; // Thêm dấu % vào cuối giá trị phần trăm
         row.appendChild(cellPercent);
+
 
         const cellCode = document.createElement('td');
         cellCode.classList.add("text-center");
@@ -323,16 +347,16 @@ function editDiscount(button) {
     document.getElementById("name").value = discount.name;
     document.getElementById("percent").value = discount.percent;
     document.getElementById("type").value = discount.type;
-
+    document.getElementById("cinema").value = discount.cinema;
     // Tải danh sách rạp vào select box
-    const cinemaSelect = document.getElementById("cinema");
-    cinemaSelect.innerHTML = ''; // Xóa các option cũ
-    discount.cinema.forEach(cinema => {
-        const option = document.createElement("option");
-        option.value = cinema._id; 
-        option.textContent = cinema.name; 
-        cinemaSelect.appendChild(option);
-    });
+    // const cinemaSelect = document.getElementById("cinema");
+   
+    // discount.cinema.forEach(cinema => {
+    //     const option = document.createElement("option");
+    //     option.value = cinema._id; 
+    //     option.textContent = cinema.name; 
+    //     cinemaSelect.appendChild(option);
+    // });
 
     // Hiện modal
     var myModal = new bootstrap.Modal(document.getElementById("editModal"));
@@ -364,5 +388,33 @@ async function submitEdit() {
 
 
 </script>
-
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    fetch('/discount/cinemaList')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data.success) {
+         
+          const cinemaSelect = document.getElementById('cinema'); 
+          data.getAll.forEach(cinema => {
+            const option = document.createElement('option');
+            option.value = cinema._id;
+            option.textContent = cinema.name;
+            cinemaSelect.appendChild(option);
+          });
+        } else {
+          console.error('Error fetching cinema data:', data.error);
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching cinema data:', error);
+      });
+  });
+  
+</script>
 

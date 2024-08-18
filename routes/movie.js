@@ -18,7 +18,7 @@ router.put(
   "/updateMovie/:id",
   authMiddleware.requireLogin,
   uploadImage.single("image"),
-  uploadImage.array("videos"), // Sử dụng array nếu có nhiều video
+
   movieController.updateMovie
 );
 

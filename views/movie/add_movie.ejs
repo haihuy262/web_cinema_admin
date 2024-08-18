@@ -302,6 +302,7 @@
         success: function (response) {
           console.log(response);
           alert("Thêm phim thành công!");
+          document.getElementById('addMovieForm').reset();
         },
         error: function (jqXHR, textStatus, errorThrown) {
           console.log("Lỗi: " + jqXHR.responseJSON.message);

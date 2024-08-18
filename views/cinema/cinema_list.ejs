@@ -5,6 +5,7 @@
   <table class="table table-bordered table-hover align-middle">
     <thead>
       <tr class="table table-secondary">
+        <th class="text-center">STT</th>
         <th class="text-center">Id</th>
         <th class="text-center">Tên</th>
         <th class="text-center">Địa Chỉ</th>
@@ -13,8 +14,10 @@
       </tr>
     </thead>
     <tbody>
-      <% cinemas.forEach(cinema => { %>
+      
+      <% cinemas.forEach((cinema,index) => { %>
       <tr>
+        <td class="text-center"><%= index + 1 %></td>
         <td class="text-center"><%= cinema._id.slice(-8).toUpperCase() %></td>
         <td class="text-center"><%= cinema.name %></td>
         <td class="text-center"><%= cinema.address %></td>
@@ -27,12 +30,12 @@
           >
             Sửa
           </button>
-          <button
+          <!-- <button
             class="btn btn-danger"
             onclick="deleteCinema('<%= cinema._id %>')"
           >
             Xoá
-          </button>
+          </button> -->
         </td>
       </tr>
       <% }); %>

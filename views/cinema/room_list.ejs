@@ -3,13 +3,13 @@
 <div class="container mt-5" style="padding: 3%;">
   <h2 class="text-center">Danh Sách Phòng</h2>
   
-      <table class="table table-bordered table-hover align-middle" >
-        <thead >
-          <tr class="table table-secondary" >
+  <table class="table table-bordered table-hover align-middle">
+    <thead>
+      <tr class="table-secondary">
         <th class="text-center">Stt</th>
         <th class="text-center">Tên</th>
         <th class="text-center">Phim</th>
-        <th class="text-center">Thời Gian Chiếu </th>
+        <th class="text-center">Thời Gian Chiếu</th>
         <th class="text-center">Rạp</th>
         <th class="text-center">Hành Động</th>
       </tr>
@@ -19,36 +19,33 @@
         <tr>
           <td class="text-center"><%= index + 1 %></td>
           <td class="text-center"><%= room.name %></td>
-          
-          <td class="text-center"><%= room.movie.name %></td>        
+          <td class="text-center"><%= room.movie.name %></td>
           <td class="text-center">
             <ul>
               <% room.showtime.forEach(showtime => { %>
                 <% Object.values(showtime.time).forEach(timeObj => { %>
-                  <li><%= showtime.date.substring(0, 10)%> - <%= timeObj.time %></li>
+                  <li><%= new Date(showtime.date).toLocaleDateString() %> - <%= timeObj.time %></li>
                 <% }); %>
               <% }); %>
             </ul>
-            
-            
           </td>
           <td class="text-center"><%= room.cinema.name %></td>
-          
           <td class="text-center">
             <button
-            class="btn btn-info"
-            data-room="<%= JSON.stringify(room) %>"
-            onclick="editRoom(this)"
-          >
-            Sửa
-          </button>
-            <button class="btn btn-danger" onclick="deleteRoom('<%= room._id %>')">Xoá</button>
+              class="btn btn-info"
+              data-room='<%= JSON.stringify(room) %>'
+              onclick="editRoom(this)"
+            >
+              Sửa
+            </button>
+            <!-- <button class="btn btn-danger" onclick="deleteRoom('<%= room._id %>')">Xoá</button> -->
           </td>
         </tr>
       <% }); %>
     </tbody>
   </table>
 </div>
+
 <div
   class="modal fade"
   id="editRoomModal"
@@ -71,34 +68,32 @@
         <form id="editRoomForm">
           <input type="hidden" id="roomId" name="roomId" />
           <div class="mb-3">
-            <label for="cinemaName" class="form-label">Tên</label>
+            <label for="roomName" class="form-label">Tên Phòng</label>
             <input
               type="text"
               class="form-control"
-              id="cinemaName"
+              id="roomName"
               name="name"
               required
             />
           </div>
           <div class="mb-3">
-            <label for="cinemaAddress" class="form-label">Địa chỉ</label>
-            <input
-              type="text"
-              class="form-control"
-              id="cinemaAddress"
-              name="address"
-              required
-            />
+            <label for="roomMovie" class="form-label">Phim</label>
+            <select class="form-control" id="roomMovie" name="roomMovie" required>
+              <!-- Options will be populated by JavaScript -->
+            </select>
           </div>
           <div class="mb-3">
-            <label for="cinemaHotline" class="form-label">Hotline</label>
-            <input
-              type="text"
-              class="form-control"
-              id="cinemaHotline"
-              name="hotline"
-              required
-            />
+            <label for="roomShowtime" class="form-label">Thời Gian Chiếu</label>
+            <select class="form-control" id="roomShowtime" name="showtime" multiple required>
+              <!-- Options will be populated by JavaScript -->
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="roomCinema" class="form-label">Rạp</label>
+            <select class="form-control" id="roomCinema" name="roomCinema" required>
+              <!-- Options will be populated by JavaScript -->
+            </select>
           </div>
         </form>
       </div>
@@ -109,7 +104,7 @@
         <button
           type="button"
           class="btn btn-primary"
-          onclick="submitEditCinema()"
+          onclick="submitEditRoom()"
         >
           Lưu thay đổi
         </button>
@@ -117,7 +112,27 @@
     </div>
   </div>
 </div>
+
 <script>
+  let token = "";
+  let apiUrl = "";
+
+  $(document).ready(function () {
+    // Lấy token và URL API
+    $.ajax({
+      url: "/token/getToken",
+      type: "GET",
+      async: false, // đồng bộ
+      success: function (data) {
+        token = data.token;
+        apiUrl = data.apiUrl;
+      },
+      error: function (error) {
+        console.log(error);
+      },
+    });
+  });
+
   async function deleteRoom(roomId) {
     if (confirm('Bạn có chắc chắn muốn xoá?')) {
       try {
@@ -141,40 +156,114 @@
     }
   }
 
-  function editCinema(button) {
-    const cinema = JSON.parse(button.getAttribute("data-cinema"));
-    document.getElementById("cinemaId").value = cinema._id;
-    document.getElementById("cinemaName").value = cinema.name;
-    document.getElementById("cinemaAddress").value = cinema.address;
-    document.getElementById("cinemaHotline").value = cinema.hotline;
+  function editRoom(button) {
+    const room = JSON.parse(button.getAttribute("data-room"));
+    document.getElementById("roomId").value = room._id;
+    document.getElementById("roomName").value = room.name;
 
+    // Xóa các tùy chọn cũ và gọi API để làm mới danh sách
+    $('#roomMovie').empty();
+    $('#roomShowtime').empty();
+    $('#roomCinema').empty();
+    
+    // Gọi API để lấy danh sách phim và cập nhật vào <select>
+    $.ajax({
+      url: `${apiUrl}/movies/no/login`,
+      type: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      success: function (data) {
+        data.getall.forEach(movie => {
+          const option = $("<option>").val(movie._id).text(movie.name);
+          $('#roomMovie').append(option);
+        });
+        // Chọn phim hiện tại
+        $('#roomMovie').val(room.movie._id);
+      },
+      error: function (error) {
+        console.log(error);
+      },
+    });
+
+    // Gọi API để lấy danh sách suất chiếu và cập nhật vào <select>
+    $.ajax({
+      url: `${apiUrl}/showtimes/user`,
+      type: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      success: function (data) {
+        data.getAll.forEach(showtime => {
+          const option = $("<option>").val(showtime._id).text(new Date(showtime.date).toLocaleDateString());
+          $('#roomShowtime').append(option);
+        });
+        // Chọn suất chiếu hiện tại
+        $('#roomShowtime').val(room.showtime.map(st => st._id)); // Giả sử chỉ có một suất chiếu cho phòng
+      },
+      error: function (error) {
+        console.log(error);
+      },
+    });
+
+    // Gọi API để lấy danh sách rạp và cập nhật vào <select>
+    $.ajax({
+      url: `${apiUrl}/cinemas`,
+      type: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      success: function (data) {
+        data.forEach(cinema => {
+          const option = $("<option>").val(cinema._id).text(cinema.name);
+          $('#roomCinema').append(option);
+        });
+        // Chọn rạp hiện tại
+        $('#roomCinema').val(room.cinema._id);
+      },
+      error: function (error) {
+        console.log(error);
+      },
+    });
+    
     // Hiện modal
-    var myModal = new bootstrap.Modal(
-      document.getElementById("editCinemaModal")
-    );
+    var myModal = new bootstrap.Modal(document.getElementById("editRoomModal"));
     myModal.show();
   }
 
-  async function submitEditCinema() {
-    const cinemaId = document.getElementById("cinemaId").value;
-    const formData = new FormData(document.getElementById("editCinemaForm"));
+  async function submitEditRoom() {
+  const roomId = document.getElementById("roomId").value;
+  const roomName = document.getElementById("roomName").value;
+  const roomMovie = document.getElementById("roomMovie").value;
+  const roomShowtime = Array.from(document.getElementById("roomShowtime").selectedOptions).map(option => option.value);
+  const roomCinema = document.getElementById("roomCinema").value;
 
-    try {
-      const response = await fetch(`/cinema/updateCinema/${cinemaId}`, {
-        method: "PUT",
-        body: formData,
-      });
+  const data = {
+    name: roomName,
+    movie: roomMovie,
+    showtime: roomShowtime, // Đây là mảng
+    cinema: roomCinema
+  };
 
-      if (response.ok) {
-        alert("Cập nhật thành công!");
-        window.location.reload();
-      } else {
-        alert("Đã xảy ra lỗi khi cập nhật.");
-      }
-    } catch (error) {
+  try {
+    const response = await fetch(`/cinema/updateRoom/${roomId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (response.ok) {
+      alert("Cập nhật thành công!");
+      window.location.reload();
+    } else {
       alert("Đã xảy ra lỗi khi cập nhật.");
-      console.error(error);
     }
+  } catch (error) {
+    alert("Đã xảy ra lỗi khi cập nhật.");
+    console.error(error);
   }
+}
 
 </script>
