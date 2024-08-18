@@ -1,4 +1,7 @@
-<%- include('../partials/header.ejs') %>
+
+
+
+
 <style>
   .custom-blue {
     background-color: #007bff;
@@ -9,107 +12,113 @@
     color: white;
   }
 </style>
-
-<div class="container mt-5" style="padding: 3%">
-  <h2 class="text-center mb-5">Thống Kê Doanh Thu </h2>
-  <div class="row mb-4">
-    <div class="col-md-6">
-      <div style="border: 2px solid #007bff; padding: 10px; border-radius: 5px;">
-        <h4 style="margin: 0;">Tổng Doanh Thu: <span id="totalRevenueDisplay">0</span> VND</h4>
-      </div>
-    </div>
-    <div class="col-md-6">
-      <div style="border: 2px solid #cc4d69; padding: 10px; border-radius: 5px;">
-        <h4 style="margin: 0;">Tổng Số Vé Bán Ra: <span id="totalTicketsDisplay">0</span></h4>
-      </div>
-    </div>
+<div style="display: flex;">
+  <div style="width: 15%;">
+    <%- include('../partials/header.ejs') %>
   </div>
-  <div class="row mb-3">
-    <div class="col-md-4">
-      <label for="cinema" class="form-label">Select Movie</label>
-      <select class="form-select" id="cinema" name="cinema" required>
-        <option value=""></option>
-      </select>
-    </div>
-    <div class="col-md-4">
-      <label for="movie" class="form-label">Select Movie</label>
-      <select class="form-select" id="movie" name="movie" required>
-        <option value=""></option>
-      </select>
-    </div>
-    <div class="col-md-2">
-      <label for="dayStart" class="form-label">From Date</label>
-      <input type="date" class="form-control" id="dayStart" />
-    </div>
-    <div class="col-md-2">
-      <label for="dayEnd" class="form-label">To Date</label>
-      <input type="date" class="form-control" id="dayEnd" />
-    </div>
-    <div class="col-md-12 mt-3">
-      <button type="button" class="btn btn-primary" onclick="fetchRevenueData()">
-        Filter
-      </button>
-    </div>
-  </div>
-  <div class="row">
-    <div id="revenueChart" style="width: 100%; height: 400px"></div>
-  </div>
-  <div class="mt-3">
-    <h4>Doang Thu: <span id="totalRevenueLabel"></span></h4>
-  </div>
-
-  <!-- Table for Movie Revenue -->
   
-  <div class="row mt-5">
-    <div class="col-md-6">
-      <h3>Doanh thu theo phim</h3>
-      <table class="table table-bordered table-hover align-middle table-primary" id="movieTableBody">
-        <thead>
-          <tr  class="custom-blue">
-            <th>Phim</th>
-            <th>Tổng Tiền</th>
-            <th>Số Vé</th>
-          </tr>
-        </thead>
-        <tbody>
-          
-        </tbody>
-      </table>
-      <nav>
-        <ul class="pagination justify-content-end" id="pagination">
-          <li class="page-item" id="prevPage" onclick="changePage(-1)">
-            <a class="page-link" href="#" aria-label="Previous">
-              <span aria-hidden="true">&laquo;</span>
-            </a>
-          </li>
-          <li class="page-item">
-            <a class="page-link" id="currentPage" href="#">1</a>
-          </li>
-          <li class="page-item" id="nextPage" onclick="changePage(1)">
-            <a class="page-link" href="#" aria-label="Next">
-              <span aria-hidden="true">&raquo;</span>
-            </a>
-          </li>
-        </ul>
-      </nav>
+  <div class="container mt-5" style="padding: 3%;min-width: 85%" >
+    <h2 class="text-center mb-5">Thống Kê Doanh Thu </h2>
+    <div class="row mb-4">
+      <div class="col-md-6">
+        <div style="border: 2px solid #007bff; padding: 10px; border-radius: 5px;">
+          <h4 style="margin: 0;">Tổng Doanh Thu: <span id="totalRevenueDisplay">0</span> VND</h4>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div style="border: 2px solid #cc4d69; padding: 10px; border-radius: 5px;">
+          <h4 style="margin: 0;">Tổng Số Vé Bán Ra: <span id="totalTicketsDisplay">0</span></h4>
+        </div>
+      </div>
     </div>
-    <div class="col-md-6">
-      <h3>Doanh thu theo rạp</h3>
-      <table class="table table-bordered table-hover align-middle table-success" id="cinemaTableBody">
-      
-        <thead>
-          <tr >
-            <th>Rạp</th>
-            <th>Tổng Tiền</th>
-           
-          </tr>
-        </thead>
-        <tbody>
-        </tbody>
-      </table>
+    <div class="row mb-3">
+      <div class="col-md-4">
+        <label for="cinema" class="form-label">Chọn Rạp</label>
+        <select class="form-select" id="cinema" name="cinema" required>
+          <option value=""></option>
+        </select>
+      </div>
+      <div class="col-md-4">
+        <label for="movie" class="form-label">Chọn Phim</label>
+        <select class="form-select" id="movie" name="movie" required>
+          <option value=""></option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label for="dayStart" class="form-label">Từ Ngày</label>
+        <input type="date" class="form-control" id="dayStart" />
+      </div>
+      <div class="col-md-2">
+        <label for="dayEnd" class="form-label">Đến Ngày</label>
+        <input type="date" class="form-control" id="dayEnd" />
+      </div>
+      <div class="col-md-12 mt-3">
+        <button type="button" class="btn btn-primary" onclick="fetchRevenueData()">
+          Filter
+        </button>
+      </div>
+    </div>
+    <div class="row">
+      <div id="revenueChart" style="width: 100%; height: 400px"></div>
+    </div>
+    <div class="mt-3">
+      <h4>Doang Thu: <span id="totalRevenueLabel"></span></h4>
+    </div>
+  
+    <!-- Table for Movie Revenue -->
+    
+    <div class="row mt-5">
+      <div class="col-md-6">
+        <h3>Doanh thu theo phim</h3>
+        <table class="table table-bordered table-hover align-middle table-primary" id="movieTableBody">
+          <thead>
+            <tr  class="custom-blue">
+              <th>Phim</th>
+              <th>Tổng Tiền</th>
+              <th>Số Vé</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+          </tbody>
+        </table>
+        <nav>
+          <ul class="pagination justify-content-end" id="pagination">
+            <li class="page-item" id="prevPage" onclick="changePage(-1)">
+              <a class="page-link" href="#" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+              </a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" id="currentPage" href="#">1</a>
+            </li>
+            <li class="page-item" id="nextPage" onclick="changePage(1)">
+              <a class="page-link" href="#" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+      <div class="col-md-6">
+        <h3>Doanh thu theo rạp</h3>
+        <table class="table table-bordered table-hover align-middle table-success" id="cinemaTableBody">
+        
+          <thead>
+            <tr >
+              <th>Rạp</th>
+              <th>Tổng Tiền</th>
+             
+            </tr>
+          </thead>
+          <tbody>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </div>
+
 
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.0/dist/echarts.min.js"></script>
 
@@ -130,7 +139,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (data.success) {
       // Gán giá trị cho Tổng Doanh Thu từ trường 'getAll'
       const totalRevenueDisplay = document.getElementById('totalRevenueDisplay');
-      totalRevenueDisplay.textContent = data.getAll + ' VND';
+      totalRevenueDisplay.textContent = data.getAll.toLocaleString('en-US') ;
 
      
     } else {
@@ -325,18 +334,33 @@ function formatDate(dateString) {
 }
 
 function fetchRevenueData() {
-  const cinemaId=document.getElementById('cinema').value;
+  const cinemaId = document.getElementById('cinema').value;
   const movieId = document.getElementById('movie').value;
-  const dayStart = formatDate(document.getElementById('dayStart').value);
-  const dayEnd = formatDate(document.getElementById('dayStart').value);
+  let dayStart = document.getElementById('dayStart').value ? formatDate(document.getElementById('dayStart').value) : null;
+  let dayEnd = document.getElementById('dayEnd').value ? formatDate(document.getElementById('dayEnd').value) : null;
+
+  // Kiểm tra dayStart và dayEnd
+  if (dayStart && dayEnd && new Date(dayStart) > new Date(dayEnd)) {
+    Swal.fire({
+              title: "Thông Báo!",
+              text: "Ngày bắt đầu phải nhỏ hơn ngày kết thúp!",
+              icon: "error",
+              confirmButtonText: "OK",
+            }).then((result) => {
+              location.reload();
+            });
+    return;
+  }
 
   const url = new URL('/dashboard/totalCinema', window.location.origin);
-  const params = {
-    cinemaId:cinemaId,
-    movieId: movieId,
-    dayStart: dayStart,
-    dayEnd: dayEnd
-  };
+  const params = { cinemaId, movieId };
+
+  if (dayStart) {
+    params.dayStart = dayStart;
+  }
+  if (dayEnd) {
+    params.dayEnd = dayEnd;
+  }
 
   Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
 
@@ -349,22 +373,18 @@ function fetchRevenueData() {
     })
     .then(data => {
       if (data.success) {
-        const revenueData = data.revenueData || [];
-        const totalRevenue = revenueData.reduce((acc, item) => acc + item.totalRevenue, 0);
+        const totalRevenue = data.totalRevenue;
 
         const totalRevenueLabel = document.getElementById('totalRevenueLabel');
-const formattedTotalRevenue = Number(totalRevenue).toLocaleString('en-US');
-totalRevenueLabel.textContent = `${formattedTotalRevenue} VND`;
+        const formattedTotalRevenue = Number(totalRevenue).toLocaleString('en-US');
+        totalRevenueLabel.textContent = `${formattedTotalRevenue} VND`;
 
-
+        const revenueData = data.revenueData || [];
+        const cinemaNames = revenueData.map(item => item.cinemaName);
+        const seriesData = revenueData.map(item => item.totalRevenue);
 
         const chartDom = document.getElementById("revenueChart");
         const myChart = echarts.init(chartDom);
-
-        const cinemaNames = revenueData.map(item => item.cinemaName);
-        const seriesData = revenueData.length > 0
-          ? revenueData.map(item => item.totalRevenue)
-          : [0]; 
 
         const option = {
           title: {
@@ -390,77 +410,47 @@ totalRevenueLabel.textContent = `${formattedTotalRevenue} VND`;
         };
 
         myChart.setOption(option);
-
       } else {
-        console.error('Error fetching revenue data:', data.error);
-        const totalRevenueLabel = document.getElementById('totalRevenueLabel');
-        totalRevenueLabel.textContent = `0 VND`;
-
-        const chartDom = document.getElementById("revenueChart");
-        const myChart = echarts.init(chartDom);
-
-        const option = {
-          title: {
-            text: "Doanh thu",
-          },
-          tooltip: {
-            trigger: "axis",
-          },
-          xAxis: {
-            type: "category",
-            data: [], 
-          },
-          yAxis: {
-            type: "value",
-          },
-          series: [
-            {
-              data: [], 
-              type: "bar",
-              barWidth: '50',
-            },
-          ],
-        };
-
-        myChart.setOption(option);
-
+        handleNoRevenue();
       }
     })
     .catch(error => {
       console.error('Error fetching revenue data:', error);
-
-      const totalRevenueLabel = document.getElementById('totalRevenueLabel');
-      totalRevenueLabel.textContent = `0$`;
-
-      const chartDom = document.getElementById("revenueChart");
-      const myChart = echarts.init(chartDom);
-
-      const option = {
-        title: {
-          text: "Doanh thu",
-        },
-        tooltip: {
-          trigger: "axis",
-        },
-        xAxis: {
-          type: "category",
-          data: [], 
-        },
-        yAxis: {
-          type: "value",
-        },
-        series: [
-          {
-            data: [], 
-            type: "bar",
-            barWidth: '50',
-          },
-        ],
-      };
-
-      myChart.setOption(option);
-
+      handleNoRevenue();
     });
+}
+
+function handleNoRevenue() {
+  const totalRevenueLabel = document.getElementById('totalRevenueLabel');
+  totalRevenueLabel.textContent = `0 VND`;
+
+  const chartDom = document.getElementById("revenueChart");
+  const myChart = echarts.init(chartDom);
+
+  const option = {
+    title: {
+      text: "Doanh thu",
+    },
+    tooltip: {
+      trigger: "axis",
+    },
+    xAxis: {
+      type: "category",
+      data: [], 
+    },
+    yAxis: {
+      type: "value",
+    },
+    series: [
+      {
+        data: [], 
+        type: "bar",
+        barWidth: '50',
+      },
+    ],
+  };
+
+  myChart.setOption(option);
 }
 
 

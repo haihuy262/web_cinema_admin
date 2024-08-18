@@ -59,27 +59,27 @@ exports.totalCinema = async (req, res, next) => {
       params: {
         cinemaId,
         movieId,
-        // dayStart,
-        // dayEnd
+        dayStart,
+        dayEnd
       }
     });
 
     const total = response.data;
     if (Array.isArray(total) && total.length > 0) {
-      const totalRevenue = total[0].totalRevenue;
+      const totalRevenue = total.reduce((acc, item) => acc + item.totalRevenue, 0);
       
-      console.log('totalRevenue',movieId,cinemaId,dayStart,dayEnd);
-      res.json({ success: true, getAll: totalRevenue, revenueData: total });
+      console.log('totalRevenue', cinemaId, movieId, dayEnd, dayStart);
+      res.json({ success: true, totalRevenue, revenueData: total });
     } else {
       console.log('No totalRevenue found in response');
       res.json({ success: false, error: 'No totalRevenue found' });
     }
   } catch (error) {
     console.log(error);
-
     res.status(500).json({ success: false, error: error.message });
   }
 };
+
 
 exports.totalMovie = async (req, res, next) => {
   try {
