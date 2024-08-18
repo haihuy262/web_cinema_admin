@@ -138,14 +138,7 @@
               required
             />
           </div>
-          <!-- <div class="mb-3">
-            <label for="image" class="form-label">Hình Ảnh</label>
-            <input type="file" class="form-control" id="image" name="image" />
-          </div>
-          <div class="mb-3">
-            <label for="trailer" class="form-label">Trailer</label>
-            <input type="file" class="form-control" id="trailer" name="trailer" />
-          </div> -->
+        
         </form>
       </div>
       <div class="modal-footer">
@@ -325,6 +318,15 @@ async function submitEdit() {
   const form = document.getElementById('editForm');
   const formData = new FormData(form);
 
+  // Debug: Kiểm tra nội dung của FormData (chỉ cho các trường dữ liệu không phải tệp)
+  for (const [key, value] of formData.entries()) {
+    if (value instanceof File) {
+      console.log(`${key}: File`);
+    } else {
+      console.log(`${key}: ${value}`);
+    }
+  }
+
   try {
     const response = await fetch(`/movie/updateMovie/${id}`, {
       method: 'PUT',
@@ -334,23 +336,18 @@ async function submitEdit() {
     if (response.ok) {
       const result = await response.json();
       if (result.success) {
-        // Ẩn modal sau khi cập nhật thành công
         const editModal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
         editModal.hide();
-
-        // Tải lại danh sách phim
         await fetchMovies(currentPage);
       } else {
-        console.error('Lỗi khi chỉnh sửa phim:', result.error);
         alert('Đã xảy ra lỗi khi chỉnh sửa phim: ' + result.error);
       }
     } else {
-      console.error('Lỗi khi gửi yêu cầu:', response.statusText);
       alert('Đã xảy ra lỗi khi gửi yêu cầu: ' + response.statusText);
     }
   } catch (error) {
-    console.error('Lỗi khi gửi yêu cầu:', error);
     alert('Đã xảy ra lỗi khi gửi yêu cầu: ' + error.message);
+    console.error('Lỗi khi gửi yêu cầu:', error);
   }
 }
 

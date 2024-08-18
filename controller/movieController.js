@@ -120,30 +120,17 @@ exports.createMovie = async (req, res, next) => {
 };
 
 exports.updateMovie = async (req, res, next) => {
-  const { id } = req.params; // Lấy ID từ tham số yêu cầu
+  const { id } = req.params;
   const { name, duration, subtitle, censorship, rate, release_date } = req.body;
-  const image = req.file; // Xử lý hình ảnh
-  const videos = req.files.videos; // Xử lý video
+  const token = req.session.admin.token;
+  const apiUrl = process.env.API_URL;
 
   // Kiểm tra các trường bắt buộc
-  if (
-    !name ||
-    !duration ||
-    !subtitle ||
-    !censorship ||
-    !rate ||
-    !release_date ||
-    !image ||
-    !videos || // Kiểm tra nếu video không được gửi thì lỗi
-    videos.length === 0
-  ) {
+  if (!name || !duration || !subtitle || !censorship || !rate || !release_date) {
     return res.status(400).json({ error: "Tất cả các trường là bắt buộc." });
   }
 
   try {
-    const token = req.session.admin.token;
-    const apiUrl = process.env.API_URL;
-
     const formData = new FormData();
     formData.append("name", name);
     formData.append("duration", duration);
@@ -152,39 +139,23 @@ exports.updateMovie = async (req, res, next) => {
     formData.append("rate", rate);
     formData.append("release_date", release_date);
 
-    
-    if (image) {
-      formData.append("image", fs.createReadStream(image.path));
-    }
-
-    // Xử lý video
-    if (videos) {
-      videos.forEach(video => {
-        formData.append("videos", fs.createReadStream(video.path));
-      });
-    }
-
     const response = await axios.put(`${apiUrl}/movies/${id}`, formData, {
       headers: {
         Authorization: `Bearer ${token}`,
         ...formData.getHeaders(),
       },
     });
-
-    
-    if (image) {
-      fs.unlinkSync(image.path);
-    }
-    if (videos) {
-      videos.forEach(video => fs.unlinkSync(video.path));
-    }
-    console.log('check',name)
+    console.log('test',name)
     res.json({ success: true });
   } catch (error) {
-    console.error('Lỗi khi cập nhật phim:', error);
-    res.json({ success: false });
+    console.error('Lỗi khi cập nhật phim:', error.message);
+    res.status(500).json({ success: false, error: "Đã xảy ra lỗi khi cập nhật." });
   }
 };
+
+
+
+
 
 exports.deleteMovie = async (req, res, next) => {
   const id = req.params.id;
