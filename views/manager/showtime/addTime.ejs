@@ -182,10 +182,25 @@
             Authorization: `Bearer ${token}`,
           },
           success: function (data) {
-            console.log(data);
+            Swal.fire({
+              title: "Thành công!",
+              text: "Xoá thành công!",
+              icon: "success",
+              confirmButtonText: "OK",
+            }).then((result) => {
+              location.reload();
+            });
           },
           error: function (error) {
             console.log(error);
+            Swal.fire({
+              title: "Lỗi!",
+              text: "Đã xảy ra lỗi gì đó!.",
+              icon: "error",
+              confirmButtonText: "OK",
+            }).then((result) => {
+              location.reload();
+            });
           },
         });
       });

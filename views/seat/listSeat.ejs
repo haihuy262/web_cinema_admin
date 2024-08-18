@@ -36,9 +36,7 @@
         <select id="cinemaSelect" class="form-select" required>
           <option value="" selected disabled>Chọn Rạp Phim...</option>
           <% for(let i = 0; i < dataCinemas.length; i++){ %>
-          <option value="<%= dataCinemas[i]._id %>">
-            <%= dataCinemas[i].name %>
-          </option>
+          <option value="<%= dataCinemas[i]._id %>"><%= dataCinemas[i].name %></option>
           <% } %>
         </select>
       </div>
@@ -62,18 +60,12 @@
       </div>
     </div>
     <div class="col-md-12 text-center">
-      <button
-        class="btn btn-primary mb-4"
-        data-bs-toggle="modal"
-        data-bs-target="#addSeatModal"
-      >
+      <button class="btn btn-primary mb-4" data-bs-toggle="modal" data-bs-target="#addSeatModal">
         Thêm ghế mới
       </button>
-      <button id="viewSeatsBtn" type="submit" class="btn btn-primary mb-4 ms-3">
-        Xem Ghế
-      </button>
-      <button class="btn btn-primary mb-4 ms-3">Edit</button>
-      <button class="btn btn-danger mb-4 ms-3">Delete</button>
+      <button id="viewSeatsBtn" type="submit" class="btn btn-primary mb-4 ms-3">Xem Ghế</button>
+      <button class="btn btn-primary mb-4 ms-3" hidden>Edit</button>
+      <button class="btn btn-danger mb-4 ms-3" hidden>Delete</button>
     </div>
   </form>
   <div class="d-flex justify-content-center mb-3">
@@ -87,15 +79,10 @@
     <i class="bi bi-diamond-fill text-success fs-3 d-flex align-items-center">
       <h3 class="ms-2">Đã đặt</h3>
     </i>
-    <i
-      class="bi bi-diamond-fill text-warning fs-3 d-flex align-items-center ms-5"
-    >
+    <i class="bi bi-diamond-fill text-warning fs-3 d-flex align-items-center ms-5">
       <h3 class="ms-2">Chờ thanh toán</h3>
     </i>
-    <i
-      id="iconAvailble"
-      class="bi bi-diamond-fill text-secondary fs-3 d-flex align-items-center ms-5"
-    >
+    <i id="iconAvailble" class="bi bi-diamond-fill text-secondary fs-3 d-flex align-items-center ms-5">
       <h3 id="nameAvailble" class="ms-2">Có sẵn</h3>
     </i>
   </div>
@@ -105,8 +92,7 @@
     id="addSeatModal"
     tabindex="-1"
     aria-labelledby="addSeatModalLabel"
-    aria-hidden="true"
-  >
+    aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <!-- Modal Header -->
@@ -115,12 +101,7 @@
             <i class="fas fa-exclamation-triangle text-danger"></i>
             Thêm ghế mới
           </h1>
-          <button
-            type="button"
-            class="btn-close"
-            data-bs-dismiss="modal"
-            aria-label="Close"
-          ></button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <!-- Modal Body -->
         <div class="modal-body">
@@ -140,9 +121,7 @@
             <select id="cinemaSelectAdd" class="form-select">
               <option value="" selected disabled>Chọn Rạp Chiếu...</option>
               <% for(let i = 0; i < dataCinemas.length; i++){ %>
-              <option value="<%= dataCinemas[i]._id %>">
-                <%= dataCinemas[i].name %>
-              </option>
+              <option value="<%= dataCinemas[i]._id %>"><%= dataCinemas[i].name %></option>
               <% } %>
             </select>
           </div>
@@ -155,16 +134,8 @@
         </div>
         <!-- Modal Footer -->
         <div class="modal-footer">
-          <button
-            type="button"
-            class="btn btn-secondary"
-            data-bs-dismiss="modal"
-          >
-            Close
-          </button>
-          <button type="button" class="btn btn-primary" id="confirmAdd">
-            Lưu
-          </button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" id="confirmAdd">Lưu</button>
         </div>
       </div>
     </div>
@@ -232,9 +203,7 @@
           });
 
           // Map các phần tử giống nhau lại
-          const uniqueDates = Array.from(
-            new Set(showtimes.map((st) => st.date))
-          );
+          const uniqueDates = Array.from(new Set(showtimes.map((st) => st.date)));
 
           $("#showDateSelect").change(function () {
             const idShowDate = $(this).val();
@@ -255,9 +224,7 @@
 
             if (selectedShowtime && Array.isArray(selectedShowtime.time)) {
               selectedShowtime.time.forEach((timeObj) => {
-                const timeOption = $("<option>")
-                  .val(timeObj._id)
-                  .text(timeObj.time);
+                const timeOption = $("<option>").val(timeObj._id).text(timeObj.time);
                 $("#timeSelect").append(timeOption);
               });
             }
@@ -409,10 +376,7 @@
         // Clear the existing options
         $("#seatSelect").empty();
         $("#seatSelect").append(
-          $("<option>")
-            .text("Chọn ghế...")
-            .attr("disabled", "disabled")
-            .attr("selected", "selected")
+          $("<option>").text("Chọn ghế...").attr("disabled", "disabled").attr("selected", "selected")
         );
 
         for (let i = 0; i < availableSeats.length; i++) {
@@ -473,9 +437,7 @@
             data.forEach((seat) => existingSeats.push(seat.name));
 
             // Nếu ghế đã có, loại bỏ khỏi danh sách option
-            const availableSeats = seats.filter(
-              (seat) => !existingSeats.includes(seat)
-            );
+            const availableSeats = seats.filter((seat) => !existingSeats.includes(seat));
 
             // Thêm lại các ghế vào option
             populateSeatOptions(availableSeats);
