@@ -239,7 +239,7 @@
           </div>
         </div>
       </div>
-      <div class="col-md-12"><h2 id="sumTicket"></h2></div>
+      <div class="col-md-12"><h4 id="sumTicket"></h4></div>
       <div class="col-md-12">
         <table class="table table-bordered align-middle">
           <thead class="table table-secondary">
@@ -256,6 +256,22 @@
             <!-- content -->
           </tbody>
         </table>
+        <!-- Pagination -->
+        <nav>
+          <ul class="pagination justify-content-end">
+            <li class="prevPageLi page-item">
+              <a id="prevPage" class="page-link" href="#" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+              </a>
+            </li>
+            <li class="page-item"><a id="numberPage" class="page-link" href="#">1</a></li>
+            <li class="nextPageLi page-item">
+              <a id="nextPage" class="page-link" href="#" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
       </div>
     </div>
     <!-- getToken apiURl -->
@@ -290,13 +306,42 @@
           },
           success: function (data) {
             $("#sumTicket").text(`Tổng số vé đã quét: ${data.length}`);
-
-            displayTableRows(data);
           },
           error: function (error) {
             console.log(error);
           },
         });
+
+        function fetchData(currentIndex) {
+          $.ajax({
+            url: `${apiUrl}/tickets/staff/admin/${idStaff}?page=${currentIndex}`,
+            type: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            success: function (data) {
+              if (data.length === 0 && currentIndex > 1) {
+                currentIndex--;
+                return;
+              }
+              if (data.length < 10) {
+                $(".nextPageLi").addClass("disabled");
+              }
+
+              $("#numberPage").text(currentIndex);
+
+              if (currentIndex === 1) {
+                $(".prevPageLi").addClass("disabled");
+              }
+
+              displayTableRows(data);
+            },
+            error: function (error) {
+              console.log(error);
+            },
+          });
+        }
+        fetchData(currentIndex);
 
         function displayTableRows(data) {
           const tbody = document.querySelector("#tableBody");
@@ -335,7 +380,7 @@
 
             tbody.innerHTML += `
             <tr>
-              <td class="text-center">${startIndex + i + 1}</td>
+              <td class="text-center p-3">${startIndex + i + 1}</td>
               <td class="text-center text-primary">
                 <a href="/tickets/details/${historyStaff._id}" class="nav-link">${shortId}</a>
               </td>
@@ -347,6 +392,23 @@
             `;
           }
         }
+        $("#nextPage").click(function () {
+          currentIndex++;
+          fetData(currentIndex);
+
+          if (currentIndex > 1) {
+            $(".prevPageLi").removeClass("disabled");
+          }
+        });
+
+        $("#prevPage").click(function () {
+          if (currentIndex > 1) {
+            currentIndex--;
+            $("#numberPage").text(currentIndex);
+            fetData(currentIndex);
+            $(".nextPageLi").removeClass("disabled");
+          }
+        });
       });
     </script>
     <!-- Delete -->
