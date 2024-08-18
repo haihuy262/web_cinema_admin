@@ -18,7 +18,7 @@ exports.movieListTable = async (req, res, next) => {
     const movies = response.data.getall;
     res.json({ success: true, getAll: movies });
 
-   
+   console.log('ckeck',movies)
   } catch (error) {
     console.log(error);
 
@@ -162,6 +162,35 @@ exports.updateMovie = async (req, res, next) => {
   }
 };
 
+exports.updateStatus = async (req, res, next) => {
+  const { movieId } = req.params; // Lấy ID từ tham số yêu cầu
+  try {
+    const token = req.session.admin.token; // Lấy token từ session
+    const apiUrl = process.env.API_URL; // Lấy URL của API từ biến môi trường
+
+    // Gửi yêu cầu PUT để cập nhật trạng thái phim
+    const response = await axios.put(
+      `${apiUrl}/movies/stopshows/${movieId}`,
+      {}, // Payload rỗng nếu bạn không cần gửi dữ liệu trong body
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // Thiết lập headers với token
+        },
+      }
+    );
+
+    if (response.status === 200) {
+      // Trạng thái đã được cập nhật thành công
+      return res.status(200).json({ message: "Trạng thái đã được cập nhật thành công." });
+    } else {
+      // Nếu response từ server không phải 200, trả về lỗi từ server
+      return res.status(response.status).json({ error: response.data.error || "Lỗi từ server." });
+    }
+  } catch (error) {
+    console.error("Error updating status:", error);
+    return res.status(500).json({ error: "Đã xảy ra lỗi khi cập nhật trạng thái." });
+  }
+};
 
 
 

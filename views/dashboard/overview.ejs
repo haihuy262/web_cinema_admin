@@ -38,12 +38,12 @@
       </select>
     </div>
     <div class="col-md-2">
-      <label for="startDate" class="form-label">From Date</label>
-      <input type="date" class="form-control" id="startDate" />
+      <label for="dayStart" class="form-label">From Date</label>
+      <input type="date" class="form-control" id="dayStart" />
     </div>
     <div class="col-md-2">
-      <label for="endDate" class="form-label">To Date</label>
-      <input type="date" class="form-control" id="endDate" />
+      <label for="dayEnd" class="form-label">To Date</label>
+      <input type="date" class="form-control" id="dayEnd" />
     </div>
     <div class="col-md-12 mt-3">
       <button type="button" class="btn btn-primary" onclick="fetchRevenueData()">
@@ -327,15 +327,15 @@ function formatDate(dateString) {
 function fetchRevenueData() {
   const cinemaId=document.getElementById('cinema').value;
   const movieId = document.getElementById('movie').value;
-  const startDate = formatDate(document.getElementById('startDate').value);
-  const endDate = formatDate(document.getElementById('endDate').value);
+  const dayStart = formatDate(document.getElementById('dayStart').value);
+  const dayEnd = formatDate(document.getElementById('dayStart').value);
 
   const url = new URL('/dashboard/totalCinema', window.location.origin);
   const params = {
     cinemaId:cinemaId,
     movieId: movieId,
-    startDate: startDate,
-    endDate: endDate
+    dayStart: dayStart,
+    dayEnd: dayEnd
   };
 
   Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));

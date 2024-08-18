@@ -32,6 +32,7 @@
         <th class="text-center">Ngày Chiếu</th>
         <th class="text-center">Ảnh</th>
         <th style="width: 15%">Trailer</th>
+        <th  class="text-center">Trạng Thái</th>
         <th class="text-center">Hành Động</th>
       </tr>
     </thead>
@@ -182,8 +183,10 @@ document.addEventListener('DOMContentLoaded', () => fetchMovies(currentPage));
 function populateMovieTable(movies) {
   const tableBody = document.querySelector('#movieTable tbody');
   tableBody.innerHTML = '';
+  let currentIndex = 1; // Khởi tạo số thứ tự
+  const updateInProgress = {}; // Để theo dõi trạng thái cập nhật
 
-  movies.forEach((movie) => {
+  movies.forEach((movie, index) => {
     const row = document.createElement('tr');
 
     const cellSTT = document.createElement('td');
@@ -241,6 +244,26 @@ function populateMovieTable(movies) {
     cellTrailer.appendChild(link);
     row.appendChild(cellTrailer);
 
+    const cellStatus = document.createElement('td');
+    const switchDiv = document.createElement('div');
+    switchDiv.className = 'form-check form-switch form-check-reverse';
+
+    const checkbox = document.createElement('input');
+    checkbox.className = 'form-check-input status-toggle';
+    checkbox.type = 'checkbox';
+    checkbox.id = `toggle${index}`;
+    checkbox.setAttribute('data-id', movie._id);
+    checkbox.checked = movie.release_status === 'dc' || movie.release_status === 'sc'; // Bật nếu là 'dc' hoặc 'sc'
+
+    const label = document.createElement('label');
+    label.className = 'form-check-label';
+    label.htmlFor = `toggle${index}`;
+
+    switchDiv.appendChild(checkbox);
+    switchDiv.appendChild(label);
+    cellStatus.appendChild(switchDiv);
+    row.appendChild(cellStatus);
+
     const cellActions = document.createElement('td');
     cellActions.classList.add("text-center");
     const editButton = document.createElement('button');
@@ -252,8 +275,42 @@ function populateMovieTable(movies) {
 
     row.appendChild(cellActions);
     tableBody.appendChild(row);
+
+    checkbox.addEventListener('change', async function () {
+      if (updateInProgress[movie._id]) return;
+
+      updateInProgress[movie._id] = true;
+      const movieId = this.getAttribute('data-id');
+      const status = this.checked ? (movie.release_status === 'sc' ? 'sc' : 'dc') : 'nc';
+
+      console.log('Movie ID:', movieId, 'Status:', status);
+
+      await updateMovieStatus(movieId, status);
+      delete updateInProgress[movie._id];
+    });
   });
 }
+
+async function updateMovieStatus(movieId) {
+  try {
+    const response = await fetch(`/movie/updateStatus/${movieId}`, {
+      method: "PUT",
+      headers: {
+        'Content-Type': 'application/json'
+      },
+     
+    });
+
+    if (response.ok) {
+      console.log("Status updated successfully.");
+    } else {
+      console.error("Error updating status:", await response.text());
+    }
+  } catch (error) {
+    console.error("Error updating status:", error);
+  }
+}
+
 
 function editMovie(button) {
   const movie = JSON.parse(button.getAttribute('data-movie'));

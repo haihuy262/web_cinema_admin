@@ -50,7 +50,7 @@ exports.total = async (req, res, next) => {
 exports.totalCinema = async (req, res, next) => {
   try {
     const token = req.session.admin.token;
-    const { cinemaId, movieId, startDate, endDate } = req.query;
+    const { cinemaId, movieId, dayStart, dayEnd } = req.query;
 
     const response = await axios.get('http://139.180.132.97:3000/tickets/revenue/cmd', {
       headers: {
@@ -59,8 +59,8 @@ exports.totalCinema = async (req, res, next) => {
       params: {
         cinemaId,
         movieId,
-        startDate,
-        endDate
+        // dayStart,
+        // dayEnd
       }
     });
 
@@ -68,7 +68,7 @@ exports.totalCinema = async (req, res, next) => {
     if (Array.isArray(total) && total.length > 0) {
       const totalRevenue = total[0].totalRevenue;
       
-      console.log('totalRevenue',total);
+      console.log('totalRevenue',movieId,cinemaId,dayStart,dayEnd);
       res.json({ success: true, getAll: totalRevenue, revenueData: total });
     } else {
       console.log('No totalRevenue found in response');
