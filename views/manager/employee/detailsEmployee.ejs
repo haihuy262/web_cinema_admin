@@ -1,47 +1,37 @@
 <%- include('../../partials/header.ejs') %>
+<style>
+  .role-label {
+    background-color: #ffcccc;
+  }
+  .status-label {
+    background-color: #ccffcc;
+  }
+</style>
 <div class="container-fluid mt-5 p-3">
   <div class="mt-5">
     <div
       class="alert alert-success alert-dismissible d-none position-absolute translate-middle-y ms-3 mt-3"
       role="alert"
-      id="successDeleteAlert"
-    >
+      id="successDeleteAlert">
       Xoá thành công
-      <button
-        type="button"
-        class="btn-close"
-        data-bs-dismiss="alert"
-        aria-label="Close"
-      ></button>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
   </div>
   <div class="mt-5">
     <div
       class="alert alert-success alert-dismissible d-none position-absolute translate-middle-y ms-3 mt-3"
       role="alert"
-      id="successUpdateAlert"
-    >
+      id="successUpdateAlert">
       Sửa thông tin thành công.
-      <button
-        type="button"
-        class="btn-close"
-        data-bs-dismiss="alert"
-        aria-label="Close"
-      ></button>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
   </div>
   <div
     class="alert alert-danger alert-dismissible d-none position-absolute translate-middle-y ms-3 mt-3"
     role="alert"
-    id="errorAlert"
-  >
+    id="errorAlert">
     Có lỗi xảy ra. Vui lòng thử lại sau.
-    <button
-      type="button"
-      class="btn-close"
-      data-bs-dismiss="alert"
-      aria-label="Close"
-    ></button>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
   </div>
   <div class="text-center">
     <h2 class="mt-4">Chi tiết nhân viên</h2>
@@ -53,8 +43,7 @@
           class="card-img-top"
           src="<%= apiUrl %>/images/<%= dataStaffID.image %>"
           alt="Card image"
-          height="660"
-        />
+          height="660" />
       </div>
       <div class="col-md-6">
         <div class="card-body">
@@ -85,8 +74,7 @@
                 type="button"
                 class="btn btn-primary"
                 data-bs-toggle="modal"
-                data-bs-target="#updateModal"
-              >
+                data-bs-target="#updateModal">
                 Sửa thông tin
               </button>
               <form id="editForm">
@@ -95,74 +83,60 @@
                   id="updateModal"
                   tabindex="-1"
                   aria-labelledby="updateModalLabel"
-                  aria-hidden="true"
-                >
+                  aria-hidden="true">
                   <div class="modal-dialog modal-dialog-centered modal-lg">
                     <div class="modal-content">
                       <!-- Modal Header -->
                       <div class="modal-header">
                         <h1 class="modal-title fs-5" id="updateModalLabel">
-                          <i
-                            class="fas fa-solid fa-pen-to-square text-danger"
-                          ></i>
+                          <i class="fas fa-solid fa-pen-to-square text-danger"></i>
                           Sửa thông tin nhân viên
                         </h1>
                         <button
                           type="button"
                           class="btn-close"
                           data-bs-dismiss="modal"
-                          aria-label="Close"
-                        ></button>
+                          aria-label="Close"></button>
                       </div>
                       <!-- Modal body -->
                       <div class="modal-body">
                         <div class="row">
                           <div class="col-md-6">
                             <div class="mb-3">
-                              <label for="imageUpload" class="form-label"
-                                >Image</label
-                              >
+                              <label for="imageUpload" class="form-label">Image</label>
                               <input
                                 hidden
                                 name="image"
                                 type="file"
                                 class="form-control"
                                 id="imageUpload"
-                                accept="image/*"
-                              />
+                                accept="image/*" />
                               <input
                                 type="hidden"
                                 name="currentImage"
                                 id="currentImage"
-                                value="<%= dataStaffID.image %>"
-                              />
+                                value="<%= dataStaffID.image %>" />
                             </div>
                             <img
                               id="imagePreview"
                               src="<%= apiUrl %>/images/<%= dataStaffID.image %>"
                               alt="Image Preview"
                               width="100%"
-                              height="85%"
-                            />
+                              height="85%" />
                           </div>
                           <div class="col-md-6">
                             <div class="mb-3">
-                              <label for="fullName" class="form-label required"
-                                >Họ Tên</label
-                              >
+                              <label for="fullName" class="form-label required">Họ Tên</label>
                               <input
                                 name="name"
                                 type="text"
                                 class="form-control"
                                 id="fullName"
                                 value="<%= dataStaffID.name %>"
-                                required
-                              />
+                                required />
                             </div>
                             <div class="mb-3">
-                              <label for="email" class="form-label required"
-                                >Email</label
-                              >
+                              <label for="email" class="form-label required">Email</label>
                               <input
                                 name="email"
                                 type="email"
@@ -170,67 +144,45 @@
                                 id="email"
                                 value="<%= dataStaffID.email %>"
                                 required
-                                readonly
-                              />
+                                readonly />
                             </div>
                             <div class="mb-3">
-                              <label for="phone" class="form-label required"
-                                >Số điện thoại</label
-                              >
+                              <label for="phone" class="form-label required">Số điện thoại</label>
                               <input
                                 name="number_phone"
                                 type="tel"
                                 class="form-control"
                                 id="phone"
                                 value="<%= dataStaffID.number_phone %>"
-                                required
-                              />
+                                required />
                             </div>
                             <div class="mb-3">
-                              <label for="birthdate" class="form-label"
-                                >Ngày tháng năm sinh</label
-                              >
+                              <label for="birthdate" class="form-label">Ngày tháng năm sinh</label>
                               <input
                                 type="text"
                                 class="form-control"
                                 id="birthdate"
                                 name="date_of_birth"
                                 value="<%= dataStaffID.date_of_birth %>"
-                                required
-                              />
+                                required />
                             </div>
                             <div class="mb-3">
-                              <label for="birthdate" class="form-label"
-                                >Giới tính</label
-                              >
+                              <label for="birthdate" class="form-label">Giới tính</label>
                               <input
                                 type="text"
                                 class="form-control"
                                 id="gender"
                                 name="gender"
                                 value="<%= dataStaffID.gender %>"
-                                required
-                              />
+                                required />
                             </div>
                           </div>
                         </div>
                       </div>
                       <!-- Modal footer -->
                       <div class="modal-footer">
-                        <button
-                          type="button"
-                          class="btn btn-secondary"
-                          data-bs-dismiss="modal"
-                        >
-                          Close
-                        </button>
-                        <button
-                          type="submit"
-                          class="btn btn-primary"
-                          id="confirmUpdate"
-                        >
-                          Cập nhật
-                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" id="confirmUpdate">Cập nhật</button>
                       </div>
                     </div>
                   </div>
@@ -243,8 +195,7 @@
                 type="button"
                 class="btn btn-danger"
                 data-bs-toggle="modal"
-                data-bs-target="#deleteModal"
-              >
+                data-bs-target="#deleteModal">
                 Xoá nhân viên
               </button>
               <div
@@ -252,8 +203,7 @@
                 id="deleteModal"
                 tabindex="-1"
                 aria-labelledby="deleteModalLabel"
-                aria-hidden="true"
-              >
+                aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
                   <div class="modal-content">
                     <div class="modal-header">
@@ -265,43 +215,23 @@
                         type="button"
                         class="btn-close"
                         data-bs-dismiss="modal"
-                        aria-label="Close"
-                      ></button>
+                        aria-label="Close"></button>
                     </div>
-                    <div class="modal-body">
-                      Bạn có chắc muốn xoá nhân viên này?
-                    </div>
+                    <div class="modal-body">Bạn có chắc muốn xoá nhân viên này?</div>
                     <div class="modal-footer">
-                      <button
-                        type="button"
-                        class="btn btn-secondary"
-                        data-bs-dismiss="modal"
-                      >
-                        Close
-                      </button>
-                      <button
-                        type="button"
-                        class="btn btn-danger"
-                        id="confirmDelete"
-                      >
-                        Xoá
-                      </button>
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                      <button type="button" class="btn btn-danger" id="confirmDelete">Xoá</button>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-            <!-- Doi mat khau -->
+            <!-- Doi mat khau
             <div class="col-sm-3">
-              <button
-                type="button"
-                class="btn btn-warning"
-                data-bs-toggle="modal"
-                data-bs-target=""
-              >
+              <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="" hidden>
                 Đổi mật khẩu
               </button>
-            </div>
+            </div> -->
             <!-- Quay lai -->
             <div class="col-sm-3">
               <button id="backList" class="btn btn-secondary">Quay lại</button>
@@ -309,49 +239,142 @@
           </div>
         </div>
       </div>
+      <div class="col-md-12"><h2 id="sumTicket"></h2></div>
+      <div class="col-md-12">
+        <table class="table table-bordered align-middle">
+          <thead class="table table-secondary">
+            <tr class="text-center">
+              <th>STT</th>
+              <th>Mã vé</th>
+              <th>Phim</th>
+              <th>Ngày</th>
+              <th>Rạp</th>
+              <th>Trạng thái</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <!-- content -->
+          </tbody>
+        </table>
+      </div>
     </div>
+    <!-- getToken apiURl -->
+    <script>
+      let token = "";
+      let apiUrl = "";
+      let idStaff = "<%= dataStaffID._id %>";
+      $(document).ready(function () {
+        $.ajax({
+          url: "/token/getToken",
+          type: "GET",
+          async: false, // đồng bộ
+          success: function (data) {
+            token = data.token;
+            apiUrl = data.apiUrl;
+          },
+          error: function (error) {
+            console.log(error);
+          },
+        });
+      });
+    </script>
+    <script>
+      $(document).ready(function () {
+        let currentIndex = 1;
+
+        $.ajax({
+          url: `${apiUrl}/tickets/staff/${idStaff}`,
+          type: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          success: function (data) {
+            $("#sumTicket").text(`Tổng số vé đã quét: ${data.length}`);
+
+            displayTableRows(data);
+          },
+          error: function (error) {
+            console.log(error);
+          },
+        });
+
+        function displayTableRows(data) {
+          const tbody = document.querySelector("#tableBody");
+
+          while (tableBody.firstChild) {
+            tableBody.removeChild(tableBody.firstChild);
+          }
+
+          const startIndex = (currentIndex - 1) * 10;
+
+          for (let i = 0; i < data.length; i++) {
+            let historyStaff = data[i];
+            console.log(historyStaff);
+            // Mã đơn hàng
+            const id = historyStaff._id;
+            const shortId = id.slice(-8).toUpperCase();
+            // Ngày
+            const date = historyStaff.date;
+            const dateString = date.substring(0, 10);
+            const dateParts = dateString.split("-");
+            const year = dateParts[0];
+            const month = dateParts[1];
+            const day = dateParts[2];
+            const formattedDate = `${day}/${month}/${year}`;
+            // Status
+            if (historyStaff.status === "active") {
+              status = "Đã thanh toán";
+              statusClass = "status-label rounded-3 text-success border border-success ps-3 pe-3 pt-1 pb-1";
+            } else if (historyStaff.status === "complete") {
+              status = "Đã quét vé";
+              statusClass = "status-label rounded-3 text-success border border-success ps-3 pe-3 pt-1 pb-1";
+            } else {
+              status = "Chưa thanh toán";
+              statusClass = "role-label rounded-3 text-danger border border-danger ps-3 pe-3 pt-1 pb-1";
+            }
+
+            tbody.innerHTML += `
+            <tr>
+              <td class="text-center">${startIndex + i + 1}</td>
+              <td class="text-center text-primary">
+                <a href="/tickets/details/${historyStaff._id}" class="nav-link">${shortId}</a>
+              </td>
+              <td>${historyStaff.movie.name}</td>
+              <td class="text-center">${formattedDate}</td>
+              <td class="text-center">${historyStaff.cinema.name}</td>
+              <td class="text-center"><span class="${statusClass}">${status}</span></td>
+            </tr>
+            `;
+          }
+        }
+      });
+    </script>
     <!-- Delete -->
     <script>
-      document
-        .getElementById("confirmDelete")
-        .addEventListener("click", async function () {
-          const id = "<%= dataStaffID._id %>";
+      document.getElementById("confirmDelete").addEventListener("click", async function () {
+        const id = "<%= dataStaffID._id %>";
 
-          const deleteModal = bootstrap.Modal.getInstance(
-            document.getElementById("deleteModal")
-          );
+        const deleteModal = bootstrap.Modal.getInstance(document.getElementById("deleteModal"));
 
-          try {
-            const response = await fetch(`/employee/delete/${id}`, {
-              method: "DELETE",
-              headers: {
-                "Content-Type": "application/json",
-              },
-            });
+        try {
+          const response = await fetch(`/employee/delete/${id}`, {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
 
-            const result = await response.json();
-            if (result.success) {
-              const successAlert =
-                document.getElementById("successDeleteAlert");
-              successAlert.classList.remove("d-none");
+          const result = await response.json();
+          if (result.success) {
+            const successAlert = document.getElementById("successDeleteAlert");
+            successAlert.classList.remove("d-none");
 
-              deleteModal.hide();
+            deleteModal.hide();
 
-              setTimeout(function () {
-                window.location.href = "/employee/list";
-              }, 1000);
-            } else {
-              const errorAlert = document.getElementById("errorAlert");
-              errorAlert.classList.remove("d-none");
-
-              deleteModal.hide();
-
-              setTimeout(function () {
-                window.location.href = `/employee/details/${id}`;
-              }, 1000);
-            }
-          } catch (error) {
-            console.error("Error:", error);
+            setTimeout(function () {
+              window.location.href = "/employee/list";
+            }, 1000);
+          } else {
             const errorAlert = document.getElementById("errorAlert");
             errorAlert.classList.remove("d-none");
 
@@ -361,97 +384,83 @@
               window.location.href = `/employee/details/${id}`;
             }, 1000);
           }
-        });
+        } catch (error) {
+          console.error("Error:", error);
+          const errorAlert = document.getElementById("errorAlert");
+          errorAlert.classList.remove("d-none");
+
+          deleteModal.hide();
+
+          setTimeout(function () {
+            window.location.href = `/employee/details/${id}`;
+          }, 1000);
+        }
+      });
     </script>
     <!-- Hien thi anh -->
     <script>
-      document
-        .getElementById("imageUpload")
-        .addEventListener("change", function (event) {
-          const file = event.target.files[0];
-          if (file) {
-            const reader = new FileReader();
-            reader.onload = function (e) {
-              const img = document.getElementById("imagePreview");
-              img.src = e.target.result;
-              img.classList.remove("d-none");
-            };
-            reader.readAsDataURL(file);
-          }
-        });
+      document.getElementById("imageUpload").addEventListener("change", function (event) {
+        const file = event.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            const img = document.getElementById("imagePreview");
+            img.src = e.target.result;
+            img.classList.remove("d-none");
+          };
+          reader.readAsDataURL(file);
+        }
+      });
     </script>
     <!-- Update -->
     <script>
-      document
-        .getElementById("editForm")
-        .addEventListener("submit", async function (event) {
-          event.preventDefault();
+      document.getElementById("editForm").addEventListener("submit", async function (event) {
+        event.preventDefault();
 
-          const updateModal = bootstrap.Modal.getInstance(
-            document.getElementById("updateModal")
-          );
+        const updateModal = bootstrap.Modal.getInstance(document.getElementById("updateModal"));
 
-          const id = "<%= dataStaffID._id %>";
-          const token = "<%= token %>";
-          const name = document.getElementById("fullName").value;
-          const email = document.getElementById("email").value;
-          const number_phone = document.getElementById("phone").value;
-          const date_of_birth = document.getElementById("birthdate").value;
-          const gender = document.getElementById("gender").value;
-          const image = document.getElementById("imageUpload").files[0];
-          const currentImage = document.getElementById("currentImage").value;
+        const id = "<%= dataStaffID._id %>";
+        const token = "<%= token %>";
+        const name = document.getElementById("fullName").value;
+        const email = document.getElementById("email").value;
+        const number_phone = document.getElementById("phone").value;
+        const date_of_birth = document.getElementById("birthdate").value;
+        const gender = document.getElementById("gender").value;
+        const image = document.getElementById("imageUpload").files[0];
+        const currentImage = document.getElementById("currentImage").value;
 
-          if (
-            name == "" ||
-            email == "" ||
-            number_phone == "" ||
-            date_of_birth == "" ||
-            gender == ""
-          ) {
-            return;
-          }
+        if (name == "" || email == "" || number_phone == "" || date_of_birth == "" || gender == "") {
+          return;
+        }
 
-          const formData = new FormData();
-          formData.append("name", name);
-          formData.append("email", email);
-          formData.append("number_phone", number_phone);
-          formData.append("date_of_birth", date_of_birth);
-          formData.append("gender", gender);
-          formData.append("currentImage", currentImage);
-          if (image) {
-            formData.append("image", image);
-          }
+        const formData = new FormData();
+        formData.append("name", name);
+        formData.append("email", email);
+        formData.append("number_phone", number_phone);
+        formData.append("date_of_birth", date_of_birth);
+        formData.append("gender", gender);
+        formData.append("currentImage", currentImage);
+        if (image) {
+          formData.append("image", image);
+        }
 
-          try {
-            const response = await fetch(`/employee/edit/${id}`, {
-              method: "PUT",
-              body: formData,
-            });
+        try {
+          const response = await fetch(`/employee/edit/${id}`, {
+            method: "PUT",
+            body: formData,
+          });
 
-            const result = await response.json();
-            if (result.success) {
-              const successAlert =
-                document.getElementById("successUpdateAlert");
-              successAlert.classList.remove("d-none");
+          const result = await response.json();
+          if (result.success) {
+            const successAlert = document.getElementById("successUpdateAlert");
+            successAlert.classList.remove("d-none");
 
-              updateModal.hide();
+            updateModal.hide();
 
-              setTimeout(function () {
-                window.location.href = `/employee/details/${id}`;
-              }, 1000);
-            } else {
-              const errorAlert = document.getElementById("errorAlert");
-              errorAlert.classList.remove("d-none");
-
-              updateModal.hide();
-
-              setTimeout(function () {
-                window.location.href = `/employee/details/${id}`;
-              }, 1000);
-            }
-          } catch (error) {
-            console.error("Error:", error);
-
+            setTimeout(function () {
+              window.location.href = `/employee/details/${id}`;
+            }, 1000);
+          } else {
             const errorAlert = document.getElementById("errorAlert");
             errorAlert.classList.remove("d-none");
 
@@ -461,15 +470,25 @@
               window.location.href = `/employee/details/${id}`;
             }, 1000);
           }
-        });
+        } catch (error) {
+          console.error("Error:", error);
+
+          const errorAlert = document.getElementById("errorAlert");
+          errorAlert.classList.remove("d-none");
+
+          updateModal.hide();
+
+          setTimeout(function () {
+            window.location.href = `/employee/details/${id}`;
+          }, 1000);
+        }
+      });
     </script>
     <!-- Su kien back -->
     <script>
-      document
-        .getElementById("backList")
-        .addEventListener("click", async function () {
-          window.location.href = "/employee/list";
-        });
+      document.getElementById("backList").addEventListener("click", async function () {
+        window.location.href = "/employee/list";
+      });
     </script>
   </div>
 </div>
