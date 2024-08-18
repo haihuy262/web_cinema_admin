@@ -1,1 +1,194 @@
 <%- include('../../partials/header.ejs') %>
+<style>
+  .delete-icon:hover {
+    color: #ee2a2a;
+    transform: scale(1.1);
+  }
+</style>
+<div class="container mt-5 p-3">
+  <h2 class="text-center mt-4">Tạo Giờ</h2>
+  <div class="row">
+    <div class="col-md-6">
+      <form id="addTimeForm">
+        <div class="mb-3">
+          <label for="timeInput" class="form-label">Giờ</label>
+          <input type="time" class="form-control" id="timeInput" />
+        </div>
+        <button type="submit" class="btn btn-primary">Tạo giờ</button>
+      </form>
+    </div>
+    <div class="col-md-6">
+      <table class="table table-bordered align-middle" style="margin-top: 30px">
+        <thead class="table table-secondary">
+          <tr class="text-center">
+            <th>STT</th>
+            <th>Giờ</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody" class="text-center">
+          <td>1</td>
+          <td>22:00</td>
+        </tbody>
+      </table>
+      <!-- Pagination -->
+      <nav>
+        <ul class="pagination justify-content-end">
+          <li class="prevPageLi page-item">
+            <a id="prevPage" class="page-link" href="#" aria-label="Previous">
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
+          <li class="page-item"><a id="numberPage" class="page-link" href="#">1</a></li>
+          <li class="nextPageLi page-item">
+            <a id="nextPage" class="page-link" href="#" aria-label="Next">
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+  <!-- Modal Edit Date -->
+  <div
+    class="modal fade"
+    id="deleteTimeModal"
+    tabindex="-1"
+    aria-labelledby="deleteTimeModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <!-- Modal header -->
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteTimeModalLabel">Xoá</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <!-- Modal body -->
+        <div class="modal-body">Bạn có muốn xoá không?</div>
+        <!-- Model footer -->
+        <div class="modal-footer">
+          <button id="deleteTime" class="btn btn-danger">Xoá</button>
+          <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- getToken apiURl -->
+<script>
+  let token = "";
+  let apiUrl = "";
+  $(document).ready(function () {
+    $.ajax({
+      url: "/token/getToken",
+      type: "GET",
+      async: false, // đồng bộ
+      success: function (data) {
+        token = data.token;
+        apiUrl = data.apiUrl;
+      },
+      error: function (error) {
+        console.log(error);
+      },
+    });
+  });
+</script>
+<!-- Add Time -->
+<script>
+  $(document).ready(function () {
+    let currentIndex = 1;
+    // Get ALl Time
+    function fetData(currentIndex) {
+      $.ajax({
+        url: `${apiUrl}/times?page=${currentIndex}`,
+        type: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        success: function (data) {
+          let arrTime = data.getall;
+          displayTableRows(arrTime);
+        },
+        error: function (error) {
+          console.log(error);
+        },
+      });
+    }
+    fetData(currentIndex);
+
+    $("#addTimeForm").on("submit", function (e) {
+      e.preventDefault();
+
+      const time = $("#timeInput").val();
+
+      $.ajax({
+        url: `${apiUrl}/times`,
+        type: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        data: { time: time },
+        success: function (data) {
+          console.log(data);
+        },
+        error: function (error) {
+          console.log(error);
+        },
+      });
+    });
+
+    function displayTableRows(data) {
+      const tbody = document.querySelector("#tableBody");
+
+      while (tableBody.firstChild) {
+        tableBody.removeChild(tableBody.firstChild);
+      }
+
+      const startIndex = (currentIndex - 1) * 10;
+
+      for (let i = 0; i < data.length; i++) {
+        let time = data[i];
+        let row = document.createElement("tr");
+        tbody.innerHTML += "";
+        row.innerHTML = `
+            <td>${i + 1}</td>
+            <td>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span>${time.time}</span>
+                    <i class="bi bi-trash3 delete-icon" style="cursor: pointer;"
+                        data-bs-toggle="modal" 
+                        data-bs-target="#deleteTimeModal"
+                        data-id="${time._id}" 
+                        data-time="${time.time}">
+                    </i>
+                </div>
+            </td>
+        `;
+        tbody.appendChild(row);
+      }
+    }
+
+    // Delete Row Table
+    $("#deleteTimeModal").on("show.bs.modal", function (e) {
+      const button = $(e.relatedTarget);
+
+      let timeId = button.data("id");
+
+      $("#deleteTime").click(function () {
+        console.log(timeId);
+        $.ajax({
+          url: `${apiUrl}/times/${timeId}?password=${8888}`,
+          type: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          success: function (data) {
+            console.log(data);
+          },
+          error: function (error) {
+            console.log(error);
+          },
+        });
+      });
+    });
+  });
+</script>

@@ -1,1 +1,102 @@
 <%- include('../../partials/header.ejs') %>
+<div class="container mt-5 p-3">
+  <h2 class="text-center mt-4">Tạo Suất Chiếu</h2>
+  <div class="row">
+    <form id="addShowtime">
+      <div class="mb-3">
+        <label for="timeInput" class="form-label">Ngày</label>
+        <input type="date" class="form-control" id="dateInput" />
+      </div>
+      <div class="mb-3">
+        <label for="timeSelect" class="form-label">Giờ</label>
+        <select id="timeSelect" name="timeSelect" class="form-control" multiple required>
+          <option value="" selected disabled>Chọn giờ...</option>
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary">Tạo suất chiếu</button>
+    </form>
+  </div>
+</div>
+<!-- getToken apiURl -->
+<script>
+  let token = "";
+  let apiUrl = "";
+  $(document).ready(function () {
+    $.ajax({
+      url: "/token/getToken",
+      type: "GET",
+      async: false, // đồng bộ
+      success: function (data) {
+        token = data.token;
+        apiUrl = data.apiUrl;
+      },
+      error: function (error) {
+        console.log(error);
+      },
+    });
+  });
+</script>
+<script>
+  $(document).ready(function () {
+    // Get Time
+    $.ajax({
+      url: `${apiUrl}/times/user`,
+      type: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      success: function (data) {
+        $("#timeSelect").empty();
+        $("#timeSelect").append(
+          $("<option>").text("Chọn giờ...").attr("disabled", "disabled").attr("selected", "selected")
+        );
+
+        let dataTime = data.getall;
+        for (let i = 0; i < dataTime.length; i++) {
+          const option = $("<option>").val(dataTime[i]._id).text(dataTime[i].time);
+          $("#timeSelect").append(option);
+        }
+      },
+      error: function (error) {
+        console.log(error);
+      },
+    });
+
+    // Post Showtime
+    $("#addShowtime").on("submit", function (e) {
+      e.preventDefault();
+
+      const date = $("#dateInput").val();
+      const arrTime = $("#timeSelect").val();
+
+      $.ajax({
+        url: `${apiUrl}/showtimes`,
+        type: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        data: { date: date, time: arrTime },
+        success: function (data) {
+          Swal.fire({
+            title: "Thành công!",
+            text: "Tạo thành công!",
+            icon: "success",
+            confirmButtonText: "OK",
+          }).then((result) => {
+            window.location.href = "/showtime/list/showtime";
+          });
+        },
+        error: function (error) {
+          Swal.fire({
+            title: "Lỗi!",
+            text: "Đã xảy ra lỗi gì đó!.",
+            icon: "error",
+            confirmButtonText: "OK",
+          }).then((result) => {
+            location.reload();
+          });
+        },
+      });
+    });
+  });
+</script>
