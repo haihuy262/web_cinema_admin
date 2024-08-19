@@ -2,9 +2,14 @@ const axios = require("axios");
 const { requireLogin } = require("../middleware/authMiddleware");
 const fs = require("fs");
 const FormData = require("form-data");
+const path = require("path");
+
 exports.discountList = async (req, res, next) => {
-  res.render("../views/discount/discount_list.ejs");
+  res.render("../views/discount/discount_list.ejs", {
+    layout: path.join(__dirname, "../layouts/dashboard.ejs"),
+  });
 };
+
 exports.discountListTable = async (req, res, next) => {
   try {
     const token = req.session.admin.token;
@@ -26,7 +31,9 @@ exports.discountListTable = async (req, res, next) => {
   }
 };
 exports.discountAdd = async (req, res, next) => {
-  res.render("../views/discount/discount_add.ejs");
+  res.render("../views/discount/discount_add.ejs", {
+    layout: path.join(__dirname, "../layouts/dashboard.ejs"),
+  });
 };
 
 exports.updateStatus = async (req, res, next) => {
@@ -189,16 +196,7 @@ exports.updateDiscount = async (req, res, next) => {
     if (image) {
       fs.unlinkSync(image.path);
     }
-    console.log(
-      "dataaaa",
-      name,
-      percent,
-      type,
-      cinema,
-      dayEnd,
-      dayStart,
-      image
-    );
+    console.log("dataaaa", name, percent, type, cinema, dayEnd, dayStart, image);
     res.json({ success: true });
   } catch (error) {
     console.log(error);
