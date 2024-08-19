@@ -171,53 +171,82 @@
   let currentPage = 1;
 
   async function fetchDiscounts(page = 1) {
-    try {
-      const response = await fetch(`/discount/discountListTable?page=${page}`);
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      const data = await response.json();
-      if (data.success) {
-        if (data.getAll.length === 0 && page > 1) {
-          // Nếu không có dữ liệu và không phải là trang đầu tiên, quay về trang trước
-          changePage(-1);
-          return;
-        }
-        populateDiscountTable(data.getAll);
-        document.getElementById("currentPage").textContent = page;
-        currentPage = page;
-
-        // Kiểm tra nếu trang tiếp theo có dữ liệu
-        const nextPageResponse = await fetch(`/discount/discountListTable?page=${page + 1}`);
-        const nextPageData = nextPageResponse.ok
-          ? await nextPageResponse.json()
-          : { success: false, getAll: [] };
-        const hasNextPage = nextPageData.success && nextPageData.getAll.length > 0;
-        updatePaginationControls(hasNextPage, page > 1);
-      } else {
-        console.error("Error fetching discount data:", data.error);
-        updatePaginationControls(false, false); // Không có dữ liệu, không hiển thị nút Next và Previous
-      }
-    } catch (error) {
-      console.error("Error fetching discount data:", error);
-      updatePaginationControls(false, false); // Có lỗi, không hiển thị nút Next và Previous
+  try {
+    const response = await fetch(`/discount/discountListTable?page=${page}`);
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
     }
-  }
+    const data = await response.json();
+    if (data.success) {
+      if (data.getAll.length === 0 && page > 1) {
+        // Nếu không có dữ liệu và không phải là trang đầu tiên, quay về trang trước
+        changePage(-1);
+        return;
+      }
+      populateDiscountTable(data.getAll);
+      document.getElementById("currentPage").textContent = page;
+      currentPage = page;
 
-  function updatePaginationControls(hasNextPage, hasPrevPage) {
-    const prevButton = document.getElementById("prevPage");
-    const nextButton = document.getElementById("nextPage");
+      // Kiểm tra nếu trang tiếp theo có dữ liệu
+      const nextPageResponse = await fetch(`/discount/discountListTable?page=${page + 1}`);
+      const nextPageData = nextPageResponse.ok
+        ? await nextPageResponse.json()
+        : { success: false, getAll: [] };
+      const hasNextPage = nextPageData.success && nextPageData.getAll.length > 0;
 
-    prevButton.classList.toggle("disabled", !hasPrevPage);
-    nextButton.classList.toggle("disabled", !hasNextPage);
-  }
-
-  function changePage(direction) {
-    const newPage = currentPage + direction;
-    if (newPage > 0) {
-      fetchDiscounts(newPage);
+      // Cập nhật trạng thái của các nút phân trang
+      updatePaginationControls(hasNextPage, page > 1);
+    } else {
+      console.error("Error fetching discount data:", data.error);
+      updatePaginationControls(false, page > 1); // Không có dữ liệu, không hiển thị nút Next và Previous
     }
+  } catch (error) {
+    console.error("Error fetching discount data:", error);
+    updatePaginationControls(false, page > 1); // Có lỗi, không hiển thị nút Next và Previous
   }
+}
+
+function updatePaginationControls(hasNextPage, hasPrevPage) {
+  const prevButton = document.getElementById("prevPage");
+  const nextButton = document.getElementById("nextPage");
+
+  // Vô hiệu hóa nút prev nếu đang ở trang 1
+  if (!hasPrevPage) {
+    prevButton.classList.add("disabled");
+    prevButton.setAttribute("aria-disabled", "true");
+    prevButton.style.pointerEvents = "none";
+  } else {
+    prevButton.classList.remove("disabled");
+    prevButton.removeAttribute("aria-disabled");
+    prevButton.style.pointerEvents = "auto";
+  }
+
+  // Vô hiệu hóa nút next nếu không có trang tiếp theo
+  if (!hasNextPage) {
+    nextButton.classList.add("disabled");
+    nextButton.setAttribute("aria-disabled", "true");
+    nextButton.style.pointerEvents = "none";
+  } else {
+    nextButton.classList.remove("disabled");
+    nextButton.removeAttribute("aria-disabled");
+    nextButton.style.pointerEvents = "auto";
+  }
+}
+
+function changePage(direction) {
+  const newPage = currentPage + direction;
+  if (newPage > 0) {
+    fetchDiscounts(newPage);
+  }
+}
+
+function changePage(direction) {
+  const newPage = currentPage + direction;
+  if (newPage > 0) {
+    fetchDiscounts(newPage);
+  }
+}
+
 
   // Khởi động với trang đầu tiên
   document.addEventListener("DOMContentLoaded", () => fetchDiscounts(currentPage));
