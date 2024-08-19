@@ -1,9 +1,14 @@
 const axios = require("axios");
 const fs = require("fs");
 const FormData = require("form-data");
+const path = require("path");
+
 exports.movieList = async (req, res, next) => {
-  res.render("../views/movie/list_movie.ejs");
+  res.render("../views/movie/list_movie.ejs", {
+    layout: path.join(__dirname, "../layouts/dashboard.ejs"),
+  });
 };
+
 exports.movieListTable = async (req, res, next) => {
   try {
     const token = req.session.admin.token;
@@ -17,8 +22,6 @@ exports.movieListTable = async (req, res, next) => {
 
     const movies = response.data.getall;
     res.json({ success: true, getAll: movies });
-
-   console.log('ckeck',movies)
   } catch (error) {
     console.log(error);
 
@@ -28,7 +31,9 @@ exports.movieListTable = async (req, res, next) => {
 };
 
 exports.addMovie = async (req, res, next) => {
-  res.render("../views/movie/add_movie.ejs");
+  res.render("../views/movie/add_movie.ejs", {
+    layout: path.join(__dirname, "../layouts/dashboard.ejs"),
+  });
 };
 
 exports.createMovie = async (req, res, next) => {
@@ -121,11 +126,11 @@ exports.createMovie = async (req, res, next) => {
 
 exports.updateMovie = async (req, res, next) => {
   const { id } = req.params;
-  const { name , duration,subtitle,censorship,rate,release_date} = req.body;
+  const { name, duration, subtitle, censorship, rate, release_date } = req.body;
   const token = req.session.admin.token;
   const apiUrl = process.env.API_URL;
   const image = req.file;
-  if (!name || !duration || !subtitle || !censorship || !rate || !release_date ||!image ) {
+  if (!name || !duration || !subtitle || !censorship || !rate || !release_date || !image) {
     return res.status(400).json({ error: "Tất cả các trường là bắt buộc." });
   }
 
@@ -142,22 +147,19 @@ exports.updateMovie = async (req, res, next) => {
       filename: image.originalname,
     });
 
-
     const response = await axios.put(`${apiUrl}/movies/${id}`, formData, {
       headers: {
-        'Authorization': `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
         ...formData.getHeaders(),
       },
     });
     if (req.file && req.file.fieldname === "image") {
       fs.unlinkSync(req.file.path);
     }
- 
 
-    console.log('ckeck',name)
     res.json({ success: true });
   } catch (error) {
-    console.error('Lỗi khi cập nhật phim:', error.message);
+    console.error("Lỗi khi cập nhật phim:", error.message);
     res.status(500).json({ success: false, error: "Đã xảy ra lỗi khi cập nhật." });
   }
 };
@@ -192,9 +194,6 @@ exports.updateStatus = async (req, res, next) => {
   }
 };
 
-
-
-
 exports.deleteMovie = async (req, res, next) => {
   const id = req.params.id;
   const token = req.session.admin.token;
@@ -214,14 +213,20 @@ exports.deleteMovie = async (req, res, next) => {
 };
 
 exports.addActor = async (req, res, next) => {
-  res.render("../views/movie/actor/add_actor.ejs");
+  res.render("../views/movie/actor/add_actor.ejs", {
+    layout: path.join(__dirname, "../layouts/dashboard.ejs"),
+  });
 };
 
 exports.addDirectors = async (req, res, next) => {
-  res.render("../views/movie/directors/add_directors.ejs");
+  res.render("../views/movie/directors/add_directors.ejs", {
+    layout: path.join(__dirname, "../layouts/dashboard.ejs"),
+  });
 };
 exports.listActor = async (req, res, next) => {
-  res.render("../views/movie/actor/list_actor.ejs");
+  res.render("../views/movie/actor/list_actor.ejs", {
+    layout: path.join(__dirname, "../layouts/dashboard.ejs"),
+  });
 };
 exports.listActorTable = async (req, res, next) => {
   try {
@@ -235,7 +240,7 @@ exports.listActorTable = async (req, res, next) => {
     });
 
     const actors = response.data.getAll;
-   
+
     res.json({ success: true, getAll: actors });
   } catch (error) {
     console.log(error);
@@ -289,9 +294,7 @@ exports.updateActor = async (req, res, next) => {
   const image = req.file;
 
   if (!name && !image) {
-    return res
-      .status(400)
-      .json({ error: "Tên hoặc ảnh là bắt buộc để cập nhật." });
+    return res.status(400).json({ error: "Tên hoặc ảnh là bắt buộc để cập nhật." });
   }
 
   try {
@@ -340,7 +343,9 @@ exports.deleteActor = async (req, res, next) => {
 };
 
 exports.listDirector = async (req, res, next) => {
-  res.render("../views/movie/directors/list_directors.ejs");
+  res.render("../views/movie/directors/list_directors.ejs", {
+    layout: path.join(__dirname, "../layouts/dashboard.ejs"),
+  });
 };
 
 exports.listDirectorTable = async (req, res, next) => {
@@ -355,8 +360,7 @@ exports.listDirectorTable = async (req, res, next) => {
     });
 
     const directors = response.data;
-    
-  
+
     res.json({ success: true, getAll: directors });
   } catch (error) {
     console.log(error);
@@ -414,9 +418,7 @@ exports.updateDirecters = async (req, res, next) => {
   const image = req.file;
 
   if (!name && !image) {
-    return res
-      .status(400)
-      .json({ error: "Tên hoặc ảnh là bắt buộc để cập nhật." });
+    return res.status(400).json({ error: "Tên hoặc ảnh là bắt buộc để cập nhật." });
   }
 
   try {
@@ -476,8 +478,6 @@ exports.listDirectorOption = async (req, res, next) => {
 
     const directors = response.data.data.getAll;
     res.json({ success: true, getAll: directors });
-
-    
   } catch (error) {
     console.log(error);
 
@@ -498,8 +498,6 @@ exports.listActorOption = async (req, res, next) => {
 
     const actors = response.data.getAll;
     res.json({ success: true, getAll: actors });
-
-    console.log("check", actors);
   } catch (error) {
     console.log(error);
 
@@ -522,7 +520,6 @@ exports.genreListOption = async (req, res, next) => {
     const genres = response.data;
 
     res.json({ success: true, getAll: genres });
-    console.log("check", genres);
   } catch (error) {
     console.log(error);
 

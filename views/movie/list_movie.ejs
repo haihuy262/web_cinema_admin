@@ -1,378 +1,384 @@
-
-
-<div style="display: flex;background-color: rgb(230, 230, 228);">
-  <!-- Thẻ chứa header -->
-  <div style="width: 15%;">
-    <%- include('../partials/header.ejs') %>
-  </div>
-
-  <!-- Thẻ chứa container chiếm phần còn lại của màn hình nhưng nhỏ hơn -->
-  <div style="flex: 1; padding: 3%; max-width: 85%;">
-    <div class="container mt-5" style="min-width: 100%; border: 1px #E0E0E0; border-radius: 15px;background-color: rgb(253, 253, 250); padding:10px;">
-      <div class="row mb-3 mt-5">
-        <div class="col-md-3"></div>
-        <div class="col-md-6">
-          <h2 class="text-center">Danh sách Phim</h2>
-        </div>
-        <div class="col-md-3">
-          <div class="d-flex">
-            <input
-              id="searchInput"
-              class="form-control me-2 p-2"
-              type="search"
-              placeholder="Tìm kiếm..."
-              aria-label="Search"
-              oninput="searchTable()"
-            />
-          </div>
-        </div>
-      </div>
-      <table class="table table-bordered table-hover align-middle" id="movieTable">
-        <thead>
-          <tr class="table table-secondary">
-            <th class="text-center">STT</th>
-            <th class="text-center">Tên Phim</th>
-            <th class="text-center">Giờ Chiếu</th>
-            <th class="text-center">Phụ Đề</th>
-            <th class="text-center">Độ Tuổi</th>
-            <th class="text-center">Rate</th>
-            <th class="text-center">Ngày Chiếu</th>
-            <th class="text-center">Ảnh</th>
-            <th style="width: 15%">Trailer</th>
-            <th class="text-center">Trạng Thái</th>
-            <th class="text-center">Hành Động</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- Nội dung bảng -->
-        </tbody>
-      </table>
-      <nav>
-        <ul class="pagination justify-content-end" id="pagination">
-          <li class="page-item" id="prevPage" onclick="changePage(-1)">
-            <a class="page-link" href="#" aria-label="Previous">
-              <span aria-hidden="true">&laquo;</span>
-            </a>
-          </li>
-          <li class="page-item">
-            <a class="page-link" id="currentPage" href="#">1</a>
-          </li>
-          <li class="page-item" id="nextPage" onclick="changePage(1)">
-            <a class="page-link" href="#" aria-label="Next">
-              <span aria-hidden="true">&raquo;</span>
-            </a>
-          </li>
-        </ul>
-      </nav>
-    </div>
-  </div>
-</div>
-
-
-<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="editModalLabel">Sửa Phim</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
-      </div>
-      <div class="modal-body">
-        <form id="editForm" enctype="multipart/form-data">
-          <input type="hidden" id="Id" name="Id" />
-          <div class="mb-3">
-            <label for="name" class="form-label">Tên</label>
-            <input type="text" class="form-control" id="name" name="name" required />
-          </div>
-          <div class="mb-3">
-            <label for="duration" class="form-label">Duration</label>
-            <input type="text" class="form-control" id="duration" name="duration" required />
-          </div>
-          <div class="mb-3">
-            <label for="subtitle" class="form-label">Subtitle</label>
-            <input type="text" class="form-control" id="subtitle" name="subtitle" required />
-          </div>
-          <div class="mb-3">
-            <label for="censorship" class="form-label">Censorship</label>
-            <input type="text" class="form-control" id="censorship" name="censorship" required />
-          </div>
-          <div class="mb-3">
-            <label for="rate" class="form-label">Rate</label>
-            <input type="text" class="form-control" id="rate" name="rate" required />
-          </div>
-          <div class="mb-3">
-            <label for="release_date" class="form-label">Release Date</label>
-            <input type="date" class="form-control" id="release_date" name="release_date" required />
-          </div>
-         
-          <div class="mb-3">
-            <label for="Image" class="form-label"> Hình Ảnh </label>
-            <input type="file" class="form-control" id="Image" name="image" />
-          </div>
-          
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-        <button type="button" class="btn btn-primary" onclick="submitEdit()">Lưu thay đổi</button>
+<%- include('../partials/header.ejs') %>
+<style>
+  .search-wrapper {
+    position: relative;
+  }
+  .search-wrapper .bi-search {
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
+    color: #aaa;
+  }
+  .search-wrapper input {
+    padding-left: 2.5rem; /* Adjust padding to make room for the icon */
+  }
+</style>
+<nav style="--bs-breadcrumb-divider: '>'" aria-label="breadcrumb" class="mt-3">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="#">Quản lý phim</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Danh sách phim</li>
+  </ol>
+</nav>
+<div class="card mb-3">
+  <div class="card-body">
+    <div class="d-flex mb-3">
+      <button onclick="window.location.href = '/movie/add'" class="btn btn-primary">Tạo phim</button>
+      <div class="search-wrapper ms-3">
+        <i class="bi bi-search"></i>
+        <input
+          id="searchInput"
+          class="form-control me-2"
+          type="search"
+          placeholder="Tìm kiếm..."
+          aria-label="Search"
+          oninput="searchTable()" />
+        <!-- <button class="btn btn-outline-success" type="submit" onclick="searchTable()">Search</button> -->
       </div>
     </div>
+    <table class="table table-bordered table-hover align-middle" id="movieTable">
+      <thead>
+        <tr class="table table-secondary">
+          <th class="text-center">STT</th>
+          <th class="text-center">Tên Phim</th>
+          <th class="text-center">Thời lượng</th>
+          <th class="text-center">Phụ Đề</th>
+          <th class="text-center">Độ Tuổi</th>
+          <th class="text-center">Đánh giá</th>
+          <th class="text-center">Ngày Chiếu</th>
+          <th class="text-center">Ảnh</th>
+          <th class="text-center">Trailer</th>
+          <th class="text-center">Trạng Thái</th>
+          <th class="text-center">Hành Động</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Nội dung bảng -->
+      </tbody>
+    </table>
+    <nav>
+      <ul class="pagination justify-content-end" id="pagination">
+        <li class="page-item" id="prevPage" onclick="changePage(-1)">
+          <a class="page-link" href="#" aria-label="Previous">
+            <span aria-hidden="true">&laquo;</span>
+          </a>
+        </li>
+        <li class="page-item">
+          <a class="page-link" id="currentPage" href="#">1</a>
+        </li>
+        <li class="page-item" id="nextPage" onclick="changePage(1)">
+          <a class="page-link" href="#" aria-label="Next">
+            <span aria-hidden="true">&raquo;</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
   </div>
-</div>
 
-<script>
-function searchTable() {
-  const input = document.getElementById("searchInput").value.toLowerCase();
-  const tableBody = document.querySelector("#movieTable tbody");
-  const rows = tableBody.getElementsByTagName("tr");
+  <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editModalLabel">Sửa Phim</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+        </div>
+        <div class="modal-body">
+          <form id="editForm" enctype="multipart/form-data">
+            <input type="hidden" id="Id" name="Id" />
+            <div class="mb-3">
+              <label for="name" class="form-label">Tên</label>
+              <input type="text" class="form-control" id="name" name="name" required />
+            </div>
+            <div class="mb-3">
+              <label for="duration" class="form-label">Duration</label>
+              <input type="text" class="form-control" id="duration" name="duration" required />
+            </div>
+            <div class="mb-3">
+              <label for="subtitle" class="form-label">Subtitle</label>
+              <input type="text" class="form-control" id="subtitle" name="subtitle" required />
+            </div>
+            <div class="mb-3">
+              <label for="censorship" class="form-label">Censorship</label>
+              <input type="text" class="form-control" id="censorship" name="censorship" required />
+            </div>
+            <div class="mb-3">
+              <label for="rate" class="form-label">Rate</label>
+              <input type="text" class="form-control" id="rate" name="rate" required />
+            </div>
+            <div class="mb-3">
+              <label for="release_date" class="form-label">Release Date</label>
+              <input type="date" class="form-control" id="release_date" name="release_date" required />
+            </div>
 
-  for (let i = 0; i < rows.length; i++) {
-    const row = rows[i];
-    const cells = row.getElementsByTagName("td");
-    let match = false;
+            <div class="mb-3">
+              <label for="Image" class="form-label"> Hình Ảnh </label>
+              <input type="file" class="form-control" id="Image" name="image" />
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+          <button type="button" class="btn btn-primary" onclick="submitEdit()">Lưu thay đổi</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
-    for (let j = 0; j < cells.length; j++) {
-      if (cells[j].innerText.toLowerCase().indexOf(input) > -1) {
-        match = true;
-        break;
+  <script>
+    function searchTable() {
+      const input = document.getElementById("searchInput").value.toLowerCase();
+      const tableBody = document.querySelector("#movieTable tbody");
+      const rows = tableBody.getElementsByTagName("tr");
+
+      for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
+        const cells = row.getElementsByTagName("td");
+        let match = false;
+
+        for (let j = 0; j < cells.length; j++) {
+          if (cells[j].innerText.toLowerCase().indexOf(input) > -1) {
+            match = true;
+            break;
+          }
+        }
+
+        row.style.display = match ? "" : "none";
+      }
+    }
+  </script>
+  <script>
+    let currentPage = 1;
+    let currentIndex = 1;
+    async function fetchMovies(page = 1) {
+      try {
+        const response = await fetch(`/movie/movieListTable?page=${page}`);
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        const data = await response.json();
+        if (data.success) {
+          if (data.getAll.length === 0 && page > 1) {
+            changePage(-1);
+            return;
+          }
+          populateMovieTable(data.getAll);
+          document.getElementById("currentPage").textContent = page;
+          currentPage = page;
+
+          const nextPageResponse = await fetch(`/movie/movieListTable?page=${page + 1}`);
+          const nextPageData = nextPageResponse.ok
+            ? await nextPageResponse.json()
+            : { success: false, getAll: [] };
+          const hasNextPage = nextPageData.success && nextPageData.getAll.length > 0;
+          updatePaginationControls(hasNextPage, page > 1);
+        } else {
+          console.error("Error fetching movie data:", data.error);
+          updatePaginationControls(false, false);
+        }
+      } catch (error) {
+        console.error("Error fetching movie data:", error);
+        updatePaginationControls(false, false);
       }
     }
 
-    row.style.display = match ? "" : "none";
-  }
-}
-</script>
-<script>
-let currentPage = 1;
-let currentIndex = 1;
-async function fetchMovies(page = 1) {
-  try {
-    const response = await fetch(`/movie/movieListTable?page=${page}`);
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
+    function updatePaginationControls(hasNextPage, hasPrevPage) {
+      const prevButton = document.getElementById("prevPage");
+      const nextButton = document.getElementById("nextPage");
+
+      prevButton.classList.toggle("disabled", !hasPrevPage);
+      nextButton.classList.toggle("disabled", !hasNextPage);
     }
-    const data = await response.json();
-    if (data.success) {
-      if (data.getAll.length === 0 && page > 1) {
-        changePage(-1);
-        return;
+
+    function changePage(direction) {
+      const newPage = currentPage + direction;
+      if (newPage > 0) {
+        fetchMovies(newPage);
       }
-      populateMovieTable(data.getAll);
-      document.getElementById('currentPage').textContent = page;
-      currentPage = page;
-
-      const nextPageResponse = await fetch(`/movie/movieListTable?page=${page + 1}`);
-      const nextPageData = nextPageResponse.ok ? await nextPageResponse.json() : { success: false, getAll: [] };
-      const hasNextPage = nextPageData.success && nextPageData.getAll.length > 0;
-      updatePaginationControls(hasNextPage, page > 1);
-    } else {
-      console.error('Error fetching movie data:', data.error);
-      updatePaginationControls(false, false);
     }
-  } catch (error) {
-    console.error('Error fetching movie data:', error);
-    updatePaginationControls(false, false);
-  }
-}
 
-function updatePaginationControls(hasNextPage, hasPrevPage) {
-  const prevButton = document.getElementById('prevPage');
-  const nextButton = document.getElementById('nextPage');
+    document.addEventListener("DOMContentLoaded", () => fetchMovies(currentPage));
 
-  prevButton.classList.toggle('disabled', !hasPrevPage);
-  nextButton.classList.toggle('disabled', !hasNextPage);
-}
+    function populateMovieTable(movies) {
+      const tableBody = document.querySelector("#movieTable tbody");
+      tableBody.innerHTML = "";
+      let currentIndex = 1; // Khởi tạo số thứ tự
+      const updateInProgress = {}; // Để theo dõi trạng thái cập nhật
 
-function changePage(direction) {
-  const newPage = currentPage + direction;
-  if (newPage > 0) {
-    fetchMovies(newPage);
-  }
-}
+      movies.forEach((movie, index) => {
+        const row = document.createElement("tr");
 
-document.addEventListener('DOMContentLoaded', () => fetchMovies(currentPage));
+        const cellSTT = document.createElement("td");
+        cellSTT.textContent = currentIndex++; // Tăng số thứ tự
+        cellSTT.classList.add("text-center");
+        row.appendChild(cellSTT);
 
-function populateMovieTable(movies) {
-  const tableBody = document.querySelector('#movieTable tbody');
-  tableBody.innerHTML = '';
-  let currentIndex = 1; // Khởi tạo số thứ tự
-  const updateInProgress = {}; // Để theo dõi trạng thái cập nhật
+        const cellName = document.createElement("td");
+        cellName.textContent = movie.name;
+        cellName.classList.remove("text-center");
+        row.appendChild(cellName);
 
-  movies.forEach((movie, index) => {
-    const row = document.createElement('tr');
+        const cellDuration = document.createElement("td");
+        cellDuration.classList.add("text-center");
+        cellDuration.textContent = movie.duration;
+        row.appendChild(cellDuration);
 
-    const cellSTT = document.createElement('td');
-    cellSTT.textContent = currentIndex++; // Tăng số thứ tự
-    cellSTT.classList.add("text-center");
-    row.appendChild(cellSTT);
-  
-    const cellName = document.createElement('td');
-    cellName.textContent = movie.name;
-    cellName.classList.add("text-center");
-    row.appendChild(cellName);
+        const cellSubtitle = document.createElement("td");
+        cellSubtitle.classList.add("text-center");
+        cellSubtitle.textContent = movie.subtitle;
+        row.appendChild(cellSubtitle);
 
-    const cellDuration = document.createElement('td');
-    cellDuration.classList.add("text-center");
-    cellDuration.textContent = movie.duration;
-    row.appendChild(cellDuration);
+        const cellCensorship = document.createElement("td");
+        cellCensorship.classList.add("text-center");
+        cellCensorship.textContent = movie.censorship;
+        row.appendChild(cellCensorship);
 
-    const cellSubtitle = document.createElement('td');
-    cellSubtitle.classList.add("text-center");
-    cellSubtitle.textContent = movie.subtitle;
-    row.appendChild(cellSubtitle);
+        const cellRate = document.createElement("td");
+        cellRate.classList.add("text-center");
+        cellRate.textContent = movie.rate;
+        row.appendChild(cellRate);
 
-    const cellCensorship = document.createElement('td');
-    cellCensorship.classList.add("text-center");
-    cellCensorship.textContent = movie.censorship;
-    row.appendChild(cellCensorship);
+        const cellReleaseDate = document.createElement("td");
+        cellReleaseDate.classList.add("text-center");
+        cellReleaseDate.textContent = movie.release_date.substring(0, 10);
+        row.appendChild(cellReleaseDate);
 
-    const cellRate = document.createElement('td');
-    cellRate.classList.add("text-center");
-    cellRate.textContent = movie.rate;
-    row.appendChild(cellRate);
+        const cellImage = document.createElement("td");
+        cellImage.classList.add("text-center");
+        const image = document.createElement("img");
+        image.src = `http://139.180.132.97:3000/images/${movie.image}`;
+        image.alt = movie.name;
+        image.style.width = "70px";
+        image.style.height = "70px";
+        image.classList.add("rounded-3");
+        cellImage.appendChild(image);
+        row.appendChild(cellImage);
 
-    const cellReleaseDate = document.createElement('td');
-    cellReleaseDate.classList.add("text-center");
-    cellReleaseDate.textContent = movie.release_date.substring(0, 10);
-    row.appendChild(cellReleaseDate);
+        const cellTrailer = document.createElement("td");
+        cellTrailer.classList.add("text-center");
+        const link = document.createElement("a");
+        link.href = `http://139.180.132.97:3000/videos/${movie.trailer}`;
+        link.target = "_blank";
+        link.textContent = "Xem Trailer";
+        cellTrailer.appendChild(link);
+        row.appendChild(cellTrailer);
 
-    const cellImage = document.createElement('td');
-    cellImage.classList.add("text-center");
-    const image = document.createElement('img');
-    image.src = `http://139.180.132.97:3000/images/${movie.image}`;
-    image.alt = movie.name;
-    image.style.width = '70px';
-    image.style.height = '70px';
-    image.classList.add("rounded-3");
-    cellImage.appendChild(image);
-    row.appendChild(cellImage);
-
-    const cellTrailer = document.createElement('td');
-    cellTrailer.classList.add("text-center");
-    const link = document.createElement('a');
-    link.href = `http://139.180.132.97:3000/videos/${movie.trailer}`;
-    link.target = '_blank';
-    link.textContent = 'Xem Trailer';
-    cellTrailer.appendChild(link);
-    row.appendChild(cellTrailer);
-
-    const cellStatus = document.createElement('td');
-    const switchDiv = document.createElement('div');
-    switchDiv.classList.add(
+        const cellStatus = document.createElement("td");
+        const switchDiv = document.createElement("div");
+        switchDiv.classList.add(
           "form-check",
           "form-switch",
           "form-check-reverse",
           "d-flex",
           "justify-content-center"
         );
-    
-    const checkbox = document.createElement('input');
-    checkbox.className = 'form-check-input status-toggle';
-    checkbox.type = 'checkbox';
-    checkbox.id = `toggle${index}`;
-    checkbox.setAttribute('data-id', movie._id);
-    checkbox.checked = movie.release_status === 'dc' || movie.release_status === 'sc'; // Bật nếu là 'dc' hoặc 'sc'
 
-    const label = document.createElement('label');
-    label.className = 'form-check-label';
-    label.htmlFor = `toggle${index}`;
+        const checkbox = document.createElement("input");
+        checkbox.className = "form-check-input status-toggle";
+        checkbox.type = "checkbox";
+        checkbox.id = `toggle${index}`;
+        checkbox.setAttribute("data-id", movie._id);
+        checkbox.checked = movie.release_status === "dc" || movie.release_status === "sc"; // Bật nếu là 'dc' hoặc 'sc'
 
-    switchDiv.appendChild(checkbox);
-    switchDiv.appendChild(label);
-    cellStatus.appendChild(switchDiv);
-    row.appendChild(cellStatus);
+        const label = document.createElement("label");
+        label.className = "form-check-label";
+        label.htmlFor = `toggle${index}`;
 
-    const cellActions = document.createElement('td');
-   
-    cellActions.classList.add("text-center");
-    const editButton = document.createElement('button');
-    editButton.textContent = 'Sửa';
-    editButton.classList.add("btn", "btn-info");
-    editButton.setAttribute('data-movie', JSON.stringify(movie));
-    editButton.onclick = () => editMovie(editButton);
-    cellActions.appendChild(editButton);
+        switchDiv.appendChild(checkbox);
+        switchDiv.appendChild(label);
+        cellStatus.appendChild(switchDiv);
+        row.appendChild(cellStatus);
 
-    row.appendChild(cellActions);
-    tableBody.appendChild(row);
+        const cellActions = document.createElement("td");
 
-    checkbox.addEventListener('change', async function () {
-      if (updateInProgress[movie._id]) return;
+        cellActions.classList.add("text-center");
+        const editButton = document.createElement("button");
+        editButton.textContent = "Sửa";
+        editButton.classList.add("btn", "btn-info");
+        editButton.setAttribute("data-movie", JSON.stringify(movie));
+        editButton.onclick = () => editMovie(editButton);
+        cellActions.appendChild(editButton);
 
-      updateInProgress[movie._id] = true;
-      const movieId = this.getAttribute('data-id');
-      const status = this.checked ? (movie.release_status === 'sc' ? 'sc' : 'dc') : 'nc';
+        row.appendChild(cellActions);
+        tableBody.appendChild(row);
 
-      console.log('Movie ID:', movieId, 'Status:', status);
+        checkbox.addEventListener("change", async function () {
+          if (updateInProgress[movie._id]) return;
 
-      await updateMovieStatus(movieId, status);
-      delete updateInProgress[movie._id];
-    });
-  });
-}
+          updateInProgress[movie._id] = true;
+          const movieId = this.getAttribute("data-id");
+          const status = this.checked ? (movie.release_status === "sc" ? "sc" : "dc") : "nc";
 
-async function updateMovieStatus(movieId) {
-  try {
-    const response = await fetch(`/movie/updateStatus/${movieId}`, {
-      method: "PUT",
-      headers: {
-        'Content-Type': 'application/json'
-      },
-     
-    });
+          console.log("Movie ID:", movieId, "Status:", status);
 
-    if (response.ok) {
-      console.log("Status updated successfully.");
-    } else {
-      console.error("Error updating status:", await response.text());
+          await updateMovieStatus(movieId, status);
+          delete updateInProgress[movie._id];
+        });
+      });
     }
-  } catch (error) {
-    console.error("Error updating status:", error);
-  }
-}
 
+    async function updateMovieStatus(movieId) {
+      try {
+        const response = await fetch(`/movie/updateStatus/${movieId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
 
-function editMovie(button) {
-  const movie = JSON.parse(button.getAttribute('data-movie'));
-
-  // Điền dữ liệu vào các trường trong form
-  document.getElementById('Id').value = movie._id;
-  document.getElementById('name').value = movie.name || '';
-  document.getElementById('duration').value = movie.duration || ''; 
-  document.getElementById('subtitle').value = movie.subtitle || ''; 
-  document.getElementById('censorship').value = movie.censorship || ''; 
-  document.getElementById('rate').value = movie.rate || ''; 
-  document.getElementById('release_date').value = movie.release_date ? movie.release_date.substring(0, 10) : ''; 
-  const editModal = new bootstrap.Modal(document.getElementById('editModal'));
-  editModal.show();
-}
-
-async function submitEdit() {
-  const Id = document.getElementById('Id').value;
-  const formData = new FormData(document.getElementById('editForm'));
-
-  try {
-    const response = await fetch(`/movie/updateMovie/${Id}`, {
-      method: 'PUT',
-      body: formData,
-    });
-
-    if (response.ok) {
-      Swal.fire({
-              title: "Thành công!",
-              text: "Sửa thành công!",
-              icon: "success",
-              confirmButtonText: "OK",
-            }).then((result) => {
-              location.reload();
-            });
-          
-    } else {
-      const errorData = await response.json();
-      alert(`Đã xảy ra lỗi khi cập nhật: ${errorData.error || 'Lỗi không xác định'}`);
+        if (response.ok) {
+          console.log("Status updated successfully.");
+        } else {
+          console.error("Error updating status:", await response.text());
+        }
+      } catch (error) {
+        console.error("Error updating status:", error);
+      }
     }
-  } catch (error) {
-    alert('Đã xảy ra lỗi khi cập nhật.');
-    console.error(error);
-  }
-}
 
-</script>
+    function editMovie(button) {
+      const movie = JSON.parse(button.getAttribute("data-movie"));
+
+      // Điền dữ liệu vào các trường trong form
+      document.getElementById("Id").value = movie._id;
+      document.getElementById("name").value = movie.name || "";
+      document.getElementById("duration").value = movie.duration || "";
+      document.getElementById("subtitle").value = movie.subtitle || "";
+      document.getElementById("censorship").value = movie.censorship || "";
+      document.getElementById("rate").value = movie.rate || "";
+      document.getElementById("release_date").value = movie.release_date
+        ? movie.release_date.substring(0, 10)
+        : "";
+      const editModal = new bootstrap.Modal(document.getElementById("editModal"));
+      editModal.show();
+    }
+
+    async function submitEdit() {
+      const Id = document.getElementById("Id").value;
+      const formData = new FormData(document.getElementById("editForm"));
+
+      try {
+        const response = await fetch(`/movie/updateMovie/${Id}`, {
+          method: "PUT",
+          body: formData,
+        });
+
+        if (response.ok) {
+          Swal.fire({
+            title: "Thành công!",
+            text: "Sửa thành công!",
+            icon: "success",
+            confirmButtonText: "OK",
+          }).then((result) => {
+            location.reload();
+          });
+        } else {
+          const errorData = await response.json();
+          alert(`Đã xảy ra lỗi khi cập nhật: ${errorData.error || "Lỗi không xác định"}`);
+        }
+      } catch (error) {
+        alert("Đã xảy ra lỗi khi cập nhật.");
+        console.error(error);
+      }
+    }
+  </script>
+</div>
