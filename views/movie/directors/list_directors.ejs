@@ -127,6 +127,7 @@
   let currentIndex = 1;
   async function fetchDirectors(page = 1) {
   try {
+    currentIndex = (page - 1) * 10 + 1;
     const response = await fetch(`/movie/listDirectorTable?page=${page}`);
     if (!response.ok) {
       throw new Error("Network response was not ok");

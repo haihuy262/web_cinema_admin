@@ -126,6 +126,7 @@
   let currentIndex = 1;
   async function fetchGenres(page = 1) {
   try {
+    currentIndex = (page - 1) * 10 + 1;
     const response = await fetch(`/genre/genreListTable?page=${page}`);
     if (!response.ok) {
       throw new Error("Network response was not ok");
