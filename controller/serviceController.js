@@ -1,13 +1,18 @@
 const axios = require("axios");
 const fs = require("fs");
 const FormData = require("form-data");
+const path = require("path");
 
 exports.serviceList = async (req, res, next) => {
-  res.render("../views/service/service_list.ejs");
+  res.render("../views/service/service_list.ejs", {
+    layout: path.join(__dirname, "../layouts/dashboard.ejs"),
+  });
 };
 
 exports.serviceAdd = async (req, res, next) => {
-  res.render("../views/service/service_add.ejs");
+  res.render("../views/service/service_add.ejs", {
+    layout: path.join(__dirname, "../layouts/dashboard.ejs"),
+  });
 };
 
 exports.createFood = async (req, res, next) => {
