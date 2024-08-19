@@ -1,13 +1,18 @@
 const axios = require("axios");
 var fs = require("fs");
 const FormData = require("form-data");
+const path = require("path");
 
 exports.getEmployee = async (req, res, next) => {
-  res.render("../views/manager/employee/addEmployee.ejs");
+  res.render("../views/manager/employee/addEmployee.ejs", {
+    layout: path.join(__dirname, "../layouts/dashboard.ejs"),
+  });
 };
 
 exports.listEmployee = async (req, res, next) => {
-  res.render("../views/manager/employee/listEmployee.ejs");
+  res.render("../views/manager/employee/listEmployee.ejs", {
+    layout: path.join(__dirname, "../layouts/dashboard.ejs"),
+  });
 };
 
 exports.addEmployee = async (req, res, next) => {
@@ -49,15 +54,9 @@ exports.addEmployee = async (req, res, next) => {
     if (req.file && req.file.fieldname === "image") {
       fs.unlinkSync(req.file.path);
     }
-
-    res.render("../views/manager/employee/addEmployee.ejs", {
-      success: "Nhân viên đã được tạo thành công!",
-    });
+    res.status(200).json({ success: true });
   } catch (error) {
-    res.render("../views/manager/employee/addEmployee.ejs", {
-      error: "Tạo nhân viên thất bại.",
-    });
-    console.log(error);
+    res.status(500).json({ success: false, error: error.message });
   }
 };
 
@@ -108,6 +107,7 @@ exports.detailsEmployee = async (req, res, next) => {
       dataStaffID,
       token,
       apiUrl,
+      layout: path.join(__dirname, "../layouts/dashboard.ejs"),
     });
   } catch (error) {
     console.log(error);
@@ -120,7 +120,7 @@ exports.deleteEmployee = async (req, res, next) => {
   const apiUrl = process.env.API_URL;
 
   try {
-    await axios.delete(`${apiUrl}/users/${id}`, {
+    await axios.delete(`${apiUrl}/users/${id}?password=${8888}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
