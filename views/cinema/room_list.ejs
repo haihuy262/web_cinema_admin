@@ -1,81 +1,99 @@
 <%- include('../partials/header.ejs') %>
-
-<div class="container mt-5" style="padding: 3%;">
-  <h2 class="text-center">Danh Sách Phòng</h2>
-  
-  <table class="table table-bordered table-hover align-middle">
-    <thead>
-      <tr class="table-secondary">
-        <th class="text-center">Stt</th>
-        <th class="text-center">Tên</th>
-        <th class="text-center">Phim</th>
-        <th class="text-center">Thời Gian Chiếu</th>
-        <th class="text-center">Rạp</th>
-        <th class="text-center">Hành Động</th>
-      </tr>
-    </thead>
-    <tbody id="roomsTableBody">
-      <% rooms.forEach((room, index) => { %>
+<style>
+  .search-wrapper {
+    position: relative;
+  }
+  .search-wrapper .bi-search {
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
+    color: #aaa;
+  }
+  .search-wrapper input {
+    padding-left: 2.5rem; /* Adjust padding to make room for the icon */
+  }
+</style>
+<nav style="--bs-breadcrumb-divider: '>'" aria-label="breadcrumb" class="mt-3">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="#">Quản lý rạp phim</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Danh sách phòng chiếu</li>
+  </ol>
+</nav>
+<div class="card mb-3">
+  <div class="card-body">
+    <div class="d-flex mb-3">
+      <button onclick="window.location.href = '/cinema/roomAdd'" class="btn btn-primary">
+        Tạo phòng chiếu
+      </button>
+      <div class="search-wrapper ms-3">
+        <i class="bi bi-search"></i>
+        <input
+          id="searchInput"
+          class="form-control me-2"
+          type="search"
+          placeholder="Tìm kiếm..."
+          aria-label="Search"
+          oninput="searchTable()" />
+        <!-- <button class="btn btn-outline-success" type="submit" onclick="searchTable()">Search</button> -->
+      </div>
+    </div>
+    <table class="table table-bordered table-hover align-middle">
+      <thead>
+        <tr class="table-secondary">
+          <th class="text-center">Stt</th>
+          <th class="text-center">Tên</th>
+          <th class="text-center">Phim</th>
+          <th class="text-center">Thời Gian Chiếu</th>
+          <th class="text-center">Rạp</th>
+          <th class="text-center">Hành Động</th>
+        </tr>
+      </thead>
+      <tbody id="roomsTableBody">
+        <% rooms.forEach((room, index) => { %>
         <tr>
           <td class="text-center"><%= index + 1 %></td>
           <td class="text-center"><%= room.name %></td>
           <td class="text-center"><%= room.movie.name %></td>
           <td class="text-center">
             <ul>
-              <% room.showtime.forEach(showtime => { %>
-                <% Object.values(showtime.time).forEach(timeObj => { %>
-                  <li><%= new Date(showtime.date).toLocaleDateString() %> - <%= timeObj.time %></li>
-                <% }); %>
-              <% }); %>
+              <% room.showtime.forEach(showtime => { %> <% Object.values(showtime.time).forEach(timeObj => {
+              %>
+              <li><%= new Date(showtime.date).toLocaleDateString() %> - <%= timeObj.time %></li>
+              <% }); %> <% }); %>
             </ul>
           </td>
           <td class="text-center"><%= room.cinema.name %></td>
           <td class="text-center">
-            <button
-              class="btn btn-info"
-              data-room='<%= JSON.stringify(room) %>'
-              onclick="editRoom(this)"
-            >
+            <button class="btn btn-info" data-room="<%= JSON.stringify(room) %>" onclick="editRoom(this)">
               Sửa
             </button>
             <!-- <button class="btn btn-danger" onclick="deleteRoom('<%= room._id %>')">Xoá</button> -->
           </td>
         </tr>
-      <% }); %>
-    </tbody>
-  </table>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
 </div>
-
 <div
   class="modal fade"
   id="editRoomModal"
   tabindex="-1"
   aria-labelledby="editRoomModalLabel"
-  aria-hidden="true"
->
+  aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="editRoomModalLabel">Sửa Phòng</h5>
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal"
-          aria-label="Đóng"
-        ></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
       </div>
       <div class="modal-body">
         <form id="editRoomForm">
           <input type="hidden" id="roomId" name="roomId" />
           <div class="mb-3">
             <label for="roomName" class="form-label">Tên Phòng</label>
-            <input
-              type="text"
-              class="form-control"
-              id="roomName"
-              name="name"
-              required
-            />
+            <input type="text" class="form-control" id="roomName" name="name" required />
           </div>
           <div class="mb-3">
             <label for="roomMovie" class="form-label">Phim</label>
@@ -98,16 +116,8 @@
         </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-          Đóng
-        </button>
-        <button
-          type="button"
-          class="btn btn-primary"
-          onclick="submitEditRoom()"
-        >
-          Lưu thay đổi
-        </button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+        <button type="button" class="btn btn-primary" onclick="submitEditRoom()">Lưu thay đổi</button>
       </div>
     </div>
   </div>
@@ -134,23 +144,23 @@
   });
 
   async function deleteRoom(roomId) {
-    if (confirm('Bạn có chắc chắn muốn xoá?')) {
+    if (confirm("Bạn có chắc chắn muốn xoá?")) {
       try {
         const response = await fetch(`/cinema/deleteRoom/${roomId}`, {
-          method: 'DELETE',
+          method: "DELETE",
           headers: {
-            'Content-Type': 'application/json'
-          }
+            "Content-Type": "application/json",
+          },
         });
 
         if (response.ok) {
-          alert('Xoá thành công!');
+          alert("Xoá thành công!");
           window.location.reload();
         } else {
-          alert('Đã xảy ra lỗi khi xoá.');
+          alert("Đã xảy ra lỗi khi xoá.");
         }
       } catch (error) {
-        alert('Đã xảy ra lỗi khi xoá.');
+        alert("Đã xảy ra lỗi khi xoá.");
         console.error(error);
       }
     }
@@ -162,10 +172,10 @@
     document.getElementById("roomName").value = room.name;
 
     // Xóa các tùy chọn cũ và gọi API để làm mới danh sách
-    $('#roomMovie').empty();
-    $('#roomShowtime').empty();
-    $('#roomCinema').empty();
-    
+    $("#roomMovie").empty();
+    $("#roomShowtime").empty();
+    $("#roomCinema").empty();
+
     // Gọi API để lấy danh sách phim và cập nhật vào <select>
     $.ajax({
       url: `${apiUrl}/movies/no/login`,
@@ -174,12 +184,12 @@
         Authorization: `Bearer ${token}`,
       },
       success: function (data) {
-        data.getall.forEach(movie => {
+        data.getall.forEach((movie) => {
           const option = $("<option>").val(movie._id).text(movie.name);
-          $('#roomMovie').append(option);
+          $("#roomMovie").append(option);
         });
         // Chọn phim hiện tại
-        $('#roomMovie').val(room.movie._id);
+        $("#roomMovie").val(room.movie._id);
       },
       error: function (error) {
         console.log(error);
@@ -194,12 +204,12 @@
         Authorization: `Bearer ${token}`,
       },
       success: function (data) {
-        data.getAll.forEach(showtime => {
+        data.getAll.forEach((showtime) => {
           const option = $("<option>").val(showtime._id).text(new Date(showtime.date).toLocaleDateString());
-          $('#roomShowtime').append(option);
+          $("#roomShowtime").append(option);
         });
         // Chọn suất chiếu hiện tại
-        $('#roomShowtime').val(room.showtime.map(st => st._id)); // Giả sử chỉ có một suất chiếu cho phòng
+        $("#roomShowtime").val(room.showtime.map((st) => st._id)); // Giả sử chỉ có một suất chiếu cho phòng
       },
       error: function (error) {
         console.log(error);
@@ -214,56 +224,57 @@
         Authorization: `Bearer ${token}`,
       },
       success: function (data) {
-        data.forEach(cinema => {
+        data.forEach((cinema) => {
           const option = $("<option>").val(cinema._id).text(cinema.name);
-          $('#roomCinema').append(option);
+          $("#roomCinema").append(option);
         });
         // Chọn rạp hiện tại
-        $('#roomCinema').val(room.cinema._id);
+        $("#roomCinema").val(room.cinema._id);
       },
       error: function (error) {
         console.log(error);
       },
     });
-    
+
     // Hiện modal
     var myModal = new bootstrap.Modal(document.getElementById("editRoomModal"));
     myModal.show();
   }
 
   async function submitEditRoom() {
-  const roomId = document.getElementById("roomId").value;
-  const roomName = document.getElementById("roomName").value;
-  const roomMovie = document.getElementById("roomMovie").value;
-  const roomShowtime = Array.from(document.getElementById("roomShowtime").selectedOptions).map(option => option.value);
-  const roomCinema = document.getElementById("roomCinema").value;
+    const roomId = document.getElementById("roomId").value;
+    const roomName = document.getElementById("roomName").value;
+    const roomMovie = document.getElementById("roomMovie").value;
+    const roomShowtime = Array.from(document.getElementById("roomShowtime").selectedOptions).map(
+      (option) => option.value
+    );
+    const roomCinema = document.getElementById("roomCinema").value;
 
-  const data = {
-    name: roomName,
-    movie: roomMovie,
-    showtime: roomShowtime, // Đây là mảng
-    cinema: roomCinema
-  };
+    const data = {
+      name: roomName,
+      movie: roomMovie,
+      showtime: roomShowtime, // Đây là mảng
+      cinema: roomCinema,
+    };
 
-  try {
-    const response = await fetch(`/cinema/updateRoom/${roomId}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
+    try {
+      const response = await fetch(`/cinema/updateRoom/${roomId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
 
-    if (response.ok) {
-      alert("Cập nhật thành công!");
-      window.location.reload();
-    } else {
+      if (response.ok) {
+        alert("Cập nhật thành công!");
+        window.location.reload();
+      } else {
+        alert("Đã xảy ra lỗi khi cập nhật.");
+      }
+    } catch (error) {
       alert("Đã xảy ra lỗi khi cập nhật.");
+      console.error(error);
     }
-  } catch (error) {
-    alert("Đã xảy ra lỗi khi cập nhật.");
-    console.error(error);
   }
-}
-
 </script>

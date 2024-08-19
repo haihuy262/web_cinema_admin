@@ -1,9 +1,14 @@
 const axios = require("axios");
 const fs = require("fs");
 const FormData = require("form-data");
+const path = require("path");
+
 exports.genreList = async (req, res, next) => {
-  res.render("../views/movie/genre/genre_list.ejs");
+  res.render("../views/movie/genre/genre_list.ejs", {
+    layout: path.join(__dirname, "../layouts/dashboard.ejs"),
+  });
 };
+
 exports.genreListTable = async (req, res, next) => {
   try {
     const token = req.session.admin.token;
@@ -26,7 +31,9 @@ exports.genreListTable = async (req, res, next) => {
 };
 
 exports.addGenre = async (req, res, next) => {
-  res.render("../views/movie/genre/genre_add.ejs");
+  res.render("../views/movie/genre/genre_add.ejs", {
+    layout: path.join(__dirname, "../layouts/dashboard.ejs"),
+  });
 };
 exports.createGenre = async (req, res, next) => {
   const { name } = req.body;

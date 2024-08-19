@@ -7,40 +7,19 @@
     background-color: #ccffcc;
   }
 </style>
-<div class="container-fluid mt-5 p-3">
-  <div class="mt-5">
-    <div
-      class="alert alert-success alert-dismissible d-none position-absolute translate-middle-y ms-3 mt-3"
-      role="alert"
-      id="successDeleteAlert">
-      Xoá thành công
-      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-  </div>
-  <div class="mt-5">
-    <div
-      class="alert alert-success alert-dismissible d-none position-absolute translate-middle-y ms-3 mt-3"
-      role="alert"
-      id="successUpdateAlert">
-      Sửa thông tin thành công.
-      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-  </div>
-  <div
-    class="alert alert-danger alert-dismissible d-none position-absolute translate-middle-y ms-3 mt-3"
-    role="alert"
-    id="errorAlert">
-    Có lỗi xảy ra. Vui lòng thử lại sau.
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-  </div>
-  <div class="text-center">
-    <h2 class="mt-4">Chi tiết nhân viên</h2>
-  </div>
-  <div class="card container mt-5">
+<nav style="--bs-breadcrumb-divider: '>'" aria-label="breadcrumb" class="mt-3">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="#">Quản lý nhân viên</a></li>
+    <li class="breadcrumb-item"><a href="/employee/list">Danh sách nhân viên</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Chi tiết nhân viên</li>
+  </ol>
+</nav>
+<div class="card mb-3">
+  <div class="card-body">
     <div class="row">
       <div class="col-md-6 p-1">
         <img
-          class="card-img-top"
+          class="card-img-top card-img-bottom"
           src="<%= apiUrl %>/images/<%= dataStaffID.image %>"
           alt="Card image"
           height="660" />
@@ -59,11 +38,17 @@
           <h5 class="card-title">Ngày tháng năm sinh</h5>
           <p class="card-text"><%= dataStaffID.date_of_birth %></p>
           <hr />
-          <h5 class="card-title">Quyền</h5>
-          <p class="card-text"><%= dataStaffID.role %></p>
+          <h5 class="card-title">Chức vụ</h5>
+          <% if(dataStaffID.role === "staff"){ %>
+          <p class="card-text">Nhân viên</p>
+          <% } %>
           <hr />
           <h5 class="card-title">Trạng thái</h5>
-          <p class="card-text"><%= dataStaffID.status %></p>
+          <% if(dataStaffID.status === "active"){ %>
+          <p class="card-text text-success">Kích hoạt</p>
+          <% } else { %>
+          <p class="card-text text-danger">Không kích hoạt</p>
+          <% } %>
           <hr />
           <h5 class="card-title">Giới tính</h5>
           <p class="card-text"><%= dataStaffID.gender %></p>
@@ -227,11 +212,11 @@
               </div>
             </div>
             <!-- Doi mat khau
-            <div class="col-sm-3">
-              <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="" hidden>
-                Đổi mật khẩu
-              </button>
-            </div> -->
+              <div class="col-sm-3">
+                <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="" hidden>
+                  Đổi mật khẩu
+                </button>
+              </div> -->
             <!-- Quay lai -->
             <div class="col-sm-3">
               <button id="backList" class="btn btn-secondary">Quay lại</button>
@@ -274,283 +259,285 @@
         </nav>
       </div>
     </div>
-    <!-- getToken apiURl -->
-    <script>
-      let token = "";
-      let apiUrl = "";
-      let idStaff = "<%= dataStaffID._id %>";
-      $(document).ready(function () {
-        $.ajax({
-          url: "/token/getToken",
-          type: "GET",
-          async: false, // đồng bộ
-          success: function (data) {
-            token = data.token;
-            apiUrl = data.apiUrl;
-          },
-          error: function (error) {
-            console.log(error);
-          },
-        });
-      });
-    </script>
-    <script>
-      $(document).ready(function () {
-        let currentIndex = 1;
+  </div>
 
+  <!-- getToken apiURl -->
+  <script>
+    let token = "";
+    let apiUrl = "";
+    let idStaff = "<%= dataStaffID._id %>";
+    $(document).ready(function () {
+      $.ajax({
+        url: "/token/getToken",
+        type: "GET",
+        async: false, // đồng bộ
+        success: function (data) {
+          token = data.token;
+          apiUrl = data.apiUrl;
+        },
+        error: function (error) {
+          console.log(error);
+        },
+      });
+    });
+  </script>
+  <script>
+    $(document).ready(function () {
+      let currentIndex = 1;
+
+      $.ajax({
+        url: `${apiUrl}/tickets/staff/${idStaff}`,
+        type: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        success: function (data) {
+          $("#sumTicket").text(`Tổng số vé đã quét: ${data.length}`);
+        },
+        error: function (error) {
+          console.log(error);
+        },
+      });
+
+      function fetchData(currentIndex) {
         $.ajax({
-          url: `${apiUrl}/tickets/staff/${idStaff}`,
+          url: `${apiUrl}/tickets/staff/admin/${idStaff}?page=${currentIndex}`,
           type: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
           },
           success: function (data) {
-            $("#sumTicket").text(`Tổng số vé đã quét: ${data.length}`);
+            if (data.length === 0 && currentIndex > 1) {
+              currentIndex--;
+              return;
+            }
+            if (data.length < 10) {
+              $(".nextPageLi").addClass("disabled");
+            }
+
+            $("#numberPage").text(currentIndex);
+
+            if (currentIndex === 1) {
+              $(".prevPageLi").addClass("disabled");
+            }
+
+            displayTableRows(data);
           },
           error: function (error) {
             console.log(error);
           },
         });
+      }
+      fetchData(currentIndex);
 
-        function fetchData(currentIndex) {
-          $.ajax({
-            url: `${apiUrl}/tickets/staff/admin/${idStaff}?page=${currentIndex}`,
-            type: "GET",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-            success: function (data) {
-              if (data.length === 0 && currentIndex > 1) {
-                currentIndex--;
-                return;
-              }
-              if (data.length < 10) {
-                $(".nextPageLi").addClass("disabled");
-              }
+      function displayTableRows(data) {
+        const tbody = document.querySelector("#tableBody");
 
-              $("#numberPage").text(currentIndex);
-
-              if (currentIndex === 1) {
-                $(".prevPageLi").addClass("disabled");
-              }
-
-              displayTableRows(data);
-            },
-            error: function (error) {
-              console.log(error);
-            },
-          });
+        while (tableBody.firstChild) {
+          tableBody.removeChild(tableBody.firstChild);
         }
-        fetchData(currentIndex);
 
-        function displayTableRows(data) {
-          const tbody = document.querySelector("#tableBody");
+        const startIndex = (currentIndex - 1) * 10;
 
-          while (tableBody.firstChild) {
-            tableBody.removeChild(tableBody.firstChild);
+        for (let i = 0; i < data.length; i++) {
+          let historyStaff = data[i];
+          console.log(historyStaff);
+          // Mã đơn hàng
+          const id = historyStaff._id;
+          const shortId = id.slice(-8).toUpperCase();
+          // Ngày
+          const date = historyStaff.date;
+          const dateString = date.substring(0, 10);
+          const dateParts = dateString.split("-");
+          const year = dateParts[0];
+          const month = dateParts[1];
+          const day = dateParts[2];
+          const formattedDate = `${day}/${month}/${year}`;
+          // Status
+          if (historyStaff.status === "active") {
+            status = "Đã thanh toán";
+            statusClass = "status-label rounded-3 text-success border border-success ps-3 pe-3 pt-1 pb-1";
+          } else if (historyStaff.status === "complete") {
+            status = "Đã quét vé";
+            statusClass = "status-label rounded-3 text-success border border-success ps-3 pe-3 pt-1 pb-1";
+          } else {
+            status = "Chưa thanh toán";
+            statusClass = "role-label rounded-3 text-danger border border-danger ps-3 pe-3 pt-1 pb-1";
           }
 
-          const startIndex = (currentIndex - 1) * 10;
-
-          for (let i = 0; i < data.length; i++) {
-            let historyStaff = data[i];
-            console.log(historyStaff);
-            // Mã đơn hàng
-            const id = historyStaff._id;
-            const shortId = id.slice(-8).toUpperCase();
-            // Ngày
-            const date = historyStaff.date;
-            const dateString = date.substring(0, 10);
-            const dateParts = dateString.split("-");
-            const year = dateParts[0];
-            const month = dateParts[1];
-            const day = dateParts[2];
-            const formattedDate = `${day}/${month}/${year}`;
-            // Status
-            if (historyStaff.status === "active") {
-              status = "Đã thanh toán";
-              statusClass = "status-label rounded-3 text-success border border-success ps-3 pe-3 pt-1 pb-1";
-            } else if (historyStaff.status === "complete") {
-              status = "Đã quét vé";
-              statusClass = "status-label rounded-3 text-success border border-success ps-3 pe-3 pt-1 pb-1";
-            } else {
-              status = "Chưa thanh toán";
-              statusClass = "role-label rounded-3 text-danger border border-danger ps-3 pe-3 pt-1 pb-1";
-            }
-
-            tbody.innerHTML += `
+          tbody.innerHTML += `
             <tr>
               <td class="text-center p-3">${startIndex + i + 1}</td>
-              <td class="text-center text-primary">
+              <td class="text-primary">
                 <a href="/tickets/details/${historyStaff._id}" class="nav-link">${shortId}</a>
               </td>
               <td>${historyStaff.movie.name}</td>
-              <td class="text-center">${formattedDate}</td>
-              <td class="text-center">${historyStaff.cinema.name}</td>
+              <td class="">${formattedDate}</td>
+              <td class="">${historyStaff.cinema.name}</td>
               <td class="text-center"><span class="${statusClass}">${status}</span></td>
             </tr>
             `;
-          }
         }
-        $("#nextPage").click(function () {
-          currentIndex++;
+      }
+      $("#nextPage").click(function () {
+        currentIndex++;
+        fetData(currentIndex);
+
+        if (currentIndex > 1) {
+          $(".prevPageLi").removeClass("disabled");
+        }
+      });
+
+      $("#prevPage").click(function () {
+        if (currentIndex > 1) {
+          currentIndex--;
+          $("#numberPage").text(currentIndex);
           fetData(currentIndex);
-
-          if (currentIndex > 1) {
-            $(".prevPageLi").removeClass("disabled");
-          }
-        });
-
-        $("#prevPage").click(function () {
-          if (currentIndex > 1) {
-            currentIndex--;
-            $("#numberPage").text(currentIndex);
-            fetData(currentIndex);
-            $(".nextPageLi").removeClass("disabled");
-          }
-        });
+          $(".nextPageLi").removeClass("disabled");
+        }
       });
-    </script>
-    <!-- Delete -->
-    <script>
-      document.getElementById("confirmDelete").addEventListener("click", async function () {
-        const id = "<%= dataStaffID._id %>";
+    });
+  </script>
+  <!-- Delete -->
+  <script>
+    document.getElementById("confirmDelete").addEventListener("click", async function () {
+      const id = "<%= dataStaffID._id %>";
 
-        const deleteModal = bootstrap.Modal.getInstance(document.getElementById("deleteModal"));
+      const deleteModal = bootstrap.Modal.getInstance(document.getElementById("deleteModal"));
 
-        try {
-          const response = await fetch(`/employee/delete/${id}`, {
-            method: "DELETE",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          });
+      try {
+        const response = await fetch(`/employee/delete/${id}`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
 
-          const result = await response.json();
-          if (result.success) {
-            const successAlert = document.getElementById("successDeleteAlert");
-            successAlert.classList.remove("d-none");
-
-            deleteModal.hide();
-
-            setTimeout(function () {
+        const result = await response.json();
+        if (result.success) {
+          Swal.fire({
+            title: "Thành công!",
+            text: "Xoá thành công!",
+            icon: "success",
+            confirmButtonText: "OK",
+          }).then((result) => {
+            if (result.isConfirmed) {
               window.location.href = "/employee/list";
-            }, 1000);
-          } else {
-            const errorAlert = document.getElementById("errorAlert");
-            errorAlert.classList.remove("d-none");
-
-            deleteModal.hide();
-
-            setTimeout(function () {
-              window.location.href = `/employee/details/${id}`;
-            }, 1000);
-          }
-        } catch (error) {
-          console.error("Error:", error);
-          const errorAlert = document.getElementById("errorAlert");
-          errorAlert.classList.remove("d-none");
-
-          deleteModal.hide();
-
-          setTimeout(function () {
-            window.location.href = `/employee/details/${id}`;
-          }, 1000);
-        }
-      });
-    </script>
-    <!-- Hien thi anh -->
-    <script>
-      document.getElementById("imageUpload").addEventListener("change", function (event) {
-        const file = event.target.files[0];
-        if (file) {
-          const reader = new FileReader();
-          reader.onload = function (e) {
-            const img = document.getElementById("imagePreview");
-            img.src = e.target.result;
-            img.classList.remove("d-none");
-          };
-          reader.readAsDataURL(file);
-        }
-      });
-    </script>
-    <!-- Update -->
-    <script>
-      document.getElementById("editForm").addEventListener("submit", async function (event) {
-        event.preventDefault();
-
-        const updateModal = bootstrap.Modal.getInstance(document.getElementById("updateModal"));
-
-        const id = "<%= dataStaffID._id %>";
-        const token = "<%= token %>";
-        const name = document.getElementById("fullName").value;
-        const email = document.getElementById("email").value;
-        const number_phone = document.getElementById("phone").value;
-        const date_of_birth = document.getElementById("birthdate").value;
-        const gender = document.getElementById("gender").value;
-        const image = document.getElementById("imageUpload").files[0];
-        const currentImage = document.getElementById("currentImage").value;
-
-        if (name == "" || email == "" || number_phone == "" || date_of_birth == "" || gender == "") {
-          return;
-        }
-
-        const formData = new FormData();
-        formData.append("name", name);
-        formData.append("email", email);
-        formData.append("number_phone", number_phone);
-        formData.append("date_of_birth", date_of_birth);
-        formData.append("gender", gender);
-        formData.append("currentImage", currentImage);
-        if (image) {
-          formData.append("image", image);
-        }
-
-        try {
-          const response = await fetch(`/employee/edit/${id}`, {
-            method: "PUT",
-            body: formData,
+            }
           });
-
-          const result = await response.json();
-          if (result.success) {
-            const successAlert = document.getElementById("successUpdateAlert");
-            successAlert.classList.remove("d-none");
-
-            updateModal.hide();
-
-            setTimeout(function () {
-              window.location.href = `/employee/details/${id}`;
-            }, 1000);
-          } else {
-            const errorAlert = document.getElementById("errorAlert");
-            errorAlert.classList.remove("d-none");
-
-            updateModal.hide();
-
-            setTimeout(function () {
-              window.location.href = `/employee/details/${id}`;
-            }, 1000);
-          }
-        } catch (error) {
-          console.error("Error:", error);
-
-          const errorAlert = document.getElementById("errorAlert");
-          errorAlert.classList.remove("d-none");
-
-          updateModal.hide();
-
-          setTimeout(function () {
-            window.location.href = `/employee/details/${id}`;
-          }, 1000);
+        } else {
+          Swal.fire({
+            title: "Lỗi!",
+            text: "Đã xảy ra lỗi gì đó!.",
+            icon: "error",
+            confirmButtonText: "OK",
+          }).then((result) => {
+            location.reload();
+          });
         }
-      });
-    </script>
-    <!-- Su kien back -->
-    <script>
-      document.getElementById("backList").addEventListener("click", async function () {
-        window.location.href = "/employee/list";
-      });
-    </script>
-  </div>
+      } catch (error) {
+        console.error("Error:", error);
+        Swal.fire({
+          title: "Lỗi!",
+          text: "Đã xảy ra lỗi gì đó!.",
+          icon: "error",
+          confirmButtonText: "OK",
+        }).then((result) => {
+          location.reload();
+        });
+      }
+    });
+  </script>
+  <!-- Hien thi anh -->
+  <script>
+    document.getElementById("imageUpload").addEventListener("change", function (event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const img = document.getElementById("imagePreview");
+          img.src = e.target.result;
+          img.classList.remove("d-none");
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  </script>
+  <!-- Update -->
+  <script>
+    document.getElementById("editForm").addEventListener("submit", async function (event) {
+      event.preventDefault();
+
+      const updateModal = bootstrap.Modal.getInstance(document.getElementById("updateModal"));
+
+      const id = "<%= dataStaffID._id %>";
+      const token = "<%= token %>";
+      const name = document.getElementById("fullName").value;
+      const email = document.getElementById("email").value;
+      const number_phone = document.getElementById("phone").value;
+      const date_of_birth = document.getElementById("birthdate").value;
+      const gender = document.getElementById("gender").value;
+      const image = document.getElementById("imageUpload").files[0];
+      const currentImage = document.getElementById("currentImage").value;
+
+      if (name == "" || email == "" || number_phone == "" || date_of_birth == "" || gender == "") {
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("name", name);
+      formData.append("email", email);
+      formData.append("number_phone", number_phone);
+      formData.append("date_of_birth", date_of_birth);
+      formData.append("gender", gender);
+      formData.append("currentImage", currentImage);
+      if (image) {
+        formData.append("image", image);
+      }
+
+      try {
+        const response = await fetch(`/employee/edit/${id}`, {
+          method: "PUT",
+          body: formData,
+        });
+
+        const result = await response.json();
+        if (result.success) {
+          Swal.fire({
+            title: "Thành công!",
+            text: "Sửa thành công!",
+            icon: "success",
+            confirmButtonText: "OK",
+          }).then((result) => {
+            location.reload();
+          });
+        } else {
+          Swal.fire({
+            title: "Lỗi!",
+            text: "Đã xảy ra lỗi gì đó!.",
+            icon: "error",
+            confirmButtonText: "OK",
+          }).then((result) => {
+            location.reload();
+          });
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        Swal.fire({
+          title: "Lỗi!",
+          text: "Đã xảy ra lỗi gì đó!.",
+          icon: "error",
+          confirmButtonText: "OK",
+        }).then((result) => {
+          location.reload();
+        });
+      }
+    });
+  </script>
+  <!-- Su kien back -->
+  <script>
+    document.getElementById("backList").addEventListener("click", async function () {
+      window.location.href = "/employee/list";
+    });
+  </script>
 </div>

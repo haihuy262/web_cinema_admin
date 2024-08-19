@@ -1,14 +1,16 @@
 const axios = require("axios");
-const { requireLogin } = require("../middleware/authMiddleware");
-const fs = require("fs");
-const FormData = require("form-data");
+const path = require("path");
 
 exports.cinemaAdd = async (req, res, next) => {
-  res.render("../views/cinema/cinema_add.ejs");
+  res.render("../views/cinema/cinema_add.ejs", {
+    layout: path.join(__dirname, "../layouts/dashboard.ejs"),
+  });
 };
 
 exports.roomAdd = async (req, res, next) => {
-  res.render("../views/cinema/room_add.ejs");
+  res.render("../views/cinema/room_add.ejs", {
+    layout: path.join(__dirname, "../layouts/dashboard.ejs"),
+  });
 };
 
 exports.creatCinema = async (req, res, next) => {
@@ -49,7 +51,6 @@ exports.creatCinema = async (req, res, next) => {
   }
 };
 
-
 exports.cinemaList = async (req, res, next) => {
   try {
     const token = req.session.admin.token;
@@ -61,8 +62,11 @@ exports.cinemaList = async (req, res, next) => {
       },
     });
     const cinemas = response.data;
-    
-    res.render("../views/cinema/cinema_list.ejs", { cinemas });
+
+    res.render("../views/cinema/cinema_list.ejs", {
+      cinemas,
+      layout: path.join(__dirname, "../layouts/dashboard.ejs"),
+    });
   } catch (error) {
     console.error("Error fetching cinemas:", error.message);
   }
@@ -86,64 +90,63 @@ exports.deleteCinema = async (req, res, next) => {
   }
 };
 
-
 exports.updateCinema = async (req, res, next) => {
   const { id } = req.params; // Lấy ID từ tham số yêu cầu
   const { name, address, hotline } = req.body;
 
   if (!name || !hotline || !address) {
-    return res
-      .status(400)
-      .json({ error: "Tên, địa chỉ và hotline là bắt buộc." });
+    return res.status(400).json({ error: "Tên, địa chỉ và hotline là bắt buộc." });
   }
 
   try {
     const token = req.session.admin.token;
     const apiUrl = process.env.API_URL;
 
-    const response = await axios.put(`${apiUrl}/cinemas/${id}`, { name, address, hotline }, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-    });
+    const response = await axios.put(
+      `${apiUrl}/cinemas/${id}`,
+      { name, address, hotline },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
     res.json({ success: true });
   } catch (error) {
     console.error(error);
-    res
-      .status(500)
-      .json({ success: false, error: "Đã xảy ra lỗi khi cập nhật." });
+    res.status(500).json({ success: false, error: "Đã xảy ra lỗi khi cập nhật." });
   }
 };
 
 exports.updateRoom = async (req, res, next) => {
-  const { id } = req.params; 
-  const { name,cinema,showtime,movie } = req.body;
+  const { id } = req.params;
+  const { name, cinema, showtime, movie } = req.body;
 
-  if (!name || !cinema || !showtime ||!movie) {
-    return res
-      .status(400)
-      .json({ error: "Tên, địa chỉ và hotline là bắt buộc." });
+  if (!name || !cinema || !showtime || !movie) {
+    return res.status(400).json({ error: "Tên, địa chỉ và hotline là bắt buộc." });
   }
 
   try {
     const token = req.session.admin.token;
     const apiUrl = process.env.API_URL;
 
-    const response = await axios.put(`${apiUrl}/rooms/${id}`, { name,cinema,showtime,movie }, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-    });
-console.log('test',name,cinema,showtime,movie)
+    const response = await axios.put(
+      `${apiUrl}/rooms/${id}`,
+      { name, cinema, showtime, movie },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    console.log("test", name, cinema, showtime, movie);
     res.json({ success: true });
   } catch (error) {
     console.error(error);
-    res
-      .status(500)
-      .json({ success: false, error: "Đã xảy ra lỗi khi cập nhật." });
+    res.status(500).json({ success: false, error: "Đã xảy ra lỗi khi cập nhật." });
   }
 };
 
@@ -158,8 +161,11 @@ exports.roomList = async (req, res, next) => {
       },
     });
     const rooms = response.data.getall;
-    
-    res.render("../views/cinema/room_list.ejs", { rooms });
+
+    res.render("../views/cinema/room_list.ejs", {
+      rooms,
+      layout: path.join(__dirname, "../layouts/dashboard.ejs"),
+    });
   } catch (error) {
     console.error("Error fetching rooms:", error.message);
     res.status(500).send("Error fetching rooms");
@@ -172,9 +178,7 @@ exports.updateRoom = async (req, res, next) => {
 
   // Kiểm tra các trường bắt buộc
   if (!name || !movie || !showtime || !cinema) {
-    return res
-      .status(400)
-      .json({ error: "Tên, phim, thời gian chiếu và rạp là bắt buộc." });
+    return res.status(400).json({ error: "Tên, phim, thời gian chiếu và rạp là bắt buộc." });
   }
 
   try {
@@ -182,28 +186,28 @@ exports.updateRoom = async (req, res, next) => {
     const apiUrl = process.env.API_URL;
 
     // Gửi yêu cầu PUT đến API bên ngoài với dữ liệu mới
-    const response = await axios.put(`${apiUrl}/rooms/${id}`, {
-      name,
-      movie,
-      showtime: Array.isArray(showtime) ? showtime : [showtime], // Đảm bảo showtime là mảng
-      cinema
-    }, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
+    const response = await axios.put(
+      `${apiUrl}/rooms/${id}`,
+      {
+        name,
+        movie,
+        showtime: Array.isArray(showtime) ? showtime : [showtime], // Đảm bảo showtime là mảng
+        cinema,
       },
-    });
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
     res.json({ success: true });
   } catch (error) {
     console.error(error);
-    res
-      .status(500)
-      .json({ success: false, error: "Đã xảy ra lỗi khi cập nhật." });
+    res.status(500).json({ success: false, error: "Đã xảy ra lỗi khi cập nhật." });
   }
 };
-
-
 
 exports.deleteRoom = async (req, res, next) => {
   const id = req.params.id;

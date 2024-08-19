@@ -1,7 +1,10 @@
 const { default: axios } = require("axios");
+const path = require("path");
 
 exports.listTickets = async (req, res, next) => {
-  res.render("../views/manager/tickets/listTickets.ejs");
+  res.render("../views/manager/tickets/listTickets.ejs", {
+    layout: path.join(__dirname, "../layouts/dashboard.ejs"),
+  });
 };
 
 exports.detailsTickets = async (req, res, next) => {
@@ -84,6 +87,7 @@ exports.detailsTickets = async (req, res, next) => {
       tongTien: formattedMoney,
       seat: arrSeat,
       food: arrFood,
+      layout: path.join(__dirname, "../layouts/dashboard.ejs"),
     });
   } catch (error) {
     console.log(error);

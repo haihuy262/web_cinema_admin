@@ -6,6 +6,7 @@ var logger = require("morgan");
 var crypto = require("crypto");
 var session = require("express-session");
 var bodyParser = require("body-parser");
+var expressLayouts = require("express-ejs-layouts");
 require("dotenv").config();
 
 var dashboardRouter = require("./routes/dashboard");
@@ -48,11 +49,12 @@ app.use(
 
 // Middleware to log session for debugging
 app.use((req, res, next) => {
-  console.log("session middleware:", req.session);
+  // console.log("session middleware:", req.session);
   next();
 });
 
 app.use("/", loginRouter);
+app.use(expressLayouts);
 app.use("/token", tokenRouter);
 app.use("/dashboard", dashboardRouter);
 app.use("/employee", employeeRouter);
