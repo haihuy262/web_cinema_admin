@@ -5,74 +5,82 @@
     transform: scale(1.1);
   }
 </style>
-<div class="container mt-5 p-3">
-  <h2 class="text-center mt-4">Tạo Giờ</h2>
-  <div class="row">
-    <div class="col-md-6">
-      <form id="addTimeForm">
-        <div class="mb-3">
-          <label for="timeInput" class="form-label">Giờ</label>
-          <input type="time" class="form-control" id="timeInput" />
-        </div>
-        <button type="submit" class="btn btn-primary">Tạo giờ</button>
-      </form>
+<nav style="--bs-breadcrumb-divider: '>'" aria-label="breadcrumb" class="mt-3">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="#">Quản lý nhân viên</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Danh sách nhân viên</li>
+  </ol>
+</nav>
+<div class="card mb-3">
+  <div class="card-body">
+    <div class="row">
+      <div class="col-md-6">
+        <form id="addTimeForm">
+          <div class="mb-3">
+            <label for="timeInput" class="form-label">Giờ</label>
+            <input type="time" class="form-control" id="timeInput" />
+          </div>
+          <button type="submit" class="btn btn-primary">Tạo giờ</button>
+        </form>
+      </div>
+      <div class="col-md-6">
+        <table class="table table-bordered align-middle table-hover" style="margin-top: 30px">
+          <thead class="table table-secondary">
+            <tr class="text-center">
+              <th>STT</th>
+              <th>Giờ</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody" class="text-center">
+            <td>1</td>
+            <td>22:00</td>
+          </tbody>
+        </table>
+        <!-- Pagination -->
+        <nav>
+          <ul class="pagination justify-content-end">
+            <li class="prevPageLi page-item">
+              <a id="prevPage" class="page-link" href="#" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+              </a>
+            </li>
+            <li class="page-item"><a id="numberPage" class="page-link" href="#">1</a></li>
+            <li class="nextPageLi page-item">
+              <a id="nextPage" class="page-link" href="#" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
     </div>
-    <div class="col-md-6">
-      <table class="table table-bordered align-middle" style="margin-top: 30px">
-        <thead class="table table-secondary">
-          <tr class="text-center">
-            <th>STT</th>
-            <th>Giờ</th>
-          </tr>
-        </thead>
-        <tbody id="tableBody" class="text-center">
-          <td>1</td>
-          <td>22:00</td>
-        </tbody>
-      </table>
-      <!-- Pagination -->
-      <nav>
-        <ul class="pagination justify-content-end">
-          <li class="prevPageLi page-item">
-            <a id="prevPage" class="page-link" href="#" aria-label="Previous">
-              <span aria-hidden="true">&laquo;</span>
-            </a>
-          </li>
-          <li class="page-item"><a id="numberPage" class="page-link" href="#">1</a></li>
-          <li class="nextPageLi page-item">
-            <a id="nextPage" class="page-link" href="#" aria-label="Next">
-              <span aria-hidden="true">&raquo;</span>
-            </a>
-          </li>
-        </ul>
-      </nav>
-    </div>
-  </div>
-  <!-- Modal Edit Date -->
-  <div
-    class="modal fade"
-    id="deleteTimeModal"
-    tabindex="-1"
-    aria-labelledby="deleteTimeModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <!-- Modal header -->
-        <div class="modal-header">
-          <h5 class="modal-title" id="deleteTimeModalLabel">Xoá</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <!-- Modal body -->
-        <div class="modal-body">Bạn có muốn xoá không?</div>
-        <!-- Model footer -->
-        <div class="modal-footer">
-          <button id="deleteTime" class="btn btn-danger">Xoá</button>
-          <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+    <!-- Modal Edit Date -->
+    <div
+      class="modal fade"
+      id="deleteTimeModal"
+      tabindex="-1"
+      aria-labelledby="deleteTimeModalLabel"
+      aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <!-- Modal header -->
+          <div class="modal-header">
+            <h5 class="modal-title" id="deleteTimeModalLabel">Xoá</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <!-- Modal body -->
+          <div class="modal-body">Bạn có muốn xoá không?</div>
+          <!-- Model footer -->
+          <div class="modal-footer">
+            <button id="deleteTime" class="btn btn-danger">Xoá</button>
+            <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </div>
+
 <!-- getToken apiURl -->
 <script>
   let token = "";
