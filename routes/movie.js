@@ -22,7 +22,11 @@ router.put(
   movieController.updateMovie
 );
 
-
+router.put(
+  "/updateStatus/:movieId",
+  authMiddleware.requireLogin,
+  movieController.updateStatus
+);
 
 router.delete('/deleteMovie/:id', movieController.deleteMovie);
 router.get("/actor", authMiddleware.requireLogin, movieController.addActor);

@@ -1,62 +1,74 @@
-<%- include('../partials/header.ejs') %>
 
-<div class="mt-5" style="margin: 8%; padding-top: 5%">
-  <div class="row mb-3 mt-5">
-    <div class="col-md-3"></div>
-    <div class="col-md-6">
-      <h2 class="text-center">Danh sách Phim</h2>
-    </div>
-    <div class="col-md-3">
-      <div class="d-flex">
-        <input
-          id="searchInput"
-          class="form-control me-2 p-2"
-          type="search"
-          placeholder="Tìm kiếm..."
-          aria-label="Search"
-          oninput="searchTable()"
-        />
-       
+
+<div style="display: flex;background-color: rgb(230, 230, 228);">
+  <!-- Thẻ chứa header -->
+  <div style="width: 15%;">
+    <%- include('../partials/header.ejs') %>
+  </div>
+
+  <!-- Thẻ chứa container chiếm phần còn lại của màn hình nhưng nhỏ hơn -->
+  <div style="flex: 1; padding: 3%; max-width: 85%;">
+    <div class="container mt-5" style="min-width: 100%; border: 1px #E0E0E0; border-radius: 15px;background-color: rgb(253, 253, 250); padding:10px;">
+      <div class="row mb-3 mt-5">
+        <div class="col-md-3"></div>
+        <div class="col-md-6">
+          <h2 class="text-center">Danh sách Phim</h2>
+        </div>
+        <div class="col-md-3">
+          <div class="d-flex">
+            <input
+              id="searchInput"
+              class="form-control me-2 p-2"
+              type="search"
+              placeholder="Tìm kiếm..."
+              aria-label="Search"
+              oninput="searchTable()"
+            />
+          </div>
+        </div>
       </div>
+      <table class="table table-bordered table-hover align-middle" id="movieTable">
+        <thead>
+          <tr class="table table-secondary">
+            <th class="text-center">STT</th>
+            <th class="text-center">Tên Phim</th>
+            <th class="text-center">Giờ Chiếu</th>
+            <th class="text-center">Phụ Đề</th>
+            <th class="text-center">Độ Tuổi</th>
+            <th class="text-center">Rate</th>
+            <th class="text-center">Ngày Chiếu</th>
+            <th class="text-center">Ảnh</th>
+            <th style="width: 15%">Trailer</th>
+            <th class="text-center">Trạng Thái</th>
+            <th class="text-center">Hành Động</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Nội dung bảng -->
+        </tbody>
+      </table>
+      <nav>
+        <ul class="pagination justify-content-end" id="pagination">
+          <li class="page-item" id="prevPage" onclick="changePage(-1)">
+            <a class="page-link" href="#" aria-label="Previous">
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" id="currentPage" href="#">1</a>
+          </li>
+          <li class="page-item" id="nextPage" onclick="changePage(1)">
+            <a class="page-link" href="#" aria-label="Next">
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
     </div>
   </div>
-  <table class="table table-bordered table-hover align-middle" id="movieTable">
-    <thead>
-      <tr class="table table-secondary">
-        <th class="text-center">STT</th>
-        <th class="text-center">Tên Phim</th>
-        <th class="text-center">Giờ Chiếu</th>
-        <th class="text-center">Phụ Đề</th>
-        <th class="text-center">Độ Tuổi</th>
-        <th class="text-center">Rate</th>
-        <th class="text-center">Ngày Chiếu</th>
-        <th class="text-center">Ảnh</th>
-        <th style="width: 15%">Trailer</th>
-        <th class="text-center">Hành Động</th>
-      </tr>
-    </thead>
-    <tbody>
-      
-    </tbody>
-  </table>
-  <nav>
-    <ul class="pagination justify-content-end" id="pagination">
-      <li class="page-item" id="prevPage" onclick="changePage(-1)">
-        <a class="page-link" href="#" aria-label="Previous">
-          <span aria-hidden="true">&laquo;</span>
-        </a>
-      </li>
-      <li class="page-item">
-        <a class="page-link" id="currentPage" href="#">1</a>
-      </li>
-      <li class="page-item" id="nextPage" onclick="changePage(1)">
-        <a class="page-link" href="#" aria-label="Next">
-          <span aria-hidden="true">&raquo;</span>
-        </a>
-      </li>
-    </ul>
-  </nav>
 </div>
+
+
 <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -182,8 +194,10 @@ document.addEventListener('DOMContentLoaded', () => fetchMovies(currentPage));
 function populateMovieTable(movies) {
   const tableBody = document.querySelector('#movieTable tbody');
   tableBody.innerHTML = '';
+  let currentIndex = 1; // Khởi tạo số thứ tự
+  const updateInProgress = {}; // Để theo dõi trạng thái cập nhật
 
-  movies.forEach((movie) => {
+  movies.forEach((movie, index) => {
     const row = document.createElement('tr');
 
     const cellSTT = document.createElement('td');
@@ -241,7 +255,34 @@ function populateMovieTable(movies) {
     cellTrailer.appendChild(link);
     row.appendChild(cellTrailer);
 
+    const cellStatus = document.createElement('td');
+    const switchDiv = document.createElement('div');
+    switchDiv.classList.add(
+          "form-check",
+          "form-switch",
+          "form-check-reverse",
+          "d-flex",
+          "justify-content-center"
+        );
+    
+    const checkbox = document.createElement('input');
+    checkbox.className = 'form-check-input status-toggle';
+    checkbox.type = 'checkbox';
+    checkbox.id = `toggle${index}`;
+    checkbox.setAttribute('data-id', movie._id);
+    checkbox.checked = movie.release_status === 'dc' || movie.release_status === 'sc'; // Bật nếu là 'dc' hoặc 'sc'
+
+    const label = document.createElement('label');
+    label.className = 'form-check-label';
+    label.htmlFor = `toggle${index}`;
+
+    switchDiv.appendChild(checkbox);
+    switchDiv.appendChild(label);
+    cellStatus.appendChild(switchDiv);
+    row.appendChild(cellStatus);
+
     const cellActions = document.createElement('td');
+   
     cellActions.classList.add("text-center");
     const editButton = document.createElement('button');
     editButton.textContent = 'Sửa';
@@ -252,8 +293,42 @@ function populateMovieTable(movies) {
 
     row.appendChild(cellActions);
     tableBody.appendChild(row);
+
+    checkbox.addEventListener('change', async function () {
+      if (updateInProgress[movie._id]) return;
+
+      updateInProgress[movie._id] = true;
+      const movieId = this.getAttribute('data-id');
+      const status = this.checked ? (movie.release_status === 'sc' ? 'sc' : 'dc') : 'nc';
+
+      console.log('Movie ID:', movieId, 'Status:', status);
+
+      await updateMovieStatus(movieId, status);
+      delete updateInProgress[movie._id];
+    });
   });
 }
+
+async function updateMovieStatus(movieId) {
+  try {
+    const response = await fetch(`/movie/updateStatus/${movieId}`, {
+      method: "PUT",
+      headers: {
+        'Content-Type': 'application/json'
+      },
+     
+    });
+
+    if (response.ok) {
+      console.log("Status updated successfully.");
+    } else {
+      console.error("Error updating status:", await response.text());
+    }
+  } catch (error) {
+    console.error("Error updating status:", error);
+  }
+}
+
 
 function editMovie(button) {
   const movie = JSON.parse(button.getAttribute('data-movie'));
@@ -281,8 +356,15 @@ async function submitEdit() {
     });
 
     if (response.ok) {
-      alert('Cập nhật thành công!');
-      window.location.reload();
+      Swal.fire({
+              title: "Thành công!",
+              text: "Sửa thành công!",
+              icon: "success",
+              confirmButtonText: "OK",
+            }).then((result) => {
+              location.reload();
+            });
+          
     } else {
       const errorData = await response.json();
       alert(`Đã xảy ra lỗi khi cập nhật: ${errorData.error || 'Lỗi không xác định'}`);
