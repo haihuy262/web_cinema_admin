@@ -20,6 +20,11 @@ router.put(
 );
 
 router.get("/roomList", authMiddleware.requireLogin, cinemaController.roomList);
+router.get(
+  "/roomListTable",
+  authMiddleware.requireLogin,
+  cinemaController.roomListTable
+);
 router.get("/roomAdd", authMiddleware.requireLogin, cinemaController.roomAdd);
 router.post(
   "/creatCinema",
