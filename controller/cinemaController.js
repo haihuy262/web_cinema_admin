@@ -149,26 +149,27 @@ exports.updateRoom = async (req, res, next) => {
     res.status(500).json({ success: false, error: "Đã xảy ra lỗi khi cập nhật." });
   }
 };
-
 exports.roomList = async (req, res, next) => {
+  res.render("../views/cinema/room_list.ejs", {
+    layout: path.join(__dirname, "../layouts/dashboard.ejs"),
+  });
+};
+exports.roomListTable = async (req, res, next) => {
   try {
     const token = req.session.admin.token;
     const apiUrl = process.env.API_URL;
-
-    const response = await axios.get(`${apiUrl}/rooms`, {
+    const page = req.query.page || 1;
+    const response = await axios.get(`${apiUrl}/rooms?page=${page}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
     const rooms = response.data.getall;
 
-    res.render("../views/cinema/room_list.ejs", {
-      rooms,
-      layout: path.join(__dirname, "../layouts/dashboard.ejs"),
-    });
+    res.json({ success: true, getAll: rooms });
   } catch (error) {
-    console.error("Error fetching rooms:", error.message);
-    res.status(500).send("Error fetching rooms");
+    console.log(error);
+    res.status(500).json({ success: false, error: error.message });
   }
 };
 
