@@ -170,14 +170,34 @@
       });
 
       if (response.ok) {
-        alert("Cập nhật thành công!");
-        window.location.reload();
+        Swal.fire({
+          title: "Thành công!",
+          text: "Sửa thành công!",
+          icon: "success",
+          confirmButtonText: "OK",
+        }).then((result) => {
+          location.reload();
+        });
       } else {
-        alert("Đã xảy ra lỗi khi cập nhật.");
+        Swal.fire({
+          title: "Lỗi!",
+          text: "Đã xảy ra lỗi gì đó!.",
+          icon: "error",
+          confirmButtonText: "OK",
+        }).then((result) => {
+          location.reload();
+        });
       }
     } catch (error) {
-      alert("Đã xảy ra lỗi khi cập nhật.");
       console.error(error);
+      Swal.fire({
+        title: "Lỗi!",
+        text: "Đã xảy ra lỗi gì đó!.",
+        icon: "error",
+        confirmButtonText: "OK",
+      }).then((result) => {
+        location.reload();
+      });
     }
   }
 </script>

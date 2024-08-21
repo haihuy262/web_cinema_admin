@@ -120,10 +120,9 @@
       event.preventDefault();
 
       const nameForm = $("#name").val();
-      const movieForm = $("#movie").val();
+      const movieForm = $("#movieAddRoom").val();
       const showtimeForm = $("#showTime").val();
       const cinemaForm = $("#cinema").val();
-      const arrayShowtime = showtimeForm;
 
       $.ajax({
         url: `${apiUrl}/rooms`,
@@ -135,16 +134,39 @@
           name: nameForm,
           movie: movieForm,
           cinema: cinemaForm,
-          showtime: arrayShowtime,
+          showtime: showtimeForm,
         },
-
         success: function (data) {
-          console.log(data);
-          alert("Tạo phòng chiếu thành công!");
+          if (data.create === "Room already exists") {
+            Swal.fire({
+              title: "Cảnh báo!",
+              text: "Phòng đã tồn tại!",
+              icon: "warning",
+              confirmButtonText: "OK",
+            });
+          } else {
+            Swal.fire({
+              title: "Thành công!",
+              text: "Tạo thành công!",
+              icon: "success",
+              confirmButtonText: "OK",
+            }).then((result) => {
+              if (result.isConfirmed) {
+                window.location.href = "/cinema/roomList";
+              }
+            });
+          }
         },
         error: function (error) {
           console.log(error);
-          alert("Tạo phòng chiếu thất bại!");
+          Swal.fire({
+            title: "Lỗi!",
+            text: "Đã xảy ra lỗi gì đó!.",
+            icon: "error",
+            confirmButtonText: "OK",
+          }).then((result) => {
+            location.reload();
+          });
         },
       });
     });

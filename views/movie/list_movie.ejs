@@ -90,28 +90,28 @@
               <input type="text" class="form-control" id="name" name="name" required />
             </div>
             <div class="mb-3">
-              <label for="duration" class="form-label">Duration</label>
+              <label for="duration" class="form-label">Thời lượng</label>
               <input type="text" class="form-control" id="duration" name="duration" required />
             </div>
             <div class="mb-3">
-              <label for="subtitle" class="form-label">Subtitle</label>
-              <input type="text" class="form-control" id="subtitle" name="subtitle" required />
+              <label for="subtitle" class="form-label">Phụ đề</label>
+              <input type="text" class="form-control" id="subtitle" name="subtitle" required readonly />
             </div>
             <div class="mb-3">
-              <label for="censorship" class="form-label">Censorship</label>
+              <label for="censorship" class="form-label">Độ tuổi</label>
               <input type="text" class="form-control" id="censorship" name="censorship" required />
             </div>
             <div class="mb-3">
-              <label for="rate" class="form-label">Rate</label>
+              <label for="rate" class="form-label">Đánh giá</label>
               <input type="text" class="form-control" id="rate" name="rate" required />
             </div>
             <div class="mb-3">
-              <label for="release_date" class="form-label">Release Date</label>
+              <label for="release_date" class="form-label">Ngày chiếu</label>
               <input type="date" class="form-control" id="release_date" name="release_date" required />
             </div>
 
             <div class="mb-3">
-              <label for="Image" class="form-label"> Hình Ảnh </label>
+              <label for="Image" class="form-label">Hình ảnh</label>
               <input type="file" class="form-control" id="Image" name="image" />
             </div>
           </form>
@@ -150,79 +150,79 @@
     let currentPage = 1;
     let currentIndex = 1;
     async function fetchMovies(page = 1) {
-  try {
-    currentIndex = (page - 1) * 10 + 1;
-    const response = await fetch(`/movie/movieListTable?page=${page}`);
-    if (!response.ok) {
-      throw new Error("Network response was not ok");
-    }
-    const data = await response.json();
-    if (data.success) {
-      if (data.getAll.length === 0 && page > 1) {
-        changePage(-1);
-        return;
+      try {
+        currentIndex = (page - 1) * 10 + 1;
+        const response = await fetch(`/movie/movieListTable?page=${page}`);
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        const data = await response.json();
+        if (data.success) {
+          if (data.getAll.length === 0 && page > 1) {
+            changePage(-1);
+            return;
+          }
+          populateMovieTable(data.getAll);
+          document.getElementById("currentPage").textContent = page;
+          currentPage = page;
+
+          const nextPageResponse = await fetch(`/movie/movieListTable?page=${page + 1}`);
+          const nextPageData = nextPageResponse.ok
+            ? await nextPageResponse.json()
+            : { success: false, getAll: [] };
+          const hasNextPage = nextPageData.success && nextPageData.getAll.length > 0;
+
+          updatePaginationControls(hasNextPage, page > 1);
+        } else {
+          console.error("Error fetching movie data:", data.error);
+          updatePaginationControls(false, page > 1); // Không có dữ liệu, không hiển thị nút Next và Previous
+        }
+      } catch (error) {
+        console.error("Error fetching movie data:", error);
+        updatePaginationControls(false, page > 1); // Có lỗi, không hiển thị nút Next và Previous
       }
-      populateMovieTable(data.getAll);
-      document.getElementById("currentPage").textContent = page;
-      currentPage = page;
-
-      const nextPageResponse = await fetch(`/movie/movieListTable?page=${page + 1}`);
-      const nextPageData = nextPageResponse.ok
-        ? await nextPageResponse.json()
-        : { success: false, getAll: [] };
-      const hasNextPage = nextPageData.success && nextPageData.getAll.length > 0;
-
-      updatePaginationControls(hasNextPage, page > 1);
-    } else {
-      console.error("Error fetching movie data:", data.error);
-      updatePaginationControls(false, page > 1); // Không có dữ liệu, không hiển thị nút Next và Previous
     }
-  } catch (error) {
-    console.error("Error fetching movie data:", error);
-    updatePaginationControls(false, page > 1); // Có lỗi, không hiển thị nút Next và Previous
-  }
-}
 
-function updatePaginationControls(hasNextPage, hasPrevPage) {
-  const prevButton = document.getElementById("prevPage");
-  const nextButton = document.getElementById("nextPage");
+    function updatePaginationControls(hasNextPage, hasPrevPage) {
+      const prevButton = document.getElementById("prevPage");
+      const nextButton = document.getElementById("nextPage");
 
-  // Vô hiệu hóa nút prev nếu đang ở trang 1
-  if (!hasPrevPage) {
-    prevButton.classList.add("disabled");
-    prevButton.setAttribute("aria-disabled", "true");
-    prevButton.style.pointerEvents = "none";
-  } else {
-    prevButton.classList.remove("disabled");
-    prevButton.removeAttribute("aria-disabled");
-    prevButton.style.pointerEvents = "auto";
-  }
+      // Vô hiệu hóa nút prev nếu đang ở trang 1
+      if (!hasPrevPage) {
+        prevButton.classList.add("disabled");
+        prevButton.setAttribute("aria-disabled", "true");
+        prevButton.style.pointerEvents = "none";
+      } else {
+        prevButton.classList.remove("disabled");
+        prevButton.removeAttribute("aria-disabled");
+        prevButton.style.pointerEvents = "auto";
+      }
 
-  // Vô hiệu hóa nút next nếu không có trang tiếp theo
-  if (!hasNextPage) {
-    nextButton.classList.add("disabled");
-    nextButton.setAttribute("aria-disabled", "true");
-    nextButton.style.pointerEvents = "none";
-  } else {
-    nextButton.classList.remove("disabled");
-    nextButton.removeAttribute("aria-disabled");
-    nextButton.style.pointerEvents = "auto";
-  }
-}
+      // Vô hiệu hóa nút next nếu không có trang tiếp theo
+      if (!hasNextPage) {
+        nextButton.classList.add("disabled");
+        nextButton.setAttribute("aria-disabled", "true");
+        nextButton.style.pointerEvents = "none";
+      } else {
+        nextButton.classList.remove("disabled");
+        nextButton.removeAttribute("aria-disabled");
+        nextButton.style.pointerEvents = "auto";
+      }
+    }
 
-function changePage(direction) {
-  const newPage = currentPage + direction;
-  if (newPage > 0) {
-    fetchMovies(newPage);
-  }
-}
+    function changePage(direction) {
+      const newPage = currentPage + direction;
+      if (newPage > 0) {
+        fetchMovies(newPage);
+      }
+    }
 
     document.addEventListener("DOMContentLoaded", () => fetchMovies(currentPage));
-   
+
     function populateMovieTable(movies) {
       const tableBody = document.querySelector("#movieTable tbody");
       tableBody.innerHTML = "";
-      
+
       const updateInProgress = {}; // Để theo dõi trạng thái cập nhật
 
       movies.forEach((movie, index) => {
