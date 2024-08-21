@@ -165,7 +165,7 @@ exports.roomListTable = async (req, res, next) => {
       },
     });
     const rooms = response.data.getall;
-
+    console.log(rooms);
     res.json({ success: true, getAll: rooms });
   } catch (error) {
     console.log(error);

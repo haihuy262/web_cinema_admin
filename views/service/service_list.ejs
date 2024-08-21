@@ -234,7 +234,6 @@
 
           displayTable(foods, page);
           updatePagination(data.getall, page, foods.length);
-          console.log(data.getall, page);
         },
         error: function (error) {
           console.error("Error fetching data:", error);
@@ -430,7 +429,6 @@
               Authorization: `Bearer ${token}`,
             },
             success: function (data) {
-              console.log(data);
               alert("Xoá thành công!");
 
               deleteFoodModal.hide();
@@ -514,7 +512,6 @@
           processData: false,
           contentType: false,
           success: function (data) {
-            console.log(data);
             alert("Cập nhật thành công!");
 
             editFoodModal.hide();

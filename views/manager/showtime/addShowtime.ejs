@@ -10,12 +10,12 @@
     <form id="addShowtime">
       <div class="mb-3">
         <label for="timeInput" class="form-label">Ngày</label>
-        <input type="date" class="form-control" id="dateInput" />
+        <input type="date" class="form-control" id="dateInput" required />
       </div>
       <div class="mb-3">
         <label for="timeSelect" class="form-label">Giờ</label>
         <select id="timeSelect" name="timeSelect" class="form-control" multiple required>
-          <option value="" selected disabled>Chọn giờ...</option>
+          <option value="" disabled>Chọn giờ...</option>
         </select>
       </div>
       <button type="submit" class="btn btn-primary">Tạo suất chiếu</button>
@@ -51,11 +51,6 @@
         Authorization: `Bearer ${token}`,
       },
       success: function (data) {
-        $("#timeSelect").empty();
-        $("#timeSelect").append(
-          $("<option>").text("Chọn giờ...").attr("disabled", "disabled").attr("selected", "selected")
-        );
-
         let dataTime = data.getall;
         for (let i = 0; i < dataTime.length; i++) {
           const option = $("<option>").val(dataTime[i]._id).text(dataTime[i].time);
