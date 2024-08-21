@@ -16,10 +16,6 @@ exports.roomAdd = async (req, res, next) => {
 exports.creatCinema = async (req, res, next) => {
   const { name, address, hotline } = req.body;
 
-  console.log("name", name);
-  console.log("address", address);
-  console.log("hotline", hotline);
-
   try {
     const token = req.session.admin.token;
     const apiUrl = process.env.API_URL;
@@ -38,9 +34,6 @@ exports.creatCinema = async (req, res, next) => {
         },
       }
     );
-
-    // Kiểm tra và log thông tin sau khi cinema được tạo
-    console.log("Cinema created:", response.data);
 
     return res.redirect("/cinema/cinemaList");
   } catch (error) {
@@ -165,7 +158,6 @@ exports.roomListTable = async (req, res, next) => {
       },
     });
     const rooms = response.data.getall;
-    console.log(rooms);
     res.json({ success: true, getAll: rooms });
   } catch (error) {
     console.log(error);

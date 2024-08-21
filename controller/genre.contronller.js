@@ -63,16 +63,10 @@ exports.createGenre = async (req, res, next) => {
     if (req.file && req.file.fieldname === "image") {
       fs.unlinkSync(req.file.path);
     }
-    console.log("check", response.data);
-    res.render("../views/movie/genre/genre_add.ejs", {
-      success: "Tạo genre thành công!",
-      genre: response.data.genre,
-    });
+    res.status(200).json({ success: true });
   } catch (error) {
-    res.render("../views/movie/genre/genre_add.ejs", {
-      error: "Đã xảy ra lỗi khi tạo genre.",
-    });
     console.log(error);
+    res.status(500).json({ success: false, error: error.message });
   }
 };
 exports.updateGenre = async (req, res, next) => {
