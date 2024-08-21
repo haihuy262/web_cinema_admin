@@ -7,16 +7,63 @@
 </nav>
 <div class="card mb-3">
   <div class="card-body">
-    <form action="/genre/createGenre" method="POST" enctype="multipart/form-data">
+    <form id="addGenre" enctype="multipart/form-data">
       <div class="form-group mb-3">
         <label for="name">Tên</label>
-        <input type="text" class="form-control" id="name" name="name" required />
+        <input type="text" class="form-control" id="nameGenre" name="name" required />
       </div>
       <div class="form-group mb-3">
         <label for="image">Ảnh</label>
-        <input type="file" class="form-control" id="image" name="image" required />
+        <input type="file" class="form-control" id="imageGenre" name="image" required />
       </div>
       <button type="submit" class="btn btn-primary">Lưu</button>
     </form>
   </div>
 </div>
+<script>
+  $(document).ready(function () {
+    $("#addGenre").submit(function (e) {
+      e.preventDefault();
+
+      const name = $("#nameGenre").val();
+      const imageFile = $("#imageGenre")[0].files[0];
+
+      const formData = new FormData();
+      formData.append("name", name);
+      formData.append("image", imageFile);
+
+      $.ajax({
+        url: `/genre/createGenre`,
+        type: "POST",
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function (data) {
+          if (data.success === true) {
+            Swal.fire({
+              title: "Thành công!",
+              text: "Tạo thành công!",
+              icon: "success",
+              confirmButtonText: "OK",
+            }).then((result) => {
+              if (result.isConfirmed) {
+                window.location.href = "/genre/listGenre";
+              }
+            });
+          }
+        },
+        error: function (error) {
+          console.log(error);
+          Swal.fire({
+            title: "Lỗi!",
+            text: "Đã xảy ra lỗi gì đó!.",
+            icon: "error",
+            confirmButtonText: "OK",
+          }).then((result) => {
+            location.reload();
+          });
+        },
+      });
+    });
+  });
+</script>

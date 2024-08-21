@@ -148,11 +148,13 @@ exports.createDiscount = async (req, res, next) => {
 
     res.render("../views/discount/discount_add.ejs", {
       success: "Tạo discount thành công!",
+      layout: path.join(__dirname, "../layouts/dashboard.ejs"),
     });
   } catch (error) {
     console.error("Error creating discount:", error);
     res.render("../views/discount/discount_add.ejs", {
       error: "Đã xảy ra lỗi khi tạo discount.",
+      layout: path.join(__dirname, "../layouts/dashboard.ejs"),
     });
   }
 };

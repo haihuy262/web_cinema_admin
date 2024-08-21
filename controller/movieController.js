@@ -276,15 +276,10 @@ exports.createActor = async (req, res, next) => {
     if (req.file && req.file.fieldname === "image") {
       fs.unlinkSync(req.file.path);
     }
-    res.render("../views/movie/actor/add_actor.ejs", {
-      success: "Tạo actor thành công!",
-      actor: response.data.actor,
-    });
+    res.status(200).json({ success: true });
   } catch (error) {
-    res.render("../views/movie/actor/add_actor.ejs", {
-      error: "Đã xảy ra lỗi khi tạo actor.",
-    });
     console.log(error);
+    res.status(500).json({ success: false, error: error.message });
   }
 };
 
@@ -401,14 +396,9 @@ exports.createDirector = async (req, res, next) => {
       fs.unlinkSync(req.file.path);
     }
 
-    res.render("../views/movie/directors/add_directors.ejs", {
-      success: "Tạo directors thành công!",
-      director: response.data.director,
-    });
+    res.status(200).json({ success: true });
   } catch (error) {
-    res.render("../views/movie/directors/add_directors.ejs", {
-      error: "Đã xảy ra lỗi khi tạo directors.",
-    });
+    res.status(500).json({ success: false, error: error.message });
     console.log(error);
   }
 };
