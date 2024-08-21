@@ -13,6 +13,38 @@ router.get(
   authMiddleware.requireLogin,
   cinemaController.cinemaAdd
 );
+router.put(
+  "/updateRoom/:id",
+  authMiddleware.requireLogin,
+  cinemaController.updateRoom
+);
+
 router.get("/roomList", authMiddleware.requireLogin, cinemaController.roomList);
+router.get(
+  "/roomListTable",
+  authMiddleware.requireLogin,
+  cinemaController.roomListTable
+);
 router.get("/roomAdd", authMiddleware.requireLogin, cinemaController.roomAdd);
+router.post(
+  "/creatCinema",
+  authMiddleware.requireLogin,
+  cinemaController.creatCinema
+);
+
+router.delete(
+  "/deleteRoom/:id",
+  authMiddleware.requireLogin,
+  cinemaController.deleteRoom
+);
+router.put(
+  "/updateCinema/:id",
+  authMiddleware.requireLogin,
+  cinemaController.updateCinema
+);
+router.delete(
+  "/cinema/:id",
+  authMiddleware.requireLogin,
+  cinemaController.deleteCinema
+);
 module.exports = router;

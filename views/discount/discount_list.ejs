@@ -1,78 +1,452 @@
 <%- include('../partials/header.ejs') %>
-
-<div class="container mt-5" style="padding: 3%">
-  <h2 class="text-center mb-5">List Discounts</h2>
-  <table class="table table-bordered">
-    <thead>
-      <tr style="background-color: aquamarine">
-        <th>Stt</th>
-        <th>Name</th>
-        <th>Percent</th>
-        <th>Code</th>
-        <th>Type</th>
-        <th>Cinema</th>
-        <th>Image</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>1</td>
-        <td>An uong tet ga</td>
-        <td>40%</td>
-        <td>XSYJQU</td>
-        <td>food</td>
-        <td>MDcinema My Dinh</td>
-        <td><img src="discount1.jpg" alt="Image" width="50" /></td>
-        <td>
-          <a href="/discount/edit/1" class="btn btn-info">
-            <i class="anticon anticon-edit"></i> Edit
+<style>
+  .search-wrapper {
+    position: relative;
+  }
+  .search-wrapper .bi-search {
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
+    color: #aaa;
+  }
+  .search-wrapper input {
+    padding-left: 2.5rem; /* Adjust padding to make room for the icon */
+  }
+</style>
+<nav style="--bs-breadcrumb-divider: '>'" aria-label="breadcrumb" class="mt-3">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="#">Quản lý khuyến mãi</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Danh sách khuyến mãi</li>
+  </ol>
+</nav>
+<div class="card mb-3">
+  <div class="card-body">
+    <div class="d-flex mb-3">
+      <button onclick="window.location.href = '/discount/discountAdd'" class="btn btn-primary">
+        Tạo khuyến mãi
+      </button>
+      <div class="search-wrapper ms-3">
+        <i class="bi bi-search"></i>
+        <input
+          id="searchInput"
+          class="form-control me-2"
+          type="search"
+          placeholder="Tìm kiếm..."
+          aria-label="Search"
+          oninput="searchTable()" />
+        <!-- <button class="btn btn-outline-success" type="submit" onclick="searchTable()">Search</button> -->
+      </div>
+    </div>
+    <table class="table table-bordered table-hover align-middle" id="discountTable">
+      <thead>
+        <tr class="table table-secondary">
+          <th class="text-center">STT</th>
+          <th class="text-center">Tên</th>
+          <th class="text-center">Phần Trăm</th>
+          <th class="text-center">Mã</th>
+          <th class="text-center">Loại</th>
+          <th class="text-center">Ngày Bắt đầu</th>
+          <th class="text-center">Ngày Kết Thúc</th>
+          <th class="text-center">Rạp</th>
+          <th class="text-center">Ảnh</th>
+          <th class="text-center">Trạng Thái</th>
+          <th class="text-center">Hành Động</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Nội dung bảng sẽ được điền vào đây -->
+      </tbody>
+    </table>
+    <nav>
+      <ul class="pagination justify-content-end" id="pagination">
+        <li class="page-item" id="prevPage" onclick="changePage(-1)">
+          <a class="page-link" href="#" aria-label="Previous">
+            <span aria-hidden="true">&laquo;</span>
           </a>
-          <button
-            class="btn btn-danger"
-            data-bs-toggle="modal"
-            data-bs-target="#deleteDiscountModal1"
-          >
-            <i class="anticon anticon-delete"></i> Delete
-          </button>
-        </td>
-      </tr>
-      <!-- Add more static rows as needed -->
-    </tbody>
-  </table>
+        </li>
+        <li class="page-item">
+          <a class="page-link" id="currentPage" href="#">1</a>
+        </li>
+        <li class="page-item" id="nextPage" onclick="changePage(1)">
+          <a class="page-link" href="#" aria-label="Next">
+            <span aria-hidden="true">&raquo;</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
 </div>
 
-<!-- Delete Discount Modal -->
-<div
-  class="modal fade"
-  id="deleteDiscountModal1"
-  tabindex="-1"
-  role="dialog"
-  aria-labelledby="deleteDiscountModalLabel1"
-  aria-hidden="true"
->
-  <div class="modal-dialog" role="document">
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="deleteDiscountModalLabel1">
-          Confirm Delete
-        </h5>
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal"
-          aria-label="Close"
-        ></button>
+        <h5 class="modal-title" id="editModalLabel">Chỉnh Sửa Khuyến Mại</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
       </div>
       <div class="modal-body">
-        <p>Are you sure you want to delete this discount?</p>
+        <form id="editForm">
+          <input type="hidden" id="id" name="id" />
+          <div class="mb-3">
+            <label for="name" class="form-label">Tên</label>
+            <input type="text" class="form-control" id="name" name="name" required />
+          </div>
+          <div class="mb-3">
+            <label for="percent" class="form-label">Phần Trăm</label>
+            <select class="form-select" id="percent" name="percent" required>
+              <option value="" disabled selected>Chọn phần trăm</option>
+              <option value="0.1">0.1</option>
+              <option value="0.2">0.2</option>
+              <option value="0.3">0.3</option>
+              <option value="0.4">0.4</option>
+              <option value="0.5">0.5</option>
+              <option value="0.6">0.6</option>
+              <option value="0.7">0.7</option>
+              <option value="0.8">0.8</option>
+              <option value="0.9">0.9</option>
+              <option value="1.0">1.0</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label for="type" class="form-label">Loại</label>
+
+            <select class="form-select" id="type" name="type" required>
+              <option value="" disabled selected>Chọn Loại</option>
+              <option value="food">food</option>
+              <option value="ticket">ticket</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="cinema" class="form-label">Rạp</label>
+            <select class="form-control" id="cinema" name="cinema" multiple required></select>
+          </div>
+          <div class="mb-3">
+            <label for="dayStart" class="form-label">Ngày Bắt Đầu</label>
+            <input type="date" class="form-control" id="dayStart" name="dayStart" required />
+          </div>
+          <div class="mb-3">
+            <label for="dayEnd" class="form-label">Ngày Kết Thúc</label>
+            <input type="date" class="form-control" id="dayEnd" name="dayEnd" required />
+          </div>
+          <div class="mb-3">
+            <label for="image" class="form-label">Ảnh</label>
+            <input type="file" class="form-control" id="image" name="image" />
+          </div>
+        </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-          Cancel
-        </button>
-        <a href="/discount/delete/1" class="btn btn-danger">Delete</a>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+        <button type="button" class="btn btn-primary" onclick="submitEdit()">Lưu Thay Đổi</button>
       </div>
     </div>
   </div>
 </div>
+
+<script>
+  function searchTable() {
+    const input = document.getElementById("searchInput").value.toLowerCase();
+    const tableBody = document.querySelector("#discountTable tbody");
+    const rows = tableBody.getElementsByTagName("tr");
+
+    for (let i = 0; i < rows.length; i++) {
+      const row = rows[i];
+      const cells = row.getElementsByTagName("td");
+      let match = false;
+
+      for (let j = 0; j < cells.length; j++) {
+        if (cells[j].innerText.toLowerCase().indexOf(input) > -1) {
+          match = true;
+          break;
+        }
+      }
+
+      row.style.display = match ? "" : "none";
+    }
+  }
+</script>
+
+<script>
+   let currentPage = 1;
+  let currentIndex = 1;
+
+  async function fetchDiscounts(page = 1) {
+    try {
+      // Cập nhật giá trị currentIndex dựa trên trang hiện tại
+      currentIndex = (page - 1) * 10 + 1; // Giả sử mỗi trang có 10 mục
+
+      const response = await fetch(`/discount/discountListTable?page=${page}`);
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const data = await response.json();
+      if (data.success) {
+        if (data.getAll.length === 0 && page > 1) {
+          // Nếu không có dữ liệu và không phải là trang đầu tiên, quay về trang trước
+          changePage(-1);
+          return;
+        }
+        populateDiscountTable(data.getAll);
+        document.getElementById("currentPage").textContent = page;
+        currentPage = page;
+
+        // Kiểm tra nếu trang tiếp theo có dữ liệu
+        const nextPageResponse = await fetch(`/discount/discountListTable?page=${page + 1}`);
+        const nextPageData = nextPageResponse.ok
+          ? await nextPageResponse.json()
+          : { success: false, getAll: [] };
+        const hasNextPage = nextPageData.success && nextPageData.getAll.length > 0;
+
+        // Cập nhật trạng thái của các nút phân trang
+        updatePaginationControls(hasNextPage, page > 1);
+      } else {
+        console.error("Error fetching discount data:", data.error);
+        updatePaginationControls(false, page > 1); // Không có dữ liệu, không hiển thị nút Next và Previous
+      }
+    } catch (error) {
+      console.error("Error fetching discount data:", error);
+      updatePaginationControls(false, page > 1); // Có lỗi, không hiển thị nút Next và Previous
+    }
+  }
+
+  function updatePaginationControls(hasNextPage, hasPrevPage) {
+    const prevButton = document.getElementById("prevPage");
+    const nextButton = document.getElementById("nextPage");
+
+    // Vô hiệu hóa nút prev nếu đang ở trang 1
+    if (!hasPrevPage) {
+      prevButton.classList.add("disabled");
+      prevButton.setAttribute("aria-disabled", "true");
+      prevButton.style.pointerEvents = "none";
+    } else {
+      prevButton.classList.remove("disabled");
+      prevButton.removeAttribute("aria-disabled");
+      prevButton.style.pointerEvents = "auto";
+    }
+
+    // Vô hiệu hóa nút next nếu không có trang tiếp theo
+    if (!hasNextPage) {
+      nextButton.classList.add("disabled");
+      nextButton.setAttribute("aria-disabled", "true");
+      nextButton.style.pointerEvents = "none";
+    } else {
+      nextButton.classList.remove("disabled");
+      nextButton.removeAttribute("aria-disabled");
+      nextButton.style.pointerEvents = "auto";
+    }
+  }
+
+  function changePage(direction) {
+    const newPage = currentPage + direction;
+    if (newPage > 0) {
+      fetchDiscounts(newPage);
+    }
+  }
+
+
+  // Khởi động với trang đầu tiên
+  document.addEventListener("DOMContentLoaded", () => fetchDiscounts(currentPage));
+
+  let updateInProgress = {}; // Đối tượng để theo dõi các ID đang được cập nhật
+
+  function populateDiscountTable(discounts) {
+    const tableBody = document.querySelector("#discountTable tbody");
+    tableBody.innerHTML = ""; // Clear existing table rows
+
+    discounts.forEach((discount, index) => {
+      const row = document.createElement("tr");
+
+      const cellSTT = document.createElement("td");
+      cellSTT.textContent = currentIndex++;
+      cellSTT.classList.add("text-center");
+      row.appendChild(cellSTT);
+      // Các cột dữ liệu khác
+      const cellName = document.createElement("td");
+      cellName.classList.add("text-center");
+      cellName.textContent = discount.name;
+      row.appendChild(cellName);
+
+      const cellPercent = document.createElement("td");
+      cellPercent.classList.add("text-center");
+      cellPercent.textContent = `${discount.percent * 100}%`; // Thêm dấu % vào cuối giá trị phần trăm
+      row.appendChild(cellPercent);
+
+      const cellCode = document.createElement("td");
+      cellCode.classList.add("text-center");
+      cellCode.textContent = discount.code;
+      row.appendChild(cellCode);
+
+      const cellType = document.createElement("td");
+      cellType.classList.add("text-center");
+      cellType.textContent = discount.type;
+      row.appendChild(cellType);
+
+      const cellStartDate = document.createElement("td");
+      cellStartDate.classList.add("text-center");
+      cellStartDate.textContent = discount.dayStart.substring(0, 10);
+      row.appendChild(cellStartDate);
+
+      const cellEndDate = document.createElement("td");
+      cellEndDate.classList.add("text-center");
+      cellEndDate.textContent = discount.dayEnd.substring(0, 10);
+      row.appendChild(cellEndDate);
+
+      const cellCinema = document.createElement("td");
+      cellCinema.classList.add("text-center");
+      if (Array.isArray(discount.cinema)) {
+        const cinemaNames = discount.cinema.map((cinema) => cinema.name || "Chưa có tên").join("<br>");
+        cellCinema.innerHTML = cinemaNames;
+      } else {
+        cellCinema.textContent = "Thông tin không hợp lệ";
+      }
+      row.appendChild(cellCinema);
+
+      const cellImage = document.createElement("td");
+      cellImage.classList.add("text-center");
+      const image = document.createElement("img");
+      image.src = `http://139.180.132.97:3000/images/${discount.image}`;
+      image.alt = discount.name;
+      image.style.width = "100px"; // Set the size of the image
+      cellImage.appendChild(image);
+      row.appendChild(cellImage);
+
+      const cellStatus = document.createElement("td");
+      const switchDiv = document.createElement("div");
+      switchDiv.className = "form-check form-switch form-check-reverse";
+
+      const checkbox = document.createElement("input");
+      checkbox.className = "form-check-input status-toggle";
+      checkbox.type = "checkbox";
+      checkbox.id = `toggle${index}`;
+      checkbox.setAttribute("data-id", discount._id);
+      checkbox.checked = discount.status === "active";
+
+      const label = document.createElement("label");
+      label.className = "form-check-label";
+      label.htmlFor = `toggle${index}`;
+
+      switchDiv.appendChild(checkbox);
+      switchDiv.appendChild(label);
+      cellStatus.appendChild(switchDiv);
+      row.appendChild(cellStatus);
+
+      tableBody.appendChild(row);
+      const cellActions = document.createElement("td");
+      cellActions.classList.add("text-center");
+      const editButton = document.createElement("button");
+      editButton.classList.add("btn", "btn-info");
+      editButton.textContent = "Sửa";
+      editButton.setAttribute("data-discount", JSON.stringify(discount));
+      editButton.onclick = () => editDiscount(editButton);
+      cellActions.appendChild(editButton);
+
+      row.appendChild(cellActions);
+      tableBody.appendChild(row);
+
+      checkbox.addEventListener("change", async function () {
+        if (updateInProgress[discount._id]) return;
+
+        updateInProgress[discount._id] = true;
+        const discountId = this.getAttribute("data-id");
+        const status = this.checked ? "active" : "inactive";
+
+        console.log("Discount ID:", discountId, "Status:", status);
+
+        await updateDiscountStatus(discountId, status);
+        delete updateInProgress[discount._id];
+      });
+    });
+  }
+
+  async function updateDiscountStatus(discountId, status) {
+    try {
+      const response = await fetch(`/discount/updateStatus/${discountId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status: status }),
+      });
+
+      if (response.ok) {
+        console.log("Status updated successfully.");
+      } else {
+        console.error("Error updating status:", await response.text());
+      }
+    } catch (error) {
+      console.error("Error updating status:", error);
+    }
+  }
+
+  function editDiscount(button) {
+    const discount = JSON.parse(button.getAttribute("data-discount"));
+    document.getElementById("id").value = discount._id;
+    document.getElementById("name").value = discount.name;
+    document.getElementById("percent").value = discount.percent;
+    document.getElementById("type").value = discount.type;
+    document.getElementById("cinema").value = discount.cinema;
+    // Tải danh sách rạp vào select box
+    // const cinemaSelect = document.getElementById("cinema");
+
+    // discount.cinema.forEach(cinema => {
+    //     const option = document.createElement("option");
+    //     option.value = cinema._id;
+    //     option.textContent = cinema.name;
+    //     cinemaSelect.appendChild(option);
+    // });
+
+    // Hiện modal
+    var myModal = new bootstrap.Modal(document.getElementById("editModal"));
+    myModal.show();
+  }
+
+  async function submitEdit() {
+    const Id = document.getElementById("id").value;
+    const formData = new FormData(document.getElementById("editForm"));
+
+    try {
+      const response = await fetch(`/discount/updateDiscount/${Id}`, {
+        method: "PUT",
+        body: formData,
+      });
+
+      if (response.ok) {
+        alert("Cập nhật thành công!");
+        window.location.reload();
+      } else {
+        alert("Đã xảy ra lỗi khi cập nhật.");
+      }
+    } catch (error) {
+      alert("Đã xảy ra lỗi khi cập nhật.");
+      console.error(error);
+    }
+  }
+</script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    fetch("/discount/cinemaList")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        if (data.success) {
+          const cinemaSelect = document.getElementById("cinema");
+          data.getAll.forEach((cinema) => {
+            const option = document.createElement("option");
+            option.value = cinema._id;
+            option.textContent = cinema.name;
+            cinemaSelect.appendChild(option);
+          });
+        } else {
+          console.error("Error fetching cinema data:", data.error);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching cinema data:", error);
+      });
+  });
+</script>

@@ -1,66 +1,62 @@
 const axios = require("axios");
 var fs = require("fs");
+const FormData = require("form-data");
+const path = require("path");
 
 exports.getEmployee = async (req, res, next) => {
-  res.render("../views/manager/employee/addEmployee.ejs");
+  res.render("../views/manager/employee/addEmployee.ejs", {
+    layout: path.join(__dirname, "../layouts/dashboard.ejs"),
+  });
 };
 
 exports.listEmployee = async (req, res, next) => {
-  const token = req.session.admin.token;
-
-  try {
-    const response = await axios.get("http://139.180.132.97:3000/users/staff", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    const staffData = response.data.getall;
-    res.render("../views/manager/employee/listEmployee.ejs", { staffData });
-  } catch (error) {
-    console.log(error);
-  }
+  res.render("../views/manager/employee/listEmployee.ejs", {
+    layout: path.join(__dirname, "../layouts/dashboard.ejs"),
+  });
 };
 
 exports.addEmployee = async (req, res, next) => {
   try {
-    let image = "";
+    const form = new FormData();
+    const defaultImagePath = "public//images//avatar.jpg";
 
     if (req.file && req.file.fieldname === "image") {
-      fs.renameSync(req.file.path, "./public/uploads/" + req.file.originalname);
-      image = "/uploads/" + req.file.originalname;
+      form.append("image", fs.createReadStream(req.file.path), {
+        filename: req.file.originalname,
+      });
+    } else {
+      form.append("image", fs.createReadStream(defaultImagePath), {
+        filename: "avatart.jpg",
+      });
     }
 
-    const { name, email, password, date_of_birth, number_phone, gender } =
-      req.body;
+    const { name, email, password, date_of_birth, number_phone, gender } = req.body;
+
+    form.append("name", name);
+    form.append("email", email);
+    form.append("password", password);
+    form.append("date_of_birth", date_of_birth);
+    form.append("number_phone", number_phone);
+    form.append("gender", gender);
 
     const token = req.session.admin.token;
+    const apiUrl = process.env.API_URL;
 
-    const response = await axios.post(
-      "http://139.180.132.97:3000/users/staff",
-      {
-        name,
-        email,
-        password,
-        date_of_birth,
-        number_phone,
-        gender,
-        image,
+    await axios.post(`${apiUrl}/users/staff`, form, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        ...form.getHeaders(),
+        // Đặt Header động: Để Axios tự động đặt header cho multipart/form-data
+        // bằng cách không đặt thủ công Content-Type.
       },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    res.render("../views/manager/employee/addEmployee.ejs", {
-      success: "Nhân viên đã được tạo thành công!",
     });
+
+    if (req.file && req.file.fieldname === "image") {
+      fs.unlinkSync(req.file.path);
+    }
+    res.status(200).json({ success: true });
   } catch (error) {
-    res.render("../views/manager/employee/addEmployee.ejs", {
-      error: "Tạo nhân viên thất bại.",
-    });
-    console.log(error);
+    res.status(500).json({ success: false, error: error.message });
   }
 };
 
@@ -74,12 +70,13 @@ exports.editEmployee = async (req, res, next) => {
 
   const id = req.params.id;
   const token = req.session.admin.token;
+  const apiUrl = process.env.API_URL;
 
   const { name, email, number_phone, date_of_birth, gender } = req.body;
 
   try {
-    const response = await axios.put(
-      `http://139.180.132.97:3000/users/${id}`,
+    await axios.put(
+      `${apiUrl}/users/${id}`,
       { name, email, number_phone, date_of_birth, gender, image },
       {
         headers: {
@@ -97,20 +94,20 @@ exports.editEmployee = async (req, res, next) => {
 exports.detailsEmployee = async (req, res, next) => {
   const id = req.params.id;
   const token = req.session.admin.token;
+  const apiUrl = process.env.API_URL;
 
   try {
-    const response = await axios.get(
-      `http://139.180.132.97:3000/users/staff/${id}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const response = await axios.get(`${apiUrl}/users/staff/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     const dataStaffID = response.data.getstaff;
     res.render("../views/manager/employee/detailsEmployee.ejs", {
       dataStaffID,
       token,
+      apiUrl,
+      layout: path.join(__dirname, "../layouts/dashboard.ejs"),
     });
   } catch (error) {
     console.log(error);
@@ -120,16 +117,14 @@ exports.detailsEmployee = async (req, res, next) => {
 exports.deleteEmployee = async (req, res, next) => {
   const id = req.params.id;
   const token = req.session.admin.token;
+  const apiUrl = process.env.API_URL;
 
   try {
-    const response = await axios.delete(
-      `http://139.180.132.97:3000/users/${id}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    await axios.delete(`${apiUrl}/users/${id}?password=${8888}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     res.json({ success: true });
   } catch (error) {
     console.log(error);

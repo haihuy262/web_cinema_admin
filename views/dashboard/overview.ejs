@@ -1,85 +1,438 @@
 <%- include('../partials/header.ejs') %>
-<div class="container mt-5" style="padding: 3%">
-  <h2 class="text-center mb-5">Revenue Statistics</h2>
-  <div class="row mb-3">
-    <div class="col-md-4">
-      <label for="cinemaSelect" class="form-label">Select Cinema</label>
-      <select class="form-select" id="cinemaSelect">
-        <option value="">cinema1</option>
-        <option value="">cinema2</option>
-      </select>
+<style>
+  .custom-blue {
+    background-color: #007bff;
+    color: white;
+  }
+  .custom-tr {
+    background-color: #00ffff;
+    color: white;
+  }
+</style>
+<nav style="--bs-breadcrumb-divider: '>'" aria-label="breadcrumb" class="mt-3">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Thống kê doanh thu</li>
+  </ol>
+</nav>
+<div class="card mb-3">
+  <div class="card-body">
+    <div class="row mb-4">
+      <div class="col-md-6">
+        <div style="border: 2px solid #007bff; padding: 10px; border-radius: 5px">
+          <h4 style="margin: 0">Tổng doanh thu: <span id="totalRevenueDisplay">0</span> VND</h4>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div style="border: 2px solid #cc4d69; padding: 10px; border-radius: 5px">
+          <h4 style="margin: 0">Tổng số vé bán ra: <span id="totalTicketsDisplay">0</span></h4>
+        </div>
+      </div>
     </div>
-    <div class="col-md-4">
-      <label for="movieSelect" class="form-label">Select Movie</label>
-      <select class="form-select" id="movieSelect">
-        <option value="">movie1</option>
-        <option value="">movie2</option>
-      </select>
+    <div class="row mb-3">
+      <div class="col-md-4">
+        <label for="cinema" class="form-label">Chọn Rạp</label>
+        <select class="form-select" id="cinemaSel" name="cinema" required>
+          <option value="" selected>Chọn rạp...</option>
+        </select>
+      </div>
+      <div class="col-md-4">
+        <label for="movie" class="form-label">Chọn Phim</label>
+        <select class="form-select" id="movieSel" name="movie" required>
+          <option value="" selected>Chọn phim...</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label for="dayStart" class="form-label">Từ Ngày</label>
+        <input type="date" class="form-control" id="dayStart" />
+      </div>
+      <div class="col-md-2">
+        <label for="dayEnd" class="form-label">Đến Ngày</label>
+        <input type="date" class="form-control" id="dayEnd" />
+      </div>
+      <div class="col-md-12 mt-3">
+        <button type="button" class="btn btn-primary" onclick="fetchRevenueData()">Filter</button>
+      </div>
     </div>
-    <div class="col-md-2">
-      <label for="startDate" class="form-label">From Date</label>
-      <input type="date" class="form-control" id="startDate" />
+    <div class="row">
+      <div id="revenueChart" style="width: 100%; height: 400px"></div>
     </div>
-    <div class="col-md-2">
-      <label for="endDate" class="form-label">To Date</label>
-      <input type="date" class="form-control" id="endDate" />
+    <div class="mt-3">
+      <h4>Doanh thu: <span id="totalRevenueLabel"></span></h4>
     </div>
-    <div class="col-md-12 mt-3">
-      <button
-        type="button"
-        class="btn btn-primary"
-        onclick="fetchRevenueData()"
-      >
-        Filter
-      </button>
+
+    <!-- Table for Movie Revenue -->
+
+    <div class="row mt-5">
+      <div class="col-md-6">
+        <h3>Doanh thu theo phim</h3>
+        <table class="table table-bordered table-hover align-middle table-primary" id="movieTableBody">
+          <thead>
+            <tr class="custom-blue">
+              <th>Phim</th>
+              <th>Tổng Tiền</th>
+              <th>Số Vé</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <nav>
+          <ul class="pagination justify-content-end" id="pagination">
+            <li class="page-item" id="prevPage" onclick="changePage(-1)">
+              <a class="page-link" href="#" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+              </a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" id="currentPage" href="#">1</a>
+            </li>
+            <li class="page-item" id="nextPage" onclick="changePage(1)">
+              <a class="page-link" href="#" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+      <div class="col-md-6">
+        <h3>Doanh thu theo rạp</h3>
+        <table class="table table-bordered table-hover align-middle table-success" id="cinemaTableBody">
+          <thead>
+            <tr>
+              <th>Rạp</th>
+              <th>Tổng Tiền</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
     </div>
-  </div>
-  <div class="row">
-    <div id="revenueChart" style="width: 100%; height: 400px"></div>
-  </div>
-  <div class="mt-3">
-    <h4>Total Revenue: <span id="totalRevenueLabel">$0</span></h4>
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.0/dist/echarts.min.js"></script>
 <script>
-  // Dữ liệu ví dụ
-  const data = [
-    { date: "2024-01-01", revenue: 1000 },
-    { date: "2024-01-02", revenue: 1200 },
-    { date: "2024-01-03", revenue: 800 },
-    { date: "2024-01-04", revenue: 1500 },
-    { date: "2024-01-05", revenue: 900 },
-  ];
+  let cinemaMap = {};
 
-  // Lấy phần tử div để render biểu đồ
-  const chartDom = document.getElementById("revenueChart");
-  const myChart = echarts.init(chartDom);
+  document.addEventListener("DOMContentLoaded", function () {
+    fetch("/dashboard/total")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        if (data.success) {
+          // Gán giá trị cho Tổng Doanh Thu từ trường 'getAll'
+          const totalRevenueDisplay = document.getElementById("totalRevenueDisplay");
+          totalRevenueDisplay.textContent = data.getAll.toLocaleString("en-US");
+        } else {
+          console.error("Error fetching movie data:", data.error);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching movie data:", error);
+      });
 
-  // Cấu hình biểu đồ
-  const option = {
-    title: {
-      text: "Doanh thu",
-    },
-    tooltip: {
-      trigger: "axis",
-    },
-    xAxis: {
-      type: "category",
-      data: data.map((item) => item.date),
-    },
-    yAxis: {
-      type: "value",
-    },
-    series: [
-      {
-        data: data.map((item) => item.revenue),
-        type: "line",
+    let currentPage = 1;
+
+    async function fetchMovies(page = 1) {
+      try {
+        const response = await fetch(`/dashboard/totalMovie?page=${page}`);
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        const data = await response.json();
+        if (data.success) {
+          // Nếu không có dữ liệu trong trang hiện tại và không phải trang đầu tiên, lùi lại một trang.
+          if (data.getAll.length === 0 && page > 1) {
+            changePage(-1);
+            return;
+          }
+
+          // Điền dữ liệu vào bảng
+          populateMovieTable(data.getAll);
+
+          // Tính tổng số vé bán ra
+          const totalTickets = data.getAll.reduce((total, movieData) => total + movieData.count, 0);
+
+          // Cập nhật giá trị của Tổng Số Vé Bán Ra
+          document.getElementById("totalTicketsDisplay").textContent = totalTickets;
+
+          // Cập nhật số trang hiện tại
+          document.getElementById("currentPage").textContent = page;
+          currentPage = page;
+
+          // Kiểm tra xem có trang tiếp theo không
+          const nextPageResponse = await fetch(`/dashboard/totalMovie?page=${page + 1}`);
+          const nextPageData = nextPageResponse.ok
+            ? await nextPageResponse.json()
+            : { success: false, getAll: [] };
+          const hasNextPage = nextPageData.success && nextPageData.getAll.length > 0;
+
+          // Cập nhật trạng thái của các nút điều khiển phân trang
+          updatePaginationControls(hasNextPage, page > 1);
+        } else {
+          console.error("Error fetching movie data:", data.error);
+          updatePaginationControls(false, false);
+        }
+      } catch (error) {
+        console.error("Error fetching movie data:", error);
+        updatePaginationControls(false, false);
+      }
+    }
+
+    function populateMovieTable(movies) {
+      const tableBody = document.getElementById("movieTableBody");
+
+      movies.forEach((movieData) => {
+        const row = document.createElement("tr");
+
+        const cellName = document.createElement("td");
+        cellName.textContent = movieData.movie.join(", ");
+        row.appendChild(cellName);
+
+        const cellRevenue = document.createElement("td");
+        cellRevenue.textContent = movieData.totalRevenue.toLocaleString("en-US");
+        row.appendChild(cellRevenue);
+
+        const cellCount = document.createElement("td");
+        cellCount.textContent = movieData.count;
+        row.appendChild(cellCount);
+
+        tableBody.appendChild(row);
+      });
+    }
+
+    function updatePaginationControls(hasNextPage, hasPrevPage) {
+      const prevButton = document.getElementById("prevPage");
+      const nextButton = document.getElementById("nextPage");
+
+      prevButton.classList.toggle("disabled", !hasPrevPage);
+      nextButton.classList.toggle("disabled", !hasNextPage);
+    }
+
+    function changePage(direction) {
+      const newPage = currentPage + direction;
+      if (newPage > 0) {
+        fetchMovies(newPage);
+      }
+    }
+
+    // Gọi hàm fetchMovies để khởi tạo bảng với trang đầu tiên.
+    fetchMovies();
+
+    fetch("/dashboard/totaListCinema")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        if (data.success) {
+          const tableBody = document.getElementById("cinemaTableBody");
+          data.getAll.forEach((cinemaData) => {
+            const row = document.createElement("tr");
+
+            const cellName = document.createElement("td");
+            cellName.textContent = cinemaData.cinema.join(", ");
+            row.appendChild(cellName);
+
+            const cellRevenue = document.createElement("td");
+
+            cellRevenue.textContent = cinemaData.totalRevenue.toLocaleString("en-US");
+            row.appendChild(cellRevenue);
+
+            tableBody.appendChild(row);
+          });
+        } else {
+          console.error("Error fetching movie data:", data.error);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching movie data:", error);
+      });
+
+    fetch("/discount/cinemaList")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        if (data.success) {
+          const cinemaSelect = document.getElementById("cinemaSel");
+          data.getAll.forEach((cinema) => {
+            const option = document.createElement("option");
+            option.value = cinema._id;
+            option.textContent = cinema.name;
+            cinemaSelect.appendChild(option);
+
+            cinemaMap[cinema._id] = cinema.name;
+          });
+        } else {
+          console.error("Error fetching cinema data:", data.error);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching cinema data:", error);
+      });
+
+    fetch("/dashboard/movieList")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        if (data.success) {
+          const moviesSelect = document.getElementById("movieSel");
+          data.getAll.forEach((movie) => {
+            const option = document.createElement("option");
+            option.value = movie._id;
+            option.textContent = movie.name;
+            moviesSelect.appendChild(option);
+          });
+        } else {
+          console.error("Error fetching movies data:", data.error);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching movies data:", error);
+      });
+
+    fetchRevenueData();
+  });
+
+  function formatDate(dateString) {
+    const [year, month, day] = dateString.split("-");
+    return `${year}-${month}-${day}`;
+  }
+
+  function fetchRevenueData() {
+    const cinemaId = document.getElementById("cinemaSel").value;
+    const movieId = document.getElementById("movieSel").value;
+    let dayStart = document.getElementById("dayStart").value
+      ? formatDate(document.getElementById("dayStart").value)
+      : null;
+    let dayEnd = document.getElementById("dayEnd").value
+      ? formatDate(document.getElementById("dayEnd").value)
+      : null;
+
+    // Kiểm tra dayStart và dayEnd
+    if (dayStart && dayEnd && new Date(dayStart) > new Date(dayEnd)) {
+      Swal.fire({
+        title: "Thông Báo!",
+        text: "Ngày bắt đầu phải nhỏ hơn ngày kết thúp!",
+        icon: "error",
+        confirmButtonText: "OK",
+      }).then((result) => {
+        location.reload();
+      });
+      return;
+    }
+
+    const url = new URL("/dashboard/totalCinema", window.location.origin);
+    const params = { cinemaId, movieId };
+
+    if (dayStart) {
+      params.dayStart = dayStart;
+    }
+    if (dayEnd) {
+      params.dayEnd = dayEnd;
+    }
+
+    Object.keys(params).forEach((key) => url.searchParams.append(key, params[key]));
+
+    fetch(url)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        if (data.success) {
+          const totalRevenue = data.totalRevenue;
+
+          const totalRevenueLabel = document.getElementById("totalRevenueLabel");
+          const formattedTotalRevenue = Number(totalRevenue).toLocaleString("en-US");
+          totalRevenueLabel.textContent = `${formattedTotalRevenue} VND`;
+
+          const revenueData = data.revenueData || [];
+          const cinemaNames = revenueData.map((item) => item.cinemaName);
+          const seriesData = revenueData.map((item) => item.totalRevenue);
+
+          const chartDom = document.getElementById("revenueChart");
+          const myChart = echarts.init(chartDom);
+
+          const option = {
+            title: {
+              text: "Doanh thu",
+            },
+            tooltip: {
+              trigger: "axis",
+            },
+            xAxis: {
+              type: "category",
+              data: cinemaNames,
+            },
+            yAxis: {
+              type: "value",
+            },
+            series: [
+              {
+                data: seriesData,
+                type: "bar",
+                barWidth: "50",
+              },
+            ],
+          };
+
+          myChart.setOption(option);
+        } else {
+          handleNoRevenue();
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching revenue data:", error);
+        handleNoRevenue();
+      });
+  }
+
+  function handleNoRevenue() {
+    const totalRevenueLabel = document.getElementById("totalRevenueLabel");
+    totalRevenueLabel.textContent = `0 VND`;
+
+    const chartDom = document.getElementById("revenueChart");
+    const myChart = echarts.init(chartDom);
+
+    const option = {
+      title: {
+        text: "Doanh thu",
       },
-    ],
-  };
+      tooltip: {
+        trigger: "axis",
+      },
+      xAxis: {
+        type: "category",
+        data: [],
+      },
+      yAxis: {
+        type: "value",
+      },
+      series: [
+        {
+          data: [],
+          type: "bar",
+          barWidth: "50",
+        },
+      ],
+    };
 
-  // Đưa dữ liệu và cấu hình vào biểu đồ
-  myChart.setOption(option);
+    myChart.setOption(option);
+  }
 </script>

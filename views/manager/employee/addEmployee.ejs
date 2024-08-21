@@ -1,129 +1,162 @@
 <%- include('../../partials/header.ejs') %>
-<div class="container mt-5 p-3">
-  <h2 class="text-center mt-4">Tạo nhân viên</h2>
-  <!-- ==== alert success ==== -->
-  <% if (typeof success !== 'undefined') { %>
-  <div class="alert alert-success" role="alert" id="success-alert">
-    <%= success %>
-    <script>
-      setTimeout(function () {
-        window.location.href = "/employee/list";
-      }, 1000);
-    </script>
+<nav style="--bs-breadcrumb-divider: '>'" aria-label="breadcrumb" class="mt-3">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="#">Quản lý nhân viên</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Tạo nhân viên</li>
+  </ol>
+</nav>
+<div class="card mb-3">
+  <div class="card-body">
+    <form id="addStaff">
+      <div class="mb-3">
+        <label for="fullName" class="form-label required">Họ Tên</label>
+        <input
+          name="name"
+          type="text"
+          class="form-control"
+          id="fullName"
+          placeholder="Nhập họ tên"
+          required />
+      </div>
+      <div class="mb-3">
+        <label for="email" class="form-label required">Email</label>
+        <input name="email" type="email" class="form-control" id="email" placeholder="Nhập email" required />
+      </div>
+      <div class="mb-3">
+        <label for="phone" class="form-label required">Số điện thoại</label>
+        <input
+          name="number_phone"
+          type="tel"
+          class="form-control"
+          id="phone"
+          placeholder="Nhập số điện thoại"
+          required />
+      </div>
+      <div class="mb-3">
+        <label for="birthdate" class="form-label">Ngày tháng năm sinh</label>
+        <input type="date" class="form-control" id="birthdate" name="date_of_birth" required />
+      </div>
+      <div class="mb-3">
+        <label for="password" class="form-label required">Mật Khẩu</label>
+        <input
+          name="password"
+          type="password"
+          class="form-control"
+          id="password"
+          placeholder="Nhập mật khẩu"
+          required />
+      </div>
+      <div class="mb-3">
+        <label for="role" class="form-label required">Giới tính</label>
+        <select name="gender" class="form-select" id="role" required>
+          <option value="">Chọn giới tính</option>
+          <option value="nam">Nam</option>
+          <option value="nữ">Nữ</option>
+        </select>
+      </div>
+      <div hidden class="mb-3">
+        <label for="imageUpload" class="form-label">Thêm ảnh</label>
+        <input name="image" type="file" class="form-control" id="imageUpload" />
+      </div>
+      <img id="imagePreview" src="" alt="Image Preview" class="d-none w-50 h-50" />
+      <button onclick="window.history.back()" class="btn btn-secondary mt-3">Quay lại</button>
+      <button class="btn btn-primary mt-3">Tạo nhân viên</button>
+    </form>
   </div>
-  <% } %>
-  <!-- ======================= -->
-  <!-- ===== alert error ===== -->
-  <% if (typeof error !== 'undefined') { %>
-  <div class="alert alert-danger" role="alert"><%= error %></div>
-  <% } %>
-  <!-- ======================= -->
-  <form method="post" enctype="multipart/form-data">
-    <div class="mb-3">
-      <label for="fullName" class="form-label required">Họ Tên</label>
-      <input
-        name="name"
-        type="text"
-        class="form-control"
-        id="fullName"
-        placeholder="Nhập họ tên"
-        required
-      />
-    </div>
-    <div class="mb-3">
-      <label for="email" class="form-label required">Email</label>
-      <input
-        name="email"
-        type="email"
-        class="form-control"
-        id="email"
-        placeholder="Nhập email"
-        required
-      />
-    </div>
-    <div class="mb-3">
-      <label for="phone" class="form-label required">Số điện thoại</label>
-      <input
-        name="number_phone"
-        type="tel"
-        class="form-control"
-        id="phone"
-        placeholder="Nhập số điện thoại"
-        required
-      />
-    </div>
-    <div class="mb-3">
-      <label for="birthdate" class="form-label">Ngày tháng năm sinh</label>
-      <input
-        type="date"
-        class="form-control"
-        id="birthdate"
-        name="date_of_birth"
-        required
-      />
-    </div>
-    <div class="mb-3">
-      <label for="password" class="form-label required">Mật Khẩu</label>
-      <input
-        name="password"
-        type="password"
-        class="form-control"
-        id="password"
-        placeholder="Nhập mật khẩu"
-        required
-      />
-    </div>
-    <!-- <div class="mb-3">
-      <label for="role" class="form-label required">Quyền</label>
-      <select class="form-select" id="role" required>
-        <option value="">Chọn quyền</option>
-        <option value="user">User</option>
-        <option value="nhân viên">Staff</option>
-      </select>
-    </div> -->
-    <div class="mb-3">
-      <label for="role" class="form-label required">Giới tính</label>
-      <select name="gender" class="form-select" id="role" required>
-        <option value="">Chọn giới tính</option>
-        <option value="nam">Nam</option>
-        <option value="nữ">Nữ</option>
-      </select>
-    </div>
-    <div class="mb-3">
-      <label for="imageUpload" class="form-label">Thêm ảnh</label>
-      <input
-        name="image"
-        type="file"
-        class="form-control"
-        id="imageUpload"
-        accept="image/*"
-      />
-    </div>
-    <img
-      id="imagePreview"
-      src=""
-      alt="Image Preview"
-      class="d-none w-50 h-50"
-    />
-    <button onclick="window.history.back()" class="btn btn-secondary">
-      Quay lại
-    </button>
-    <button class="btn btn-primary">Tạo nhân viên</button>
-  </form>
 </div>
+<!-- getToken apiURl -->
 <script>
-  document
-    .getElementById("imageUpload")
-    .addEventListener("change", function (event) {
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-          const img = document.getElementById("imagePreview");
-          img.src = e.target.result;
-          img.classList.remove("d-none");
-        };
-        reader.readAsDataURL(file);
-      }
+  let token = "";
+  let apiUrl = "";
+  $(document).ready(function () {
+    $.ajax({
+      url: "/token/getToken",
+      type: "GET",
+      async: false, // đồng bộ
+      success: function (data) {
+        token = data.token;
+        apiUrl = data.apiUrl;
+      },
+      error: function (error) {
+        console.log(error);
+      },
     });
+  });
+</script>
+<!-- Add Staff -->
+<script>
+  $(document).ready(function () {
+    $("#addStaff").submit(function (e) {
+      e.preventDefault();
+      const name = $("#fullName").val();
+      const email = $("#email").val();
+      const password = $("#password").val();
+      const date_of_birth = $("#birthdate").val();
+      const number_phone = $("#phone").val();
+      const gender = $("#role").val();
+
+      console.log(name);
+      console.log(email);
+      console.log(password);
+      console.log(date_of_birth);
+      console.log(number_phone);
+      console.log(gender);
+
+      const formData = new FormData();
+      formData.append("name", name);
+      formData.append("email", email);
+      formData.append("password", password);
+      formData.append("date_of_birth", date_of_birth);
+      formData.append("number_phone", number_phone);
+      formData.append("gender", gender);
+
+      $.ajax({
+        url: `/employee/add`,
+        type: "POST",
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function (data) {
+          if (data.success === true) {
+            Swal.fire({
+              title: "Thành công!",
+              text: "Tạo thành công!",
+              icon: "success",
+              confirmButtonText: "OK",
+            }).then((result) => {
+              if (result.isConfirmed) {
+                window.location.href = "/employee/list";
+              }
+            });
+          }
+        },
+        error: function (error) {
+          console.log(error);
+          Swal.fire({
+            title: "Lỗi!",
+            text: "Đã xảy ra lỗi gì đó!.",
+            icon: "error",
+            confirmButtonText: "OK",
+          }).then((result) => {
+            location.reload();
+          });
+        },
+      });
+    });
+  });
+</script>
+<!-- Hiển thị image -->
+<script>
+  document.getElementById("imageUpload").addEventListener("change", function (event) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const img = document.getElementById("imagePreview");
+        img.src = e.target.result;
+        img.classList.remove("d-none");
+      };
+      reader.readAsDataURL(file);
+    }
+  });
 </script>

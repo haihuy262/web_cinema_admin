@@ -1,73 +1,174 @@
 <%- include('../partials/header.ejs') %>
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Add Room</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.16.13/antd.min.css">
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-</head>
-<body>
-  <div class="container mt-5" style="padding: 3%;">
-    <h2>Add Room</h2>
+<nav style="--bs-breadcrumb-divider: '>'" aria-label="breadcrumb" class="mt-3">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="#">Quản lý rạp phim</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Tạo phòng chiếu</li>
+  </ol>
+</nav>
+<div class="card mb-3">
+  <div class="card-body">
     <form id="addRoomForm">
-      <div class="form-group">
-        <label for="name">Name:</label>
-        <input type="text" class="form-control" id="name" name="name" required>
+      <div class="row">
+        <div class="col-md-12 mb-3">
+          <label for="name" class="form-label">Tên phòng chiếu:</label>
+          <select name="name" id="name" class="form-select" required>
+            <option value="" selected disabled>Chọn tên phòng...</option>
+            <option value="Phòng 1">Phòng 1</option>
+            <option value="Phòng 2">Phòng 2</option>
+            <option value="Phòng 3">Phòng 3</option>
+            <option value="Phòng 4">Phòng 4</option>
+          </select>
+        </div>
+        <div class="col-md-12 mb-3">
+          <label for="capacity" class="form-label">Rạp phim</label>
+          <select name="cinema" id="cinema" class="form-select" required>
+            <option value="" selected disabled>Chọn rạp phim...</option>
+          </select>
+        </div>
+        <div class="col-md-12 mb-3">
+          <label for="capacity" class="form-label">Suất chiếu</label>
+          <select name="showTime" id="showTime" class="form-select" multiple required></select>
+        </div>
+        <div class="col-md-12 mb-3">
+          <label for="capacity" class="form-label">Phim chiếu</label>
+          <select name="movie" id="movieAddRoom" class="form-select" required>
+            <option value="" selected disabled>Chọn phim...</option>
+          </select>
+        </div>
       </div>
-      <div class="form-group">
-        <label for="capacity">Capacity:</label>
-        <input type="number" class="form-control" id="capacity" name="capacity" required>
-      </div>
-      <div class="form-group">
-        <label for="status">Status:</label>
-        <select class="form-control" id="status" name="status" required>
-          <option value="Active">Active</option>
-          <option value="Inactive">Inactive</option>
-        </select>
-      </div>
-      <button type="submit" class="btn btn-primary">Add Room</button>
+      <button type="submit" class="btn btn-primary">Tạo phòng chiếu</button>
     </form>
   </div>
+</div>
 
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
-  <script>
-    // Example: Handle form submission for adding room
-    document.getElementById('addRoomForm').addEventListener('submit', function(event) {
-      event.preventDefault();
-      
-      const name = document.getElementById('name').value;
-      const capacity = document.getElementById('capacity').value;
-      const status = document.getElementById('status').value;
-
-      // Replace with actual AJAX request to backend
-      // Example: Send data to backend API
-      // $.ajax({
-      //   url: '/api/add-room',
-      //   method: 'POST',
-      //   data: { name, capacity, status },
-      //   success: function(response) {
-      //     console.log('Room added successfully:', response);
-      //     // Example: Redirect to rooms list page
-      //     // window.location.href = '/rooms';
-      //   },
-      //   error: function(err) {
-      //     console.error('Error adding room:', err);
-      //     // Handle error
-      //   }
-      // });
-
-      // Example: Logging data for demonstration
-      console.log('Adding new room:', { name, capacity, status });
-
-      // Reset form after submission (optional)
-      this.reset();
+<script>
+  $(document).ready(function () {
+    let token = "";
+    let apiUrl = "";
+    // Get Token
+    $.ajax({
+      url: "/token/getToken",
+      type: "GET",
+      async: false, // đồng bộ
+      success: function (data) {
+        token = data.token;
+        apiUrl = data.apiUrl;
+      },
+      error: function (error) {
+        console.log(error);
+      },
     });
-  </script>
-</body>
-</html>
+
+    // Get Cinema ( Rạp phim )
+    $.ajax({
+      url: `${apiUrl}/cinemas`,
+      type: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      success: function (data) {
+        for (let i = 0; i < data.length; i++) {
+          const option = $("<option>").val(data[i]._id).text(data[i].name);
+          $("#cinema").append(option);
+        }
+      },
+      error: function (error) {
+        console.log(error);
+      },
+    });
+
+    // Get Showtime ( Suất chiếu )
+    $.ajax({
+      url: `${apiUrl}/showtimes/user`,
+      type: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      success: function (data) {
+        for (let i = 0; i < data.getAll.length; i++) {
+          const option = $("<option>")
+            .val(data.getAll[i]._id)
+            .text(new Date(data.getAll[i].date).toLocaleDateString());
+          $("#showTime").append(option);
+        }
+      },
+      error: function (error) {
+        console.log(error);
+      },
+    });
+
+    // Get Movie ( Phim )
+    $.ajax({
+      url: `${apiUrl}/movies/no/login`,
+      type: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      success: function (data) {
+        for (let i = 0; i < data.getall.length; i++) {
+          const option = $("<option>").val(data.getall[i]._id).text(data.getall[i].name);
+          $("#movieAddRoom").append(option);
+        }
+      },
+      error: function (error) {
+        console.log(error);
+      },
+    });
+
+    // Form
+    $("#addRoomForm").submit(function (event) {
+      event.preventDefault();
+
+      const nameForm = $("#name").val();
+      const movieForm = $("#movieAddRoom").val();
+      const showtimeForm = $("#showTime").val();
+      const cinemaForm = $("#cinema").val();
+
+      $.ajax({
+        url: `${apiUrl}/rooms`,
+        type: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        data: {
+          name: nameForm,
+          movie: movieForm,
+          cinema: cinemaForm,
+          showtime: showtimeForm,
+        },
+        success: function (data) {
+          if (data.create === "Room already exists") {
+            Swal.fire({
+              title: "Cảnh báo!",
+              text: "Phòng đã tồn tại!",
+              icon: "warning",
+              confirmButtonText: "OK",
+            });
+          } else {
+            Swal.fire({
+              title: "Thành công!",
+              text: "Tạo thành công!",
+              icon: "success",
+              confirmButtonText: "OK",
+            }).then((result) => {
+              if (result.isConfirmed) {
+                window.location.href = "/cinema/roomList";
+              }
+            });
+          }
+        },
+        error: function (error) {
+          console.log(error);
+          Swal.fire({
+            title: "Lỗi!",
+            text: "Đã xảy ra lỗi gì đó!.",
+            icon: "error",
+            confirmButtonText: "OK",
+          }).then((result) => {
+            location.reload();
+          });
+        },
+      });
+    });
+  });
+</script>

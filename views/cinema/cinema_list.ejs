@@ -1,80 +1,229 @@
 <%- include('../partials/header.ejs') %>
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>List of Cinemas</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.16.13/antd.min.css">
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-</head>
-<body>
-  <div class="container mt-5" style="padding: 3%;">
-    <h2>List of Cinemas</h2>
-    <table class="table table-bordered">
-      <thead>
-        <tr>
-          <th>Stt</th>
-          <th>Name</th>
-          <th>Address</th>
-          <th>Hotline</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>1</td>
-          <td>MDcinema My Dinh</td>
-          <td>So 1 Dinh Thon</td>
-          <td>023334444</td>
-          <td>
-            <button class="btn btn-info" onclick="editCinema(1)">Edit</button>
-            <button class="btn btn-danger" data-toggle="modal" data-target="#deleteCinemaModal">Delete</button>
-          </td>
-        </tr>
-        <!-- Thêm các dòng dữ liệu tương tự nếu cần -->
-      </tbody>
-    </table>
-  </div>
-
-  <!-- Modal Xác nhận Xóa Cinema -->
-  <div class="modal fade" id="deleteCinemaModal" tabindex="-1" role="dialog" aria-labelledby="deleteCinemaModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="deleteCinemaModalLabel">Xác nhận Xóa Rạp Chiếu Phim</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <p>Bạn có chắc chắn muốn xóa rạp chiếu phim này?</p>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
-          <button type="button" class="btn btn-danger" onclick="deleteCinema()">Xóa</button>
+<style>
+  .search-wrapper {
+    position: relative;
+  }
+  .search-wrapper .bi-search {
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
+    color: #aaa;
+  }
+  .search-wrapper input {
+    padding-left: 2.5rem; /* Adjust padding to make room for the icon */
+  }
+</style>
+<nav style="--bs-breadcrumb-divider: '>'" aria-label="breadcrumb" class="mt-3">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="#">Quản lý rạp phim</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Danh sách rạp phim</li>
+  </ol>
+</nav>
+<div class="card mb-3">
+  <div class="card-body">
+    <div>
+      <div class="d-flex mb-3">
+        <button onclick="window.location.href = '/cinema/cinemaAdd'" class="btn btn-primary">
+          Tạo rạp phim
+        </button>
+        <div class="search-wrapper ms-3">
+          <i class="bi bi-search"></i>
+          <input
+            id="searchInput"
+            class="form-control me-2"
+            type="search"
+            placeholder="Tìm kiếm..."
+            aria-label="Search"
+            oninput="searchTable()" />
+          <!-- <button class="btn btn-outline-success" type="submit" onclick="searchTable()">Search</button> -->
         </div>
       </div>
     </div>
+    <table class="table table-bordered table-hover align-middle">
+      <thead>
+        <tr class="table table-secondary">
+          <th class="text-center">STT</th>
+          <th class="text-center">ID</th>
+          <th class="text-center">Tên</th>
+          <th class="text-center">Địa Chỉ</th>
+          <th class="text-center">Số Điện Thoại</th>
+          <th class="text-center">Hành Động</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody">
+        <% cinemas.forEach((cinema,index) => { %>
+        <tr>
+          <td class="text-center"><%= index + 1 %></td>
+          <td class="text-center"><%= cinema._id.slice(-8).toUpperCase() %></td>
+          <td class="text-center"><%= cinema.name %></td>
+          <td class="text-center"><%= cinema.address %></td>
+          <td class="text-center"><%= cinema.hotline %></td>
+          <td class="text-center">
+            <button
+              class="btn btn-info"
+              data-cinema="<%= JSON.stringify(cinema) %>"
+              onclick="editCinema(this)">
+              Sửa
+            </button>
+            <!-- <button
+              class="btn btn-danger"
+              onclick="deleteCinema('<%= cinema._id %>')"
+            >
+              Xoá
+            </button> -->
+          </td>
+        </tr>
+        <% }); %>
+      </tbody>
+    </table>
   </div>
+</div>
 
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<!-- Modal Sửa Rạp -->
+<div
+  class="modal fade"
+  id="editCinemaModal"
+  tabindex="-1"
+  aria-labelledby="editCinemaModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editCinemaModalLabel">Sửa Rạp</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+      </div>
+      <div class="modal-body">
+        <form id="editCinemaForm">
+          <input type="hidden" id="cinemaId" name="cinemaId" />
+          <div class="mb-3">
+            <label for="cinemaName" class="form-label">Tên</label>
+            <input type="text" class="form-control" id="cinemaName" name="name" required />
+          </div>
+          <div class="mb-3">
+            <label for="cinemaAddress" class="form-label">Địa chỉ</label>
+            <input type="text" class="form-control" id="cinemaAddress" name="address" required />
+          </div>
+          <div class="mb-3">
+            <label for="cinemaHotline" class="form-label">Hotline</label>
+            <input type="text" class="form-control" id="cinemaHotline" name="hotline" required />
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+        <button type="button" class="btn btn-primary" onclick="submitEditCinema()">Lưu thay đổi</button>
+      </div>
+    </div>
+  </div>
+</div>
 
-  <script>
-    // Function to delete a cinema (mock implementation, replace with actual logic)
-    function deleteCinema() {
-      alert("Delete Cinema function called.");
-      // Implement your logic to delete cinema here
+<script>
+  async function deleteCinema(Id) {
+    if (confirm("Bạn có chắc chắn muốn xoá?")) {
+      try {
+        const response = await fetch(`/cinema/cinema/${Id}`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (response.ok) {
+          alert("Xoá thành công!");
+          window.location.reload();
+        } else {
+          alert("Đã xảy ra lỗi khi xoá.");
+        }
+      } catch (error) {
+        alert("Đã xảy ra lỗi khi xoá.");
+        console.error(error);
+      }
     }
+  }
 
-    // Function to edit a cinema (mock implementation, replace with actual logic)
-    function editCinema(cinemaId) {
-      alert("Edit Cinema function called for Cinema ID: " + cinemaId);
-      // Implement your logic to edit cinema here
+  function editCinema(button) {
+    const cinema = JSON.parse(button.getAttribute("data-cinema"));
+    document.getElementById("cinemaId").value = cinema._id;
+    document.getElementById("cinemaName").value = cinema.name;
+    document.getElementById("cinemaAddress").value = cinema.address;
+    document.getElementById("cinemaHotline").value = cinema.hotline;
+
+    // Hiện modal
+    var myModal = new bootstrap.Modal(document.getElementById("editCinemaModal"));
+    myModal.show();
+  }
+
+  async function submitEditCinema() {
+    const cinemaId = document.getElementById("cinemaId").value;
+    const name = document.getElementById("cinemaName").value;
+    const address = document.getElementById("cinemaAddress").value;
+    const hotline = document.getElementById("cinemaHotline").value;
+
+    try {
+      const response = await fetch(`/cinema/updateCinema/${cinemaId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name, address, hotline }),
+      });
+
+      if (response.ok) {
+        Swal.fire({
+          title: "Thành công!",
+          text: "Sửa thành công!",
+          icon: "success",
+          confirmButtonText: "OK",
+        }).then((result) => {
+          location.reload();
+        });
+      } else {
+        Swal.fire({
+          title: "Lỗi!",
+          text: "Đã xảy ra lỗi gì đó!.",
+          icon: "error",
+          confirmButtonText: "OK",
+        }).then((result) => {
+          location.reload();
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      Swal.fire({
+        title: "Lỗi!",
+        text: "Đã xảy ra lỗi gì đó!.",
+        icon: "error",
+        confirmButtonText: "OK",
+      }).then((result) => {
+        location.reload();
+      });
     }
-  </script>
-</body>
-</html>
+  }
+</script>
+<script>
+  function searchTable() {
+    const input = document.getElementById("searchInput").value.toLowerCase();
+    const tableBody = document.getElementById("tableBody");
+    const rows = tableBody.getElementsByTagName("tr");
+
+    for (let i = 0; i < rows.length; i++) {
+      const row = rows[i];
+      const cells = row.getElementsByTagName("td");
+      let match = false;
+
+      for (let j = 0; j < cells.length; j++) {
+        if (cells[j].innerText.toLowerCase().indexOf(input) > -1) {
+          match = true;
+          break;
+        }
+      }
+
+      if (match) {
+        row.style.display = "";
+      } else {
+        row.style.display = "none";
+      }
+    }
+  }
+</script>

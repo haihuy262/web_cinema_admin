@@ -1,73 +1,28 @@
 <%- include('../partials/header.ejs') %>
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Add Cinema</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.16.13/antd.min.css">
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-</head>
-<body>
-  <div class="container mt-5" style="padding: 3%;">
-    <h2>Add Cinema</h2>
-    <form id="addCinemaForm">
-      <div class="form-group">
-        <label for="name">Name:</label>
-        <input type="text" class="form-control" id="name" name="name" required>
-      </div>
-      <div class="form-group">
-        <label for="address">Address:</label>
-        <input type="text" class="form-control" id="address" name="address" required>
-      </div>
-      <div class="form-group">
-        <label for="hotline">Hotline:</label>
-        <input type="text" class="form-control" id="hotline" name="hotline" required>
-      </div>
-      <button type="submit" class="btn btn-primary">Add Cinema</button>
-    </form>
+<nav style="--bs-breadcrumb-divider: '>'" aria-label="breadcrumb" class="mt-3">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="#">Quản rạp phim</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Tạo rạp phim</li>
+  </ol>
+</nav>
+<div class="card mb-3">
+  <div class="card-body">
+    <div>
+      <form action="/cinema/creatCinema" method="POST">
+        <div class="mb-3">
+          <label for="name" class="form-label">Tên rạp</label>
+          <input type="text" class="form-control" id="name" name="name" required />
+        </div>
+        <div class="mb-3">
+          <label for="address" class="form-label">Địa chỉ</label>
+          <input type="text" class="form-control" id="address" name="address" required />
+        </div>
+        <div class="mb-3">
+          <label for="hotline" class="form-label">Số hotline</label>
+          <input type="text" class="form-control" id="hotline" name="hotline" required />
+        </div>
+        <button type="submit" class="btn btn-primary">Lưu</button>
+      </form>
+    </div>
   </div>
-
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
-  <script>
-    // Function to handle form submission
-    document.getElementById('addCinemaForm').addEventListener('submit', function(event) {
-      event.preventDefault(); // Prevent default form submission
-      // Collect form data
-      let formData = {
-        name: document.getElementById('name').value,
-        address: document.getElementById('address').value,
-        hotline: document.getElementById('hotline').value
-      };
-
-      // Mock AJAX request (replace with actual logic)
-      console.log('Form data:', formData);
-      alert('Add Cinema function called. Check console for form data.');
-      // Implement your logic to send formData to backend for adding cinema
-      // Example: Using fetch API to send formData to backend
-      /*
-      fetch('/api/cinemas', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      })
-      .then(response => response.json())
-      .then(data => {
-        console.log('Success:', data);
-        // Optionally, redirect to cinema list page or show success message
-      })
-      .catch((error) => {
-        console.error('Error:', error);
-        // Handle error scenario
-      });
-      */
-    });
-  </script>
-</body>
-</html>
+</div>
