@@ -53,8 +53,8 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use("/", loginRouter);
 app.use(expressLayouts);
+app.use("/", loginRouter);
 app.use("/token", tokenRouter);
 app.use("/dashboard", dashboardRouter);
 app.use("/employee", employeeRouter);
