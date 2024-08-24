@@ -15,6 +15,7 @@ exports.detailsTickets = async (req, res, next) => {
   const arrUser = [];
   const arrSeat = [];
   const arrFood = [];
+  const arrDiscount = [];
 
   try {
     const response = await axios.get(`${apiUrl}/tickets/${id}`, {
@@ -24,7 +25,7 @@ exports.detailsTickets = async (req, res, next) => {
     });
     // Mã tickets
     const idTickets = response.data.getTicket._id;
-    const shorId = idTickets.substring(0, 8).toUpperCase();
+    const shorId = idTickets.slice(-8).toUpperCase();
     // Tên phim
     const movieName = response.data.getTicket.movie.name;
     // Giờ chiếu
@@ -52,7 +53,8 @@ exports.detailsTickets = async (req, res, next) => {
     // Khách hàng
     const nameUser = response.data.getTicket.user.name;
     const emailUser = response.data.getTicket.user.email;
-    arrUser.push(nameUser, emailUser);
+    const number_phone = response.data.getTicket.user.number_phone;
+    arrUser.push(nameUser, emailUser, number_phone);
     // Tổng tiền
     const total = response.data.getTicket.total;
     const formattedMoney = total.toLocaleString("en-US");
@@ -60,19 +62,30 @@ exports.detailsTickets = async (req, res, next) => {
     const seat = response.data.getTicket.seat;
     for (let i = 0; i < seat.length; i++) {
       if (seat[i] !== null) {
-        arrSeat.push(seat[i].name, seat[i].price);
+        arrSeat.push(seat[i].name, seat[i].price.toLocaleString("en-US"));
       } else {
         console.log("Dữ liệu", seat[i], "trống!");
       }
     }
     // Đồ ăn
     const food = response.data.getTicket.food;
+    const totalFood = response.data.getTicket.total_food;
     for (let i = 0; i < food.length; i++) {
       if (food[i].foodId !== null) {
         arrFood.push(food[i].foodId.name.toUpperCase(), food[i].quantity, food[i].foodId.price);
       } else {
         console.log("Dữ liệu", food[i], "trống!");
       }
+    }
+    // Discount
+    const discount = response.data.getTicket.discount;
+    for (let i = 0; i < discount.length; i++) {
+      const percent = discount[i].percent * 100 + "%";
+      const id = discount[i]._id.slice(-8).toUpperCase();
+      const name = discount[i].name;
+      const code = discount[i].code;
+      const type = discount[i].type;
+      arrDiscount.push(percent, id, name, code, type);
     }
 
     res.render("../views/manager/tickets/detailsTickets.ejs", {
@@ -87,6 +100,8 @@ exports.detailsTickets = async (req, res, next) => {
       tongTien: formattedMoney,
       seat: arrSeat,
       food: arrFood,
+      discount: arrDiscount,
+      totalFood,
       layout: path.join(__dirname, "../layouts/dashboard.ejs"),
     });
   } catch (error) {

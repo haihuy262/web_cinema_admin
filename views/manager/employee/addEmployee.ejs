@@ -17,20 +17,23 @@
           id="fullName"
           placeholder="Nhập họ tên"
           required />
+        <div class="invalid-feedback" id="nameError">Tên không hợp lệ!</div>
       </div>
       <div class="mb-3">
         <label for="email" class="form-label required">Email</label>
         <input name="email" type="email" class="form-control" id="email" placeholder="Nhập email" required />
+        <div class="invalid-feedback" id="emailError">Email không hợp lệ!</div>
       </div>
       <div class="mb-3">
         <label for="phone" class="form-label required">Số điện thoại</label>
         <input
           name="number_phone"
-          type="tel"
+          type="number"
           class="form-control"
           id="phone"
           placeholder="Nhập số điện thoại"
           required />
+        <div class="invalid-feedback" id="numberPhoneError">Số điện thoại không hợp lệ!</div>
       </div>
       <div class="mb-3">
         <label for="birthdate" class="form-label">Ngày tháng năm sinh</label>
@@ -88,6 +91,7 @@
   $(document).ready(function () {
     $("#addStaff").submit(function (e) {
       e.preventDefault();
+
       const name = $("#fullName").val();
       const email = $("#email").val();
       const password = $("#password").val();
@@ -95,12 +99,31 @@
       const number_phone = $("#phone").val();
       const gender = $("#role").val();
 
-      console.log(name);
-      console.log(email);
-      console.log(password);
-      console.log(date_of_birth);
-      console.log(number_phone);
-      console.log(gender);
+      let isNameValid = isVietnameseFullname(name);
+      let isPhoneValid = isVietnamesePhoneNumber(number_phone);
+      let isGmailValid = isGmailGoogle(email);
+
+      if (!isNameValid) {
+        $("#nameError").show();
+      } else {
+        $("#nameError").hide();
+      }
+
+      if (!isPhoneValid) {
+        $("#numberPhoneError").show();
+      } else {
+        $("#numberPhoneError").hide();
+      }
+
+      if (!isGmailValid) {
+        $("#emailError").show();
+      } else {
+        $("#emailError").hide();
+      }
+
+      if (!isNameValid || !isPhoneValid || !isGmailValid) {
+        return;
+      }
 
       const formData = new FormData();
       formData.append("name", name);
@@ -143,6 +166,25 @@
         },
       });
     });
+
+    // Regex tên Việt Nam
+    function isVietnameseFullname(name) {
+      return /^[A-ZÀÁẠẢÃÂẦẤẬẨẪĂẰẮẶẲẴÈÉẸẺẼÊỀẾỆỂỄÌÍỊỈĨÒÓỌỎÕÔỒỐỘỔỖƠỜỚỢỞỠÙÚỤỦŨƯỪỨỰỬỮỲÝỴỶỸĐ][a-zàáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]*(?:[ ][A-ZÀÁẠẢÃÂẦẤẬẨẪĂẰẮẶẲẴÈÉẸẺẼÊỀẾỆỂỄÌÍỊỈĨÒÓỌỎÕÔỒỐỘỔỖƠỜỚỢỞỠÙÚỤỦŨƯỪỨỰỬỮỲÝỴỶỸĐ][a-zàáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]*)*$/gm.test(
+        name
+      );
+    }
+
+    // Regex Số điện thoại Việt Nam
+    function isVietnamesePhoneNumber(number) {
+      return /^(0|84)(2(0[3-9]|1[0-6|8|9]|2[0-2|5-9]|3[2-9]|4[0-9]|5[1|2|4-9]|6[0-3|9]|7[0-7]|8[0-9]|9[0-4|6|7|9])|3[2-9]|5[5|6|8|9]|7[0|6-9]|8[0-6|8|9]|9[0-4|6-9])([0-9]{7})$/gm.test(
+        number
+      );
+    }
+
+    // Regex Gmail Google
+    function isGmailGoogle(gmail) {
+      return /[\w]*@*[a-z]*\.*[\w]{5,}(\.)*(com)*(@gmail\.com)/g.test(gmail);
+    }
   });
 </script>
 <!-- Hiển thị image -->

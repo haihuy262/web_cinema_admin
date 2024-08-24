@@ -48,7 +48,7 @@
             </button> -->
       </div>
     </div>
-    <table class="table table-bordered table-hover align-middle text-center">
+    <table class="table table-bordered table-hover align-middle">
       <thead class="thead-light">
         <tr class="table table-secondary">
           <th class="text-center">STT</th>
@@ -215,15 +215,15 @@
 
         tbody.innerHTML += `
         <tr>
-          <td>${startIndex + i + 1}</td>
-          <td class="text-primary p-3">
+          <td class="text-center">${startIndex + i + 1}</td>
+          <td class="text-primary p-3 text-center">
             <a href="/tickets/details/${tickets._id}" class="nav-link">${shortId}</a>
           </td>
           <td class="text-primary text-success-emphasis">${tickets.movie.name}</td>
-          <td>${tickets.cinema.name}</td>
-          <td><span class="${statusClass}">${status}</span></td>
-          <td>${formattedMoney}</td>
-          <td>${formattedDate}</td>
+          <td class="text-center">${tickets.cinema.name}</td>
+          <td class="text-center"><span class="${statusClass}">${status}</span></td>
+          <td class="text-center">${formattedMoney}</td>
+          <td class="text-center">${formattedDate}</td>
         </tr>
           `;
       }
