@@ -205,25 +205,28 @@
         $("#roomShowtime").val(room.showtime.map((st) => st._id));
 
         $("#roomShowtime").change(function () {
-          const idShowtime = $(this).val();
-          $.ajax({
-            url: `${apiUrl}/showtimes/${idShowtime}`,
-            type: "GET",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-            success: function (data) {
-              // debug
-              let time = data.getShowtime.time;
-              $("#roomTime").empty();
-              for (let i = 0; i < time.length; i++) {
-                const option = $("<option>").val(time[i]._id).text(time[i].time);
-                $("#roomTime").append(option);
-              }
-            },
-            error: function (error) {
-              console.log(error);
-            },
+          const selectedDates = $(this).val();
+          $("#roomTime").empty();
+
+          selectedDates.forEach(function (idShowtime) {
+            $.ajax({
+              url: `${apiUrl}/showtimes/${idShowtime}`,
+              type: "GET",
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+              success: function (data) {
+                const time = data.getShowtime.time;
+
+                time.forEach(function (timeEntry) {
+                  const option = $("<option>").val(timeEntry._id).text(timeEntry.time);
+                  $("#roomTime").append(option);
+                });
+              },
+              error: function (error) {
+                console.log(error);
+              },
+            });
           });
         });
         $("#roomShowtime").change();
@@ -272,10 +275,10 @@
       },
       data: { movie: roomMovie, showtime: roomShowtime },
       success: function (data) {
-        if (data.updated.status === "error") {
+        if (data.updated === "Day allready exists") {
           Swal.fire({
             title: "Cảnh báo!",
-            text: `Phim đã tồn ở ${room.cinema.name}`,
+            text: `Vui lòng chọn lại ngày!`,
             icon: "warning",
             confirmButtonText: "OK",
           });

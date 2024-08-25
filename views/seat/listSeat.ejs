@@ -146,6 +146,54 @@
         </div>
       </div>
     </div>
+    <!-- Modal Edit Seat -->
+    <div
+      class="modal fade"
+      id="editSeatModal"
+      tabindex="-1"
+      aria-labelledby="editSeatModalLabel"
+      aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <!-- Modal Header -->
+          <div class="modal-header">
+            <h5 class="modal-title fs-5" id="editSeatModalLabel">
+              <i class="fas fa-solid fa-pen-to-square text-danger"></i>
+              Sửa thông tin ghế
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <!-- Modal Body -->
+          <div class="modal-body">
+            <div id="name" hidden>
+              <label for="editSeatRoomId" class="form-label h6">ID Phòng</label>
+              <input type="text" name="editSeatRoomId" id="editSeatRoomId" class="form-control" readonly />
+            </div>
+            <div id="name">
+              <label for="editSeatName" class="form-label h6">Tên ghế</label>
+              <input type="text" name="editSeatName" id="editSeatName" class="form-control" readonly />
+            </div>
+            <div class="mt-3">
+              <label for="editSeatPrice" class="form-label h6">Giá tiền</label>
+              <input type="text" id="editSeatPrice" class="form-control" />
+            </div>
+            <div class="mt-3">
+              <label for="editSeatCinema" class="form-label h6">Rạp chiếu</label>
+              <input type="text" name="editSeatCinema" id="editSeatCinema" class="form-control" readonly />
+            </div>
+            <div class="mt-3">
+              <label for="editSeatRoom" class="form-label h6">Phòng chiếu</label>
+              <input type="text" name="editSeatRoom" id="editSeatRoom" class="form-control" readonly />
+            </div>
+          </div>
+          <!-- Modal Footer -->
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" id="confirmEdit">Lưu</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -486,7 +534,7 @@
                 }
               }
 
-              seatElement.innerHTML = `<button class="btn ${seatClass}">${seat.name}</button>`;
+              seatElement.innerHTML = `<button id="editSeat" class="btn ${seatClass}" data-id=${seat._id}>${seat.name}</button>`;
               seatsContainer.appendChild(seatElement);
             });
           },
@@ -497,6 +545,82 @@
       } else {
         console.log("Please select a room.");
       }
+    });
+  });
+</script>
+<!-- Cập nhật giá tiền của ghế -->
+<script>
+  $(document).ready(function () {
+    $(document).on("click", "#editSeat", function () {
+      const id = $(this).data("id");
+      console.log(id);
+      $("#editSeatModal").modal("show");
+
+      // Call API ghế theo ID
+      $.ajax({
+        url: `${apiUrl}/seats/${id}`,
+        type: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        success: function (data) {
+          console.log(data);
+          $("#editSeatRoomId").val(data.room._id);
+          $("#editSeatName").val(data.name);
+          const price = data.price;
+          $("#editSeatPrice").val(price.toLocaleString("en-US"));
+          $("#editSeatRoom").val(data.room.name);
+          $("#editSeatCinema").val(data.room.cinema.name);
+        },
+        error: function (error) {
+          console.log(error);
+        },
+      });
+
+      // Khi nhấn nút Lưu sửa thông tin ghế
+      $("#confirmEdit").click(function () {
+        const nameRoom = $("#editSeatName").val();
+        const priceRoom = $("#editSeatPrice").val();
+        const idRoom = $("#editSeatRoomId").val();
+
+        $.ajax({
+          url: `${apiUrl}/seats/${id}`,
+          type: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          data: {
+            name: nameRoom,
+            price: priceRoom,
+            room: idRoom,
+          },
+          success: function (data) {
+            Swal.fire({
+              title: "Thành công!",
+              text: `Cập nhật giá ghế ${nameRoom} thành công!`,
+              icon: "success",
+              confirmButtonText: "OK",
+            }).then((result) => {
+              if (result.isConfirmed) {
+                $("#editSeatModal").modal("hide");
+              }
+            });
+          },
+          error: function (error) {
+            console.log(error);
+            Swal.fire({
+              title: "Lỗi!",
+              text: "Đã xảy ra lỗi gì đó!.",
+              icon: "error",
+              confirmButtonText: "OK",
+            }).then((result) => {
+              if (result.isConfirmed) {
+                $("#editSeatModal").modal("hide");
+              }
+            });
+          },
+        });
+      });
     });
   });
 </script>
