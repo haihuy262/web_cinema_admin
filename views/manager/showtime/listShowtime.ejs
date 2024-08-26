@@ -333,14 +333,27 @@
           },
           data: { date: newDate, time: timeId },
           success: function (data) {
-            Swal.fire({
-              title: "Thành công!",
-              text: "Sửa thành công!",
-              icon: "success",
-              confirmButtonText: "OK",
-            }).then((result) => {
-              location.reload();
-            });
+            const str = data.updateShowtime;
+            const message = str.split(" ").slice(0, -1).join(" ");
+            const time = str.split(" ").pop();
+
+            if (message === "Time already exists") {
+              Swal.fire({
+                title: "Cảnh báo!",
+                text: `Suất chiếu ${time} đã có trong ngày ${formatDate(newDate)}`,
+                icon: "warning",
+                confirmButtonText: "OK",
+              });
+            } else {
+              Swal.fire({
+                title: "Thành công!",
+                text: "Sửa thành công!",
+                icon: "success",
+                confirmButtonText: "OK",
+              }).then((result) => {
+                location.reload();
+              });
+            }
           },
           error: function (error) {
             console.log(error);
@@ -355,6 +368,14 @@
           },
         });
       });
+    }
+    function formatDate(dateString) {
+      let date = new Date(dateString);
+      let day = String(date.getDate()).padStart(2, "0");
+      let month = String(date.getMonth() + 1).padStart(2, "0");
+      let year = date.getFullYear();
+
+      return `${day}-${month}-${year}`;
     }
   });
 </script>
