@@ -217,7 +217,7 @@
               },
               success: function (data) {
                 const time = data.getShowtime.time;
-
+                $("#roomTime").empty();
                 time.forEach(function (timeEntry) {
                   const option = $("<option>").val(timeEntry._id).text(timeEntry.time);
                   $("#roomTime").append(option);
