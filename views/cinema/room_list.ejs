@@ -94,7 +94,7 @@
       <div class="modal-body">
         <form id="editRoomForm">
           <input type="hidden" id="roomId" name="roomId" />
-          <div class="mb-3">
+          <div class="mb-3" hidden>
             <label for="roomName" class="form-label">Tên Phòng</label>
             <input type="text" class="form-control" id="roomName" name="name" required />
           </div>
@@ -105,12 +105,18 @@
             </select>
           </div>
           <div class="mb-3">
-            <label for="roomShowtime" class="form-label">Thời Gian Chiếu</label>
-            <select class="form-control" id="roomShowtime" name="showtime" multiple required>
-              <!-- Options will be populated by JavaScript -->
+            <label for="roomShowtime" class="form-label">Thời gian chiếu</label>
+            <select class="form-control" id="roomShowtime" name="showtime" required multiple>
+              <!-- <option value="" selected disabled>Chọn ngày chiếu...</option> -->
             </select>
           </div>
           <div class="mb-3">
+            <label for="roomTime" class="form-label">Giờ Chiếu</label>
+            <select class="form-control" id="roomTime" name="roomTime" multiple>
+              <!-- Options will be populated by JavaScript -->
+            </select>
+          </div>
+          <div class="mb-3" hidden>
             <label for="roomCinema" class="form-label">Rạp</label>
             <select class="form-control" id="roomCinema" name="roomCinema" required>
               <!-- Options will be populated by JavaScript -->
@@ -129,7 +135,7 @@
 <script>
   let token = "";
   let apiUrl = "";
-
+  let room = "";
   $(document).ready(function () {
     // Lấy token và URL API
     $.ajax({
@@ -147,7 +153,7 @@
   });
 
   function editRoom(button) {
-    const room = JSON.parse(button.getAttribute("data-room"));
+    room = JSON.parse(button.getAttribute("data-room"));
     document.getElementById("roomId").value = room._id;
     document.getElementById("roomName").value = room.name;
 
@@ -197,6 +203,33 @@
         });
 
         $("#roomShowtime").val(room.showtime.map((st) => st._id));
+
+        $("#roomShowtime").change(function () {
+          const selectedDates = $(this).val();
+          $("#roomTime").empty();
+
+          selectedDates.forEach(function (idShowtime) {
+            $.ajax({
+              url: `${apiUrl}/showtimes/${idShowtime}`,
+              type: "GET",
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+              success: function (data) {
+                const time = data.getShowtime.time;
+                $("#roomTime").empty();
+                time.forEach(function (timeEntry) {
+                  const option = $("<option>").val(timeEntry._id).text(timeEntry.time);
+                  $("#roomTime").append(option);
+                });
+              },
+              error: function (error) {
+                console.log(error);
+              },
+            });
+          });
+        });
+        $("#roomShowtime").change();
       },
       error: function (error) {
         console.log(error);
@@ -229,40 +262,49 @@
   }
 
   async function submitEditRoom() {
-    const roomId = document.getElementById("roomId").value;
-    const roomName = document.getElementById("roomName").value;
-    const roomMovie = document.getElementById("roomMovie").value;
-    const roomShowtime = Array.from(document.getElementById("roomShowtime").selectedOptions).map(
-      (option) => option.value
-    );
-    const roomCinema = document.getElementById("roomCinema").value;
+    const roomId = $("#roomId").val();
+    const roomMovie = $("#roomMovie").val();
+    const roomShowtime = $("#roomShowtime").val();
+    const cinemaName = $("#roomCinema").val();
 
-    const data = {
-      name: roomName,
-      movie: roomMovie,
-      showtime: roomShowtime, // Đây là mảng
-      cinema: roomCinema,
-    };
-
-    try {
-      const response = await fetch(`/cinema/updateRoom/${roomId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (response.ok) {
-        alert("Cập nhật thành công!");
-        window.location.reload();
-      } else {
-        alert("Đã xảy ra lỗi khi cập nhật.");
-      }
-    } catch (error) {
-      alert("Đã xảy ra lỗi khi cập nhật.");
-      console.error(error);
-    }
+    $.ajax({
+      url: `${apiUrl}/rooms/${roomId}`,
+      type: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      data: { movie: roomMovie, showtime: roomShowtime },
+      success: function (data) {
+        if (data.updated === "Day allready exists") {
+          Swal.fire({
+            title: "Cảnh báo!",
+            text: `Vui lòng chọn lại ngày!`,
+            icon: "warning",
+            confirmButtonText: "OK",
+          });
+        } else {
+          Swal.fire({
+            title: "Thành công!",
+            text: "Update thành công!",
+            icon: "success",
+            confirmButtonText: "OK",
+          }).then((result) => {
+            location.reload();
+          });
+        }
+      },
+      error: function (error) {
+        console.log(error);
+        Swal.fire({
+          title: "Lỗi!",
+          text: "Đã xảy ra lỗi gì đó!.",
+          icon: "error",
+          confirmButtonText: "OK",
+        }).then((result) => {
+          location.reload();
+        });
+      },
+    });
   }
 </script>
 <script>

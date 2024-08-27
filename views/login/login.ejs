@@ -1,142 +1,91 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <title></title>
-    <meta name="description" content="" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css"
-      integrity="sha512-dPXYcDub/aeb08c63jRq/k6GaKccl256JQy/AnOq7CAnEZ9FzSL9wSbcZkMp4R26vBsMLFYH4kQ67/bbV8XaCQ=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    />
-    <style>
-      #togglePassword {
-        float: right;
-        margin-left: -25px;
-        margin-top: -30px;
-        right: 10px;
-        position: relative;
-        z-index: 2;
-      }
-    </style>
-  </head>
-  <body
-    class="d-flex align-items-center justify-content-center"
-    style="min-height: 80vh"
-  >
-    <div class="container">
-      <div class="row justify-content-center">
-        <div class="col-md-6">
-          <div class="card">
-            <div class="card-header text-center">
-              <h3>Đăng nhập</h3>
-            </div>
-            <div class="card-body">
-              <% if (typeof error !== 'undefined') { %>
-              <div class="alert alert-danger" role="alert"><%= error %></div>
-              <% } %>
-              <!-- ==== alert success ==== -->
-              <% if (typeof success !== 'undefined') { %>
-              <div class="alert alert-success" role="alert" id="success-alert">
-                <%= success %>
-                <script>
-                  setTimeout(function () {
-                    window.location.href = "/dashboard/overview";
-                  }, 1000);
-                </script>
-              </div>
-              <% } %>
-              <form id="loginForm" action="/login" method="post">
-                <div class="mb-3">
-                  <label for="email" class="form-label">Tài khoản</label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="name"
-                    name="name"
-                    placeholder="Nhập name"
-                    required
-                  />
-                </div>
-                <div class="mb-3">
-                  <label for="password" class="form-label">Mật khẩu</label>
-                  <input
-                    type="password"
-                    class="form-control"
-                    id="password"
-                    name="password"
-                    placeholder="Nhập mật khẩu"
-                    required
-                  />
-                  <i class="bi bi-eye-slash" id="togglePassword"></i>
-                </div>
-                <div class="mb-3 form-check">
-                  <input
-                    type="checkbox"
-                    class="form-check-input"
-                    id="rememberMe"
-                  />
-                  <label class="form-check-label" for="rememberMe"
-                    >Ghi nhớ tài khoản mật khẩu</label
-                  >
-                </div>
-                <button type="submit" class="btn btn-primary w-100">
-                  Đăng nhập
-                </button>
-              </form>
-            </div>
+<style>
+  .cinema-theme {
+    background-image: url("/images/9693736.jpg");
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .card {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 15px;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+  }
+
+  .card-header {
+    background-color: rgb(243, 67, 67);
+    color: white;
+    font-weight: bold;
+    padding: 20px;
+  }
+
+  .card-body {
+    padding: 30px;
+  }
+
+  .btn-primary {
+    background-color: rgb(243, 67, 67);
+    border: none;
+  }
+
+  .btn-primary:hover {
+    background-color: rgb(245, 59, 59);
+  }
+</style>
+<div class="container-fluid">
+  <div class="row justify-content-center cinema-theme">
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-header text-center">
+          <h3>Đăng nhập</h3>
+        </div>
+        <div class="card-body">
+          <% if (typeof error !== 'undefined') { %>
+          <div class="alert alert-danger" role="alert"><%= error %></div>
+          <% } %> <% if (typeof success !== 'undefined') { %>
+          <div class="alert alert-success" role="alert" id="success-alert">
+            <%= success %>
+            <script>
+              setTimeout(function () {
+                window.location.href = "/dashboard/overview";
+              }, 1000);
+            </script>
           </div>
+          <% } %>
+          <form id="loginForm" action="/login" method="post">
+            <div class="mb-3">
+              <label for="email" class="form-label">Tài khoản</label>
+              <input
+                type="text"
+                class="form-control"
+                id="name"
+                name="name"
+                placeholder="Nhập name"
+                required />
+            </div>
+            <div class="mb-3">
+              <label for="password" class="form-label">Mật khẩu</label>
+              <input
+                type="password"
+                class="form-control"
+                id="password"
+                name="password"
+                placeholder="Nhập mật khẩu"
+                required />
+              <i class="bi bi-eye-slash" id="togglePassword"></i>
+            </div>
+            <div class="mb-3 form-check">
+              <input type="checkbox" class="form-check-input" id="rememberMe" />
+              <label class="form-check-label" for="rememberMe">Ghi nhớ tài khoản mật khẩu</label>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Đăng nhập</button>
+          </form>
         </div>
       </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Ghi nhớ tài khoản, mật khẩu -->
-    <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        const rememberMeCheckbox = document.getElementById("rememberMe");
-        const nameInput = document.getElementById("name");
-        const passwordInput = document.getElementById("password");
-        const loginForm = document.getElementById("loginForm");
-
-        // Load saved credentials if they exist
-        if (localStorage.getItem("rememberMe") === "true") {
-          rememberMeCheckbox.checked = true;
-          nameInput.value = localStorage.getItem("name") || "";
-          passwordInput.value = localStorage.getItem("password") || "";
-        }
-
-        // Save credentials on form submit if "Remember Me" is checked
-        loginForm.addEventListener("submit", function () {
-          if (rememberMeCheckbox.checked) {
-            localStorage.setItem("rememberMe", "true");
-            localStorage.setItem("name", nameInput.value);
-            localStorage.setItem("password", passwordInput.value);
-          } else {
-            localStorage.removeItem("rememberMe");
-            localStorage.removeItem("name");
-            localStorage.removeItem("password");
-          }
-        });
-      });
-    </script>
-    <!-- Hide/Show password -->
-    <script>
-      const togglePassword = document.querySelector("#togglePassword");
-      const password = document.querySelector("#password");
-      togglePassword.addEventListener("click", (e) => {
-        const type =
-          password.getAttribute("type") === "password" ? "text" : "password";
-        password.setAttribute("type", type);
-        e.target.classList.toggle("bi-eye");
-      });
-    </script>
-  </body>
-</html>
+  </div>
+</div>
